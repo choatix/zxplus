@@ -64,10 +64,59 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
 
     public Gen2RomHandler(Random random) {
         super(random, null);
+
+        loadMovesetTemplates();
     }
 
     public Gen2RomHandler(Random random, PrintStream logStream) {
         super(random, logStream);
+
+        loadMovesetTemplates();
+    }
+
+    private Map<String, List<MovesetTemplate>> movesetTemplates;
+
+    private void loadMovesetTemplates() {
+        try {
+            Map<String, List<MovesetTemplate>> x = new HashMap<String, List<MovesetTemplate>>();
+            Scanner sc = new Scanner(FileFunctions.openConfig("gen2_movesets.txt"), "UTF-8");
+
+            String movesetType = null;
+            List<MovesetTemplate> buffer = null;
+
+            List<String> stringBuffer = new ArrayList<String>();
+
+            while (sc.hasNextLine()) {
+                String q = sc.nextLine().trim();
+
+                if(q.endsWith(":")) {
+                    if(movesetType != null) {
+                        x.put(movesetType, buffer);
+                    }
+                    movesetType = q.substring(0, q.length() - 1);
+                    buffer = new ArrayList<MovesetTemplate>();
+                } else if(!q.isEmpty()) {
+                    stringBuffer.add(q);
+                    if(stringBuffer.size() == 5) {
+                        String[] moves = new String[] {stringBuffer.get(1), stringBuffer.get(2), stringBuffer.get(3), stringBuffer.get(4)};
+                        buffer.add(new MovesetTemplate(this.random, stringBuffer.get(0), moves));
+                        stringBuffer = new ArrayList<String>();
+                    }
+                }
+
+            }
+            sc.close();
+
+            // System.out.println(x);
+            this.movesetTemplates = x;
+        } catch (FileNotFoundException e) {
+            this.movesetTemplates = null;
+        }
+    }
+
+    @Override
+    public Map<String, List<MovesetTemplate>> getMovesetTemplates() {
+        return movesetTemplates;
     }
 
     private static class RomEntry {
@@ -1206,6 +1255,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         for (int i = 0; i < traineramount; i++) {
             int offs = pointers[i];
             int limit = trainerclasslimits[i];
+
             for (int trnum = 0; trnum < limit; trnum++) {
                 index++;
                 Trainer tr = new Trainer();
@@ -1252,6 +1302,11 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
+    public int getGen() {
+        return 2;
+    }
+
+    @Override
     public List<Integer> getMainPlaythroughTrainers() {
         return new ArrayList<>(); // Not implemented
     }
@@ -1262,16 +1317,30 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
+    public void pickTrainerMovesets(Settings settings) {
+        List<Trainer> trainers = getTrainers();
+        for(Trainer t: trainers)
+        {
+            // Rom memory will not support custom moves for all trainers
+            // So limit to those already with custom moves
+            if(t.pokemonHaveCustomMoves() || t.tag != null)
+            {
+                randomiseTrainersMovesets(t,false, false,
+                        settings.getUseMovesetTemplates());
+            }
+        }
+
+        setTrainers(trainers, false);
+    }
+
+    @Override
     public void setTrainers(List<Trainer> trainerData, boolean doubleBattleMode) {
         int traineroffset = romEntry.getValue("TrainerDataTableOffset");
         int traineramount = romEntry.getValue("TrainerClassAmount");
         int[] trainerclasslimits = romEntry.arrayEntries.get("TrainerDataClassCounts");
 
-        int[] pointers = new int[traineramount];
-        for (int i = 0; i < traineramount; i++) {
-            int pointer = readWord(traineroffset + i * 2);
-            pointers[i] = calculateOffset(bankOf(traineroffset), pointer);
-        }
+        int pointer = readWord(traineroffset);
+        int offs = calculateOffset(bankOf(traineroffset), pointer);
 
         // Get current movesets in case we need to reset them for certain
         // trainer mons.
@@ -1279,8 +1348,11 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
 
         Iterator<Trainer> allTrainers = trainerData.iterator();
         for (int i = 0; i < traineramount; i++) {
-            int offs = pointers[i];
+            writeWord(traineroffset + i * 2, pointer);
+            int initial_offs = offs;
+
             int limit = trainerclasslimits[i];
+
             for (int trnum = 0; trnum < limit; trnum++) {
                 Trainer tr = allTrainers.next();
                 if (tr.trainerclass != i) {
@@ -1320,6 +1392,14 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                 rom[offs] = (byte) 0xFF;
                 offs++;
             }
+
+            pointer += offs - initial_offs;
+        }
+
+        System.out.println(String.format("%x", pointer));
+
+        if(bankOf(offs) != bankOf(traineroffset)) {
+            throw new IllegalStateException("Trainer data overflowed into next bank: " + String.format("%x", pointer));
         }
 
     }
@@ -3080,4 +3160,50 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             }
         }
     }
+
+    @Override
+    public List<Integer> getAllHeldItems() {
+        return Gen2Constants.allHeldItems;
+    }
+
+    @Override
+    public List<Integer> getAllConsumableHeldItems() {
+        return Gen2Constants.consumableHeldItems;
+    }
+
+    @Override
+    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, int[] pokeMoves) {
+        List<Integer> items = new ArrayList<>();
+        items.addAll(Gen2Constants.generalPurposeConsumableItems);
+        if (!consumableOnly) {
+            items.addAll(Gen2Constants.generalPurposeItems);
+        }
+        for (int moveIdx : pokeMoves) {
+            Move move = moves.get(moveIdx);
+            if (move == null) {
+                continue;
+            }
+            if (GBConstants.physicalTypes.contains(move.type) && move.power > 0) {
+                if (!consumableOnly) {
+                    items.addAll(Gen2Constants.typeBoostingItems.get(move.type));
+                }
+            }
+            if (!GBConstants.physicalTypes.contains(move.type) && move.power > 0) {
+                if (!consumableOnly) {
+                    items.addAll(Gen2Constants.typeBoostingItems.get(move.type));
+                }
+            }
+        }
+        if (!consumableOnly) {
+            List<Integer> speciesItems = Gen2Constants.speciesBoostingItems.get(tp.pokemon.number);
+            if (speciesItems != null) {
+                for (int i = 0; i < 6; i++) {  // Increase the likelihood of using species specific items.
+                    items.addAll(speciesItems);
+                }
+            }
+        }
+        return items;
+    }
+
+
 }

@@ -1729,6 +1729,18 @@ public abstract class AbstractRomHandler implements RomHandler {
         return crashThreshold;
     }
 
+    public Map<String, List<MovesetTemplate>> getMovesetTemplates() {
+        return null;
+    }
+
+    public boolean isGen3() {
+        return false;
+    }
+
+    public int getGen() {
+        return -1;
+    }
+
     private void setEvoChainAsIllegal(Pokemon newPK, List<Pokemon> illegalList, boolean willForceEvolve) {
         // set pre-evos as illegal
         setIllegalPreEvos(newPK, illegalList);
@@ -1789,8 +1801,27 @@ public abstract class AbstractRomHandler implements RomHandler {
         }
     }
 
-    private void applyLevelModifierToTrainerPokemon(Trainer trainer, int levelModifier) {
-        if (levelModifier != 0) {
+    private void applyLevelModifierToTrainerPokemon(Trainer trainer, Settings settings) {
+        int levelModifier = settings.getTrainersLevelModifier();
+
+        boolean bossFightLevelChange = settings.getTrainerLevelChangeForBossFights();
+        boolean importantFightLevelChange = settings.getTrainerLevelChangeForImportantFights();
+        boolean correctTypeForLevelChange = false;
+        if(!bossFightLevelChange && !importantFightLevelChange)
+        {
+            //always change
+            correctTypeForLevelChange = true;
+        }
+        else if(bossFightLevelChange && trainer.isBoss())
+        {
+            correctTypeForLevelChange = true;
+        }
+        else if(importantFightLevelChange && trainer.isImportant())
+        {
+            correctTypeForLevelChange = true;
+        }
+
+        if (correctTypeForLevelChange && levelModifier != 0) {
             for (TrainerPokemon tp : trainer.pokemon) {
                 tp.level = Math.min(100, (int) Math.round(tp.level * (1 + levelModifier / 100.0)));
             }
@@ -1837,6 +1868,14 @@ public abstract class AbstractRomHandler implements RomHandler {
                         .stream()
                         .filter(pk -> !pk.actuallyCosmetic)
                         .collect(Collectors.toList());
+
+        boolean setSpecialTrainers = getMovesetTemplates() != null;
+
+        Curve levelCurve = null;
+        Curve gen2Curve = new Curve(
+                new int[] {2, 9,  14, 16, 20, 25, 27, 30, 37, 40, 50, 65, 81, 100},
+                new int[] {2, 10, 16, 19, 26, 35, 39, 45, 53, 57, 68, 75, 85, 100});
+        List<String> trainerClassNames = this.getTrainerClassNames();
 
         List<Pokemon> banned = this.getBannedFormesForTrainerPokemon();
         if (!abilitiesAreRandomized) {
@@ -1959,12 +1998,219 @@ public abstract class AbstractRomHandler implements RomHandler {
         // The result after this is done will not be final if "Force Fully Evolved" or "Rival Carries Starter"
         // are used, as they are applied later
         for (Trainer t : scrambledTrainers) {
-            applyLevelModifierToTrainerPokemon(t, levelModifier);
+            applyLevelModifierToTrainerPokemon(t, settings);
             if (t.tag != null && t.tag.equals("IRIVAL")) {
                 // This is the first rival in Yellow. His Pokemon is used to determine the non-player
                 // starter, so we can't change it here. Just skip it.
                 continue;
             }
+
+            ArrayList<Pokemon> previousPokemon = new ArrayList<Pokemon>();
+
+
+            if(t.pokemon.size() == 0) continue;
+
+            int pokeInd = 0;
+            /*boolean isSpecialTrainer = false;
+            // TODO Move this in Gen2RomHandler
+            if(getGen() == 2 && setSpecialTrainers) {
+                isSpecialTrainer = trainerClassNames.get(t.trainerclass).equals("KIMONO GIRL")
+                        || trainerClassNames.get(t.trainerclass).equals("LEADER");
+                        //|| t.tag != null && t.pokemon.get(0).level >= 15;
+                        //|| t.pokemon.get(0).level >= 35;
+                if(isSpecialTrainer) {
+                    t.poketype |= 1;
+                    if(t.pokemon.get(0).level >= 35) {
+                        t.poketype |= 2;
+                    } else {
+                        t.poketype &= ~2;
+                    }
+                } else {
+                    t.poketype &= ~1;
+                    t.poketype &= ~2;
+                }
+            };
+
+            isSpecialTrainer = false;
+
+            if(isSpecialTrainer) {
+                int extraPokes = 0;
+                if(trainerClassNames.get(t.trainerclass).equals("LEADER")) {
+                    extraPokes = (6 - t.pokemon.size()) / 2;
+                } else if(t.pokemon.get(0).level >= 35) {
+                    extraPokes = (t.pokemon.size() <= 2)? 1 : 0;
+                }
+
+                for(int i = 0; i < extraPokes; i++) {
+                    t.pokemon.add(0, new TrainerPokemon(t.pokemon.get(0)));
+                }
+            }
+
+            // System.out.println(t.name + ":\n");
+            for (TrainerPokemon tp : t.pokemon) {
+                boolean isLast = pokeInd == t.pokemon.size() - 1;
+                boolean wgAllowed = (!noEarlyWonderGuard) || tp.level >= 20;
+                int minBST = 0;
+
+                if (getGen() == 2 && setSpecialTrainers) {
+                    // Adjust levels of kanto gyms and kimono girls
+                    if (t.tag != null && t.tag.startsWith("GYM")) {
+                        int gymInd = Integer.parseInt(t.tag.substring(3));
+                        if (gymInd >= 9 && gymInd < 16) {
+                            tp.level += 20;
+                            if (gymInd == 9 || gymInd == 15)
+                                tp.level += 5;
+                        } else if (gymInd == 16) {
+                            tp.level += 18;
+                        }
+
+                        if (gymInd >= 7) {
+                            tp.level += 3;
+                        } else if (gymInd == 4 && t.pokemon.size() == 5) {
+                            tp.level += 3;
+                        }
+                    } else if (t.tag != null && t.tag.equals("UBER") && tp.level < 100) {
+                        tp.level += 3 * pokeInd;
+                        if (tp.level >= 100) tp.level = 100;
+                    }
+                    if (trainerClassNames.get(t.trainerclass).equals("KIMONO GIRL")) {
+                        tp.level += 7;
+                    }
+
+                    levelCurve = gen2Curve;
+
+                    if (isSpecialTrainer) {
+                        if (tp.level >= 65 && isLast) {
+                            minBST = 550;
+                        } else if (isLast || tp.level >= 65) {
+                            minBST = 520;
+                        } else if (trainerClassNames.get(t.trainerclass).equals("LEADER") || tp.level >= 40) {
+                            minBST = 450;
+                        } else {
+                            minBST = 390;
+                        }
+                    }
+                }
+
+                tp.pokemon = pickTrainerPokeReplacement(tp.pokemon, usePowerLevels, null, noLegendaries, wgAllowed,
+                        distributionSetting || (mainPlaythroughSetting && mainPlaythroughTrainers.contains(t.index)),
+                        false,
+                        abilitiesAreRandomized,
+                        includeFormes,
+                        banIrregularAltFormes,
+                        minBST);
+
+                while (isSpecialTrainer) {
+                    boolean isDuplicate = false;
+                    for (Pokemon prev : previousPokemon) {
+                        if (tp.pokemon.number == prev.number) {
+                            isDuplicate = true;
+                            break;
+                        }
+                    }
+
+                    if (t.name.equals("MOTHERFUCK")) {
+                        if (tp.pokemon.speed > 55 || tp.pokemon.attack < 70) {
+                            isDuplicate = true;
+                        }
+                    }
+
+                    if (!isDuplicate) break;
+                    tp.pokemon = pickTrainerPokeReplacement(tp.pokemon, usePowerLevels, null, noLegendaries, wgAllowed,
+                            distributionSetting || (mainPlaythroughSetting && mainPlaythroughTrainers.contains(t.index)),
+                            false,
+                            abilitiesAreRandomized,
+                            includeFormes,
+                            banIrregularAltFormes,
+                            minBST);
+                }
+                previousPokemon.add(tp.pokemon);
+
+                tp.resetMoves = true;
+                if (isGen3() && t.tag != null && t.tag.equals("GYM1")) {
+                    tp.level -= 2;
+                }
+                if (levelCurve != null) {
+                    tp.level = levelCurve.eval(tp.level);
+                } else if (levelModifier != 0) {
+                    tp.level = Math.min(100, (int) Math.round(tp.level * (1 + levelModifier / 100.0)));
+                }
+
+
+                if (isSpecialTrainer) {
+                    String templateType;
+
+                    if (pokeInd == 0 && t.pokemon.size() >= 3) {
+                        templateType = "lead";
+                    } else {
+                        boolean goodAttack = tp.pokemon.attack >= 90;
+                        boolean goodSpecial = tp.pokemon.spatk >= 90;
+                        if (random.nextDouble() < 0.2) {
+                            templateType = "tank";
+                        } else if (goodAttack && !goodSpecial) {
+                            templateType = "physical";
+                        } else if (goodSpecial && !goodAttack) {
+                            templateType = "special";
+                        } else if (goodAttack && goodSpecial) {
+                            double x = random.nextDouble();
+                            if (x < 0.3) {
+                                templateType = "physical";
+                            } else if (x < 0.6) {
+                                templateType = "special";
+                            } else {
+                                templateType = "mixed";
+                            }
+                        } else {
+                            templateType = "tank";
+                        }
+                    }
+                    List<MovesetTemplate> templates = getMovesetTemplates().get(templateType);
+
+                    List<MovesetTemplate> validTemplates = new ArrayList<MovesetTemplate>();
+                    while (validTemplates.size() == 0) {
+                        String rarity;
+                        double x = random.nextDouble();
+                        if (x < 0.6) {
+                            rarity = "common";
+                        } else if (x < 0.97) {
+                            rarity = "uncommon";
+                        } else {
+                            rarity = "rare";
+                        }
+
+                        for (MovesetTemplate template : templates) {
+                            if (template.rarity.equals(rarity)) {
+                                validTemplates.add(template);
+                            }
+                        }
+                    }
+                    MovesetTemplate template = templates.get(random.nextInt(templates.size()));
+
+                    List<Move> allMoves = this.getMoves();
+                    Move[] moveset = template.generate(tp.pokemon, allMoves);
+
+                    tp.resetMoves = false;
+                    tp.moves[0] = moveset[0].number;
+                    tp.moves[1] = moveset[1].number;
+                    tp.moves[2] = moveset[2].number;
+                    tp.moves[3] = moveset[3].number;
+
+
+                    if (t.name.equals("MOTHERFUCK")) {
+                        tp.moves[0] = 195;
+                        tp.moves[1] = 147;
+                        tp.moves[2] = 182;
+                        tp.moves[3] = 153;
+                        tp.level = 55;
+                    }
+
+                    if (getGen() == 2) {
+                        tp.heldItem = 0x96;
+                    }
+                }
+
+                pokeInd++;
+            }*/
 
             // If type themed, give a type to each unassigned trainer
             Type typeForTrainer = trainerTypes.get(t);
@@ -2041,7 +2287,8 @@ public abstract class AbstractRomHandler implements RomHandler {
                                 swapThisMegaEvo,
                                 abilitiesAreRandomized,
                                 includeFormes,
-                                banIrregularAltFormes
+                                banIrregularAltFormes,
+                        0
                         );
 
                 // Chosen Pokemon is locked in past here
@@ -2051,7 +2298,6 @@ public abstract class AbstractRomHandler implements RomHandler {
                 tp.pokemon = newPK;
                 setFormeForTrainerPokemon(tp, newPK);
                 tp.abilitySlot = getRandomAbilitySlot(newPK);
-                tp.resetMoves = true;
 
                 if (!eliteFourRival) {
                     if (eliteFourSetUniquePokemon) {
@@ -2223,11 +2469,10 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void onlyChangeTrainerLevels(Settings settings) {
-        int levelModifier = settings.getTrainersLevelModifier();
 
         List<Trainer> currentTrainers = this.getTrainers();
         for (Trainer t: currentTrainers) {
-            applyLevelModifierToTrainerPokemon(t, levelModifier);
+            applyLevelModifierToTrainerPokemon(t, settings);
         }
         this.setTrainers(currentTrainers, false);
     }
@@ -2427,6 +2672,395 @@ public abstract class AbstractRomHandler implements RomHandler {
         return moveSelectionPoolAtLevel.stream().distinct().collect(Collectors.toList());
     }
 
+    private void SetMovesFromTemplate(int index, Trainer t, TrainerPokemon tp)
+    {
+        String templateType;
+
+        if (index == 0 && t.pokemon.size() >= 3) {
+            templateType = "lead";
+        } else {
+            boolean goodAttack = tp.pokemon.attack >= 90;
+            boolean goodSpecial = tp.pokemon.spatk >= 90;
+            if (random.nextDouble() < 0.2) {
+                templateType = "tank";
+            } else if (goodAttack && !goodSpecial) {
+                templateType = "physical";
+            } else if (goodSpecial && !goodAttack) {
+                templateType = "special";
+            } else if (goodAttack && goodSpecial) {
+                double x = random.nextDouble();
+                if (x < 0.3) {
+                    templateType = "physical";
+                } else if (x < 0.6) {
+                    templateType = "special";
+                } else {
+                    templateType = "mixed";
+                }
+            } else {
+                templateType = "tank";
+            }
+        }
+        List<MovesetTemplate> templates = getMovesetTemplates().get(templateType);
+
+        List<MovesetTemplate> validTemplates = new ArrayList<MovesetTemplate>();
+        while (validTemplates.size() == 0) {
+            String rarity;
+            double x = random.nextDouble();
+            if (x < 0.6) {
+                rarity = "common";
+            } else if (x < 0.97) {
+                rarity = "uncommon";
+            } else {
+                rarity = "rare";
+            }
+
+            for (MovesetTemplate template : templates) {
+                if (template.rarity.equals(rarity)) {
+                    validTemplates.add(template);
+                }
+            }
+        }
+        MovesetTemplate template = templates.get(random.nextInt(templates.size()));
+
+        List<Move> allMoves = this.getMoves();
+        Move[] moveset = template.generate(tp.pokemon, allMoves);
+
+        tp.resetMoves = false;
+        tp.moves[0] = moveset[0].number;
+        tp.moves[1] = moveset[1].number;
+        tp.moves[2] = moveset[2].number;
+        tp.moves[3] = moveset[3].number;
+    }
+
+    public void randomiseTrainersMovesets(Trainer t, boolean isCyclicEvolutions, boolean doubleBattleMode,
+                                          boolean useTemplates)
+    {
+        Map<String, List<MovesetTemplate>> templates = null;
+        if(useTemplates)
+        {
+            templates = getMovesetTemplates();
+            if(templates == null)
+            {
+                useTemplates = false;
+            }
+        }
+
+        t.setPokemonHaveCustomMoves(true);
+
+        for (TrainerPokemon tp: t.pokemon) {
+            tp.resetMoves = false;
+
+            // Prefer to integrate templates into the rest of this logic in future
+            if(useTemplates)
+            {
+                SetMovesFromTemplate(t.pokemon.indexOf(tp), t, tp);
+                continue;
+            }
+
+            List<Move> movesAtLevel = getMoveSelectionPoolAtLevel(tp, isCyclicEvolutions);
+
+            movesAtLevel = trimMoveList(tp, movesAtLevel, doubleBattleMode);
+
+            if (movesAtLevel.isEmpty()) {
+                continue;
+            }
+
+            double trainerTypeModifier = 1;
+            if (t.isImportant()) {
+                trainerTypeModifier = 1.5;
+            } else if (t.isBoss()) {
+                trainerTypeModifier = 2;
+            }
+            double movePoolSizeModifier = movesAtLevel.size() / 10.0;
+            double bonusModifier = trainerTypeModifier * movePoolSizeModifier;
+
+            double atkSpatkRatioModifier = 0.75;
+            double stabMoveBias = 0.25 * bonusModifier;
+            double hardAbilityMoveBias = 1 * bonusModifier;
+            double softAbilityMoveBias = 0.5 * bonusModifier;
+            double statBias = 0.5 * bonusModifier;
+            double softMoveBias = 0.25 * bonusModifier;
+            double hardMoveBias = 1 * bonusModifier;
+            double softMoveAntiBias = 0.5;
+
+            // Add bias for STAB
+
+            Pokemon pk = getAltFormeOfPokemon(tp.pokemon, tp.forme);
+
+            List<Move> stabMoves = new ArrayList<>(movesAtLevel)
+                    .stream()
+                    .filter(mv -> mv.type == pk.primaryType && mv.category != MoveCategory.STATUS)
+                    .collect(Collectors.toList());
+            Collections.shuffle(stabMoves, this.random);
+
+            for (int i = 0; i < stabMoveBias * stabMoves.size(); i++) {
+                int j = i % stabMoves.size();
+                movesAtLevel.add(stabMoves.get(j));
+            }
+
+            if (pk.secondaryType != null) {
+                stabMoves = new ArrayList<>(movesAtLevel)
+                        .stream()
+                        .filter(mv -> mv.type == pk.secondaryType && mv.category != MoveCategory.STATUS)
+                        .collect(Collectors.toList());
+                Collections.shuffle(stabMoves, this.random);
+
+                for (int i = 0; i < stabMoveBias * stabMoves.size(); i++) {
+                    int j = i % stabMoves.size();
+                    movesAtLevel.add(stabMoves.get(j));
+                }
+            }
+
+            // Hard ability/move synergy
+
+            List<Move> abilityMoveSynergyList = MoveSynergy.getHardAbilityMoveSynergy(
+                    getAbilityForTrainerPokemon(tp),
+                    pk.primaryType,
+                    pk.secondaryType,
+                    movesAtLevel,
+                    generationOfPokemon(),
+                    perfectAccuracy);
+            Collections.shuffle(abilityMoveSynergyList, this.random);
+            for (int i = 0; i < hardAbilityMoveBias * abilityMoveSynergyList.size(); i++) {
+                int j = i % abilityMoveSynergyList.size();
+                movesAtLevel.add(abilityMoveSynergyList.get(j));
+            }
+
+            // Soft ability/move synergy
+
+            List<Move> softAbilityMoveSynergyList = MoveSynergy.getSoftAbilityMoveSynergy(
+                    getAbilityForTrainerPokemon(tp),
+                    movesAtLevel,
+                    pk.primaryType,
+                    pk.secondaryType);
+
+            Collections.shuffle(softAbilityMoveSynergyList, this.random);
+            for (int i = 0; i < softAbilityMoveBias * softAbilityMoveSynergyList.size(); i++) {
+                int j = i % softAbilityMoveSynergyList.size();
+                movesAtLevel.add(softAbilityMoveSynergyList.get(j));
+            }
+
+            // Soft ability/move anti-synergy
+
+            List<Move> softAbilityMoveAntiSynergyList = MoveSynergy.getSoftAbilityMoveAntiSynergy(
+                    getAbilityForTrainerPokemon(tp), movesAtLevel);
+            List<Move> withoutSoftAntiSynergy = new ArrayList<>(movesAtLevel);
+            for (Move mv: softAbilityMoveAntiSynergyList) {
+                withoutSoftAntiSynergy.remove(mv);
+            }
+            if (withoutSoftAntiSynergy.size() > 0) {
+                movesAtLevel = withoutSoftAntiSynergy;
+            }
+
+            List<Move> distinctMoveList = movesAtLevel.stream().distinct().collect(Collectors.toList());
+            int movesLeft = distinctMoveList.size();
+
+            if (movesLeft <= 4) {
+
+                for (int i = 0; i < 4; i++) {
+                    if (i < movesLeft) {
+                        tp.moves[i] = distinctMoveList.get(i).number;
+                    } else {
+                        tp.moves[i] = 0;
+                    }
+                }
+                continue;
+            }
+
+            // Stat/move synergy
+
+            List<Move> statSynergyList = MoveSynergy.getStatMoveSynergy(pk, movesAtLevel);
+            Collections.shuffle(statSynergyList, this.random);
+            for (int i = 0; i < statBias * statSynergyList.size(); i++) {
+                int j = i % statSynergyList.size();
+                movesAtLevel.add(statSynergyList.get(j));
+            }
+
+            // Stat/move anti-synergy
+
+            List<Move> statAntiSynergyList = MoveSynergy.getStatMoveAntiSynergy(pk, movesAtLevel);
+            List<Move> withoutStatAntiSynergy = new ArrayList<>(movesAtLevel);
+            for (Move mv: statAntiSynergyList) {
+                withoutStatAntiSynergy.remove(mv);
+            }
+            if (withoutStatAntiSynergy.size() > 0) {
+                movesAtLevel = withoutStatAntiSynergy;
+            }
+
+            distinctMoveList = movesAtLevel.stream().distinct().collect(Collectors.toList());
+            movesLeft = distinctMoveList.size();
+
+            if (movesLeft <= 4) {
+
+                for (int i = 0; i < 4; i++) {
+                    if (i < movesLeft) {
+                        tp.moves[i] = distinctMoveList.get(i).number;
+                    } else {
+                        tp.moves[i] = 0;
+                    }
+                }
+                continue;
+            }
+
+            // Add bias for atk/spatk ratio
+
+            double atkSpatkRatio = (double)pk.attack / (double)pk.spatk;
+            switch(getAbilityForTrainerPokemon(tp)) {
+                case Abilities.hugePower:
+                case Abilities.purePower:
+                    atkSpatkRatio *= 2;
+                    break;
+                case Abilities.hustle:
+                case Abilities.gorillaTactics:
+                    atkSpatkRatio *= 1.5;
+                    break;
+                case Abilities.moxie:
+                    atkSpatkRatio *= 1.1;
+                    break;
+                case Abilities.soulHeart:
+                    atkSpatkRatio *= 0.9;
+                    break;
+            }
+
+            List<Move> physicalMoves = new ArrayList<>(movesAtLevel)
+                    .stream()
+                    .filter(mv -> mv.category == MoveCategory.PHYSICAL)
+                    .collect(Collectors.toList());
+            List<Move> specialMoves = new ArrayList<>(movesAtLevel)
+                    .stream()
+                    .filter(mv -> mv.category == MoveCategory.SPECIAL)
+                    .collect(Collectors.toList());
+
+            if (atkSpatkRatio < 1 && specialMoves.size() > 0) {
+                atkSpatkRatio = 1 / atkSpatkRatio;
+                double acceptedRatio = atkSpatkRatioModifier * atkSpatkRatio;
+                int additionalMoves = (int)(physicalMoves.size() * acceptedRatio) - specialMoves.size();
+                for (int i = 0; i < additionalMoves; i++) {
+                    Move mv = specialMoves.get(this.random.nextInt(specialMoves.size()));
+                    movesAtLevel.add(mv);
+                }
+            } else if (physicalMoves.size() > 0) {
+                double acceptedRatio = atkSpatkRatioModifier * atkSpatkRatio;
+                int additionalMoves = (int)(specialMoves.size() * acceptedRatio) - physicalMoves.size();
+                for (int i = 0; i < additionalMoves; i++) {
+                    Move mv = physicalMoves.get(this.random.nextInt(physicalMoves.size()));
+                    movesAtLevel.add(mv);
+                }
+            }
+
+            // Pick moves
+
+            List<Move> pickedMoves = new ArrayList<>();
+
+            for (int i = 1; i <= 4; i++) {
+                Move move;
+                List<Move> pickFrom;
+
+                if (i == 1) {
+                    pickFrom = movesAtLevel
+                            .stream()
+                            .filter(mv -> mv.isGoodDamaging(perfectAccuracy))
+                            .collect(Collectors.toList());
+                    if (pickFrom.isEmpty()) {
+                        pickFrom = movesAtLevel;
+                    }
+                } else {
+                    pickFrom = movesAtLevel;
+                }
+
+                if (i == 4) {
+                    List<Move> requiresOtherMove = movesAtLevel
+                            .stream()
+                            .filter(mv -> GlobalConstants.requiresOtherMove.contains(mv.number))
+                            .distinct()
+                            .collect(Collectors.toList());
+
+                    for (Move dependentMove: requiresOtherMove) {
+                        boolean hasRequiredMove = false;
+                        for (Move requiredMove: MoveSynergy.requiresOtherMove(dependentMove, movesAtLevel)) {
+                            if (pickedMoves.contains(requiredMove)) {
+                                hasRequiredMove = true;
+                                break;
+                            }
+                        }
+                        if (!hasRequiredMove) {
+                            movesAtLevel.removeAll(Collections.singletonList(dependentMove));
+                        }
+                    }
+                }
+
+                move = pickFrom.get(this.random.nextInt(pickFrom.size()));
+                pickedMoves.add(move);
+
+                if (i == 4) {
+                    break;
+                }
+
+                movesAtLevel.removeAll(Collections.singletonList(move));
+
+                movesAtLevel.removeAll(MoveSynergy.getHardMoveAntiSynergy(move, movesAtLevel));
+
+                distinctMoveList = movesAtLevel.stream().distinct().collect(Collectors.toList());
+                movesLeft = distinctMoveList.size();
+
+                if (movesLeft <= (4 - i)) {
+                    pickedMoves.addAll(distinctMoveList);
+                    break;
+                }
+
+                List<Move> hardMoveSynergyList = MoveSynergy.getMoveSynergy(
+                        move,
+                        movesAtLevel,
+                        generationOfPokemon());
+                Collections.shuffle(hardMoveSynergyList, this.random);
+                for (int j = 0; j < hardMoveBias * hardMoveSynergyList.size(); j++) {
+                    int k = j % hardMoveSynergyList.size();
+                    movesAtLevel.add(hardMoveSynergyList.get(k));
+                }
+
+                List<Move> softMoveSynergyList = MoveSynergy.getSoftMoveSynergy(
+                        move,
+                        movesAtLevel,
+                        generationOfPokemon(),
+                        isEffectivenessUpdated());
+                Collections.shuffle(softMoveSynergyList, this.random);
+                for (int j = 0; j < softMoveBias * softMoveSynergyList.size(); j++) {
+                    int k = j % softMoveSynergyList.size();
+                    movesAtLevel.add(softMoveSynergyList.get(k));
+                }
+
+                List<Move> softMoveAntiSynergyList = MoveSynergy.getSoftMoveAntiSynergy(move, movesAtLevel);
+                Collections.shuffle(softMoveAntiSynergyList, this.random);
+                for (int j = 0; j < softMoveAntiBias * softMoveAntiSynergyList.size(); j++) {
+                    distinctMoveList = movesAtLevel.stream().distinct().collect(Collectors.toList());
+                    if (distinctMoveList.size() <= (4 - i)) {
+                        break;
+                    }
+                    int k = j % softMoveAntiSynergyList.size();
+                    movesAtLevel.remove(softMoveAntiSynergyList.get(k));
+                }
+
+                distinctMoveList = movesAtLevel.stream().distinct().collect(Collectors.toList());
+                movesLeft = distinctMoveList.size();
+
+                if (movesLeft <= (4 - i)) {
+                    pickedMoves.addAll(distinctMoveList);
+                    break;
+                }
+            }
+
+            int movesPicked = pickedMoves.size();
+
+            for (int i = 0; i < 4; i++) {
+                if (i < movesPicked) {
+                    tp.moves[i] = pickedMoves.get(i).number;
+                } else {
+                    tp.moves[i] = 0;
+                }
+            }
+        }
+    }
+
     @Override
     public void pickTrainerMovesets(Settings settings) {
         boolean isCyclicEvolutions = settings.getEvolutionsMod() == Settings.EvolutionsMod.RANDOM_EVERY_LEVEL;
@@ -2435,315 +3069,11 @@ public abstract class AbstractRomHandler implements RomHandler {
         List<Trainer> trainers = getTrainers();
 
         for (Trainer t: trainers) {
-            t.setPokemonHaveCustomMoves(true);
-
-            for (TrainerPokemon tp: t.pokemon) {
-                tp.resetMoves = false;
-
-                List<Move> movesAtLevel = getMoveSelectionPoolAtLevel(tp, isCyclicEvolutions);
-
-                movesAtLevel = trimMoveList(tp, movesAtLevel, doubleBattleMode);
-
-                if (movesAtLevel.isEmpty()) {
-                    continue;
-                }
-
-                double trainerTypeModifier = 1;
-                if (t.isImportant()) {
-                    trainerTypeModifier = 1.5;
-                } else if (t.isBoss()) {
-                    trainerTypeModifier = 2;
-                }
-                double movePoolSizeModifier = movesAtLevel.size() / 10.0;
-                double bonusModifier = trainerTypeModifier * movePoolSizeModifier;
-
-                double atkSpatkRatioModifier = 0.75;
-                double stabMoveBias = 0.25 * bonusModifier;
-                double hardAbilityMoveBias = 1 * bonusModifier;
-                double softAbilityMoveBias = 0.5 * bonusModifier;
-                double statBias = 0.5 * bonusModifier;
-                double softMoveBias = 0.25 * bonusModifier;
-                double hardMoveBias = 1 * bonusModifier;
-                double softMoveAntiBias = 0.5;
-
-                // Add bias for STAB
-
-                Pokemon pk = getAltFormeOfPokemon(tp.pokemon, tp.forme);
-
-                List<Move> stabMoves = new ArrayList<>(movesAtLevel)
-                        .stream()
-                        .filter(mv -> mv.type == pk.primaryType && mv.category != MoveCategory.STATUS)
-                        .collect(Collectors.toList());
-                Collections.shuffle(stabMoves, this.random);
-
-                for (int i = 0; i < stabMoveBias * stabMoves.size(); i++) {
-                    int j = i % stabMoves.size();
-                    movesAtLevel.add(stabMoves.get(j));
-                }
-
-                if (pk.secondaryType != null) {
-                    stabMoves = new ArrayList<>(movesAtLevel)
-                            .stream()
-                            .filter(mv -> mv.type == pk.secondaryType && mv.category != MoveCategory.STATUS)
-                            .collect(Collectors.toList());
-                    Collections.shuffle(stabMoves, this.random);
-
-                    for (int i = 0; i < stabMoveBias * stabMoves.size(); i++) {
-                        int j = i % stabMoves.size();
-                        movesAtLevel.add(stabMoves.get(j));
-                    }
-                }
-
-                // Hard ability/move synergy
-
-                List<Move> abilityMoveSynergyList = MoveSynergy.getHardAbilityMoveSynergy(
-                        getAbilityForTrainerPokemon(tp),
-                        pk.primaryType,
-                        pk.secondaryType,
-                        movesAtLevel,
-                        generationOfPokemon(),
-                        perfectAccuracy);
-                Collections.shuffle(abilityMoveSynergyList, this.random);
-                for (int i = 0; i < hardAbilityMoveBias * abilityMoveSynergyList.size(); i++) {
-                    int j = i % abilityMoveSynergyList.size();
-                    movesAtLevel.add(abilityMoveSynergyList.get(j));
-                }
-
-                // Soft ability/move synergy
-
-                List<Move> softAbilityMoveSynergyList = MoveSynergy.getSoftAbilityMoveSynergy(
-                        getAbilityForTrainerPokemon(tp),
-                        movesAtLevel,
-                        pk.primaryType,
-                        pk.secondaryType);
-
-                Collections.shuffle(softAbilityMoveSynergyList, this.random);
-                for (int i = 0; i < softAbilityMoveBias * softAbilityMoveSynergyList.size(); i++) {
-                    int j = i % softAbilityMoveSynergyList.size();
-                    movesAtLevel.add(softAbilityMoveSynergyList.get(j));
-                }
-
-                // Soft ability/move anti-synergy
-
-                List<Move> softAbilityMoveAntiSynergyList = MoveSynergy.getSoftAbilityMoveAntiSynergy(
-                        getAbilityForTrainerPokemon(tp), movesAtLevel);
-                List<Move> withoutSoftAntiSynergy = new ArrayList<>(movesAtLevel);
-                for (Move mv: softAbilityMoveAntiSynergyList) {
-                    withoutSoftAntiSynergy.remove(mv);
-                }
-                if (withoutSoftAntiSynergy.size() > 0) {
-                    movesAtLevel = withoutSoftAntiSynergy;
-                }
-
-                List<Move> distinctMoveList = movesAtLevel.stream().distinct().collect(Collectors.toList());
-                int movesLeft = distinctMoveList.size();
-
-                if (movesLeft <= 4) {
-
-                    for (int i = 0; i < 4; i++) {
-                        if (i < movesLeft) {
-                            tp.moves[i] = distinctMoveList.get(i).number;
-                        } else {
-                            tp.moves[i] = 0;
-                        }
-                    }
-                    continue;
-                }
-
-                // Stat/move synergy
-
-                List<Move> statSynergyList = MoveSynergy.getStatMoveSynergy(pk, movesAtLevel);
-                Collections.shuffle(statSynergyList, this.random);
-                for (int i = 0; i < statBias * statSynergyList.size(); i++) {
-                    int j = i % statSynergyList.size();
-                    movesAtLevel.add(statSynergyList.get(j));
-                }
-
-                // Stat/move anti-synergy
-
-                List<Move> statAntiSynergyList = MoveSynergy.getStatMoveAntiSynergy(pk, movesAtLevel);
-                List<Move> withoutStatAntiSynergy = new ArrayList<>(movesAtLevel);
-                for (Move mv: statAntiSynergyList) {
-                    withoutStatAntiSynergy.remove(mv);
-                }
-                if (withoutStatAntiSynergy.size() > 0) {
-                    movesAtLevel = withoutStatAntiSynergy;
-                }
-
-                distinctMoveList = movesAtLevel.stream().distinct().collect(Collectors.toList());
-                movesLeft = distinctMoveList.size();
-
-                if (movesLeft <= 4) {
-
-                    for (int i = 0; i < 4; i++) {
-                        if (i < movesLeft) {
-                            tp.moves[i] = distinctMoveList.get(i).number;
-                        } else {
-                            tp.moves[i] = 0;
-                        }
-                    }
-                    continue;
-                }
-
-                // Add bias for atk/spatk ratio
-
-                double atkSpatkRatio = (double)pk.attack / (double)pk.spatk;
-                switch(getAbilityForTrainerPokemon(tp)) {
-                    case Abilities.hugePower:
-                    case Abilities.purePower:
-                        atkSpatkRatio *= 2;
-                        break;
-                    case Abilities.hustle:
-                    case Abilities.gorillaTactics:
-                        atkSpatkRatio *= 1.5;
-                        break;
-                    case Abilities.moxie:
-                        atkSpatkRatio *= 1.1;
-                        break;
-                    case Abilities.soulHeart:
-                        atkSpatkRatio *= 0.9;
-                        break;
-                }
-
-                List<Move> physicalMoves = new ArrayList<>(movesAtLevel)
-                        .stream()
-                        .filter(mv -> mv.category == MoveCategory.PHYSICAL)
-                        .collect(Collectors.toList());
-                List<Move> specialMoves = new ArrayList<>(movesAtLevel)
-                        .stream()
-                        .filter(mv -> mv.category == MoveCategory.SPECIAL)
-                        .collect(Collectors.toList());
-
-                if (atkSpatkRatio < 1 && specialMoves.size() > 0) {
-                    atkSpatkRatio = 1 / atkSpatkRatio;
-                    double acceptedRatio = atkSpatkRatioModifier * atkSpatkRatio;
-                    int additionalMoves = (int)(physicalMoves.size() * acceptedRatio) - specialMoves.size();
-                    for (int i = 0; i < additionalMoves; i++) {
-                        Move mv = specialMoves.get(this.random.nextInt(specialMoves.size()));
-                        movesAtLevel.add(mv);
-                    }
-                } else if (physicalMoves.size() > 0) {
-                    double acceptedRatio = atkSpatkRatioModifier * atkSpatkRatio;
-                    int additionalMoves = (int)(specialMoves.size() * acceptedRatio) - physicalMoves.size();
-                    for (int i = 0; i < additionalMoves; i++) {
-                        Move mv = physicalMoves.get(this.random.nextInt(physicalMoves.size()));
-                        movesAtLevel.add(mv);
-                    }
-                }
-
-                // Pick moves
-
-                List<Move> pickedMoves = new ArrayList<>();
-
-                for (int i = 1; i <= 4; i++) {
-                    Move move;
-                    List<Move> pickFrom;
-
-                    if (i == 1) {
-                        pickFrom = movesAtLevel
-                                .stream()
-                                .filter(mv -> mv.isGoodDamaging(perfectAccuracy))
-                                .collect(Collectors.toList());
-                        if (pickFrom.isEmpty()) {
-                            pickFrom = movesAtLevel;
-                        }
-                    } else {
-                        pickFrom = movesAtLevel;
-                    }
-
-                    if (i == 4) {
-                        List<Move> requiresOtherMove = movesAtLevel
-                                .stream()
-                                .filter(mv -> GlobalConstants.requiresOtherMove.contains(mv.number))
-                                .distinct()
-                                .collect(Collectors.toList());
-
-                        for (Move dependentMove: requiresOtherMove) {
-                            boolean hasRequiredMove = false;
-                            for (Move requiredMove: MoveSynergy.requiresOtherMove(dependentMove, movesAtLevel)) {
-                                if (pickedMoves.contains(requiredMove)) {
-                                    hasRequiredMove = true;
-                                    break;
-                                }
-                            }
-                            if (!hasRequiredMove) {
-                                movesAtLevel.removeAll(Collections.singletonList(dependentMove));
-                            }
-                        }
-                    }
-
-                    move = pickFrom.get(this.random.nextInt(pickFrom.size()));
-                    pickedMoves.add(move);
-
-                    if (i == 4) {
-                        break;
-                    }
-
-                    movesAtLevel.removeAll(Collections.singletonList(move));
-
-                    movesAtLevel.removeAll(MoveSynergy.getHardMoveAntiSynergy(move, movesAtLevel));
-
-                    distinctMoveList = movesAtLevel.stream().distinct().collect(Collectors.toList());
-                    movesLeft = distinctMoveList.size();
-
-                    if (movesLeft <= (4 - i)) {
-                        pickedMoves.addAll(distinctMoveList);
-                        break;
-                    }
-
-                    List<Move> hardMoveSynergyList = MoveSynergy.getMoveSynergy(
-                            move,
-                            movesAtLevel,
-                            generationOfPokemon());
-                    Collections.shuffle(hardMoveSynergyList, this.random);
-                    for (int j = 0; j < hardMoveBias * hardMoveSynergyList.size(); j++) {
-                        int k = j % hardMoveSynergyList.size();
-                        movesAtLevel.add(hardMoveSynergyList.get(k));
-                    }
-
-                    List<Move> softMoveSynergyList = MoveSynergy.getSoftMoveSynergy(
-                            move,
-                            movesAtLevel,
-                            generationOfPokemon(),
-                            isEffectivenessUpdated());
-                    Collections.shuffle(softMoveSynergyList, this.random);
-                    for (int j = 0; j < softMoveBias * softMoveSynergyList.size(); j++) {
-                        int k = j % softMoveSynergyList.size();
-                        movesAtLevel.add(softMoveSynergyList.get(k));
-                    }
-
-                    List<Move> softMoveAntiSynergyList = MoveSynergy.getSoftMoveAntiSynergy(move, movesAtLevel);
-                    Collections.shuffle(softMoveAntiSynergyList, this.random);
-                    for (int j = 0; j < softMoveAntiBias * softMoveAntiSynergyList.size(); j++) {
-                        distinctMoveList = movesAtLevel.stream().distinct().collect(Collectors.toList());
-                        if (distinctMoveList.size() <= (4 - i)) {
-                            break;
-                        }
-                        int k = j % softMoveAntiSynergyList.size();
-                        movesAtLevel.remove(softMoveAntiSynergyList.get(k));
-                    }
-
-                    distinctMoveList = movesAtLevel.stream().distinct().collect(Collectors.toList());
-                    movesLeft = distinctMoveList.size();
-
-                    if (movesLeft <= (4 - i)) {
-                        pickedMoves.addAll(distinctMoveList);
-                        break;
-                    }
-                }
-
-                int movesPicked = pickedMoves.size();
-
-                for (int i = 0; i < 4; i++) {
-                    if (i < movesPicked) {
-                        tp.moves[i] = pickedMoves.get(i).number;
-                    } else {
-                        tp.moves[i] = 0;
-                    }
-                }
-            }
+            randomiseTrainersMovesets(t, isCyclicEvolutions, doubleBattleMode, settings.getUseMovesetTemplates());
         }
+
         setTrainers(trainers, false);
+
     }
 
     private List<Move> trimMoveList(TrainerPokemon tp, List<Move> movesAtLevel, boolean doubleBattleMode) {
@@ -7018,7 +7348,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                                                boolean noLegendaries, boolean wonderGuardAllowed,
                                                boolean usePlacementHistory, boolean swapMegaEvos,
                                                boolean abilitiesAreRandomized, boolean allowAltFormes,
-                                               boolean banIrregularAltFormes) {
+                                               boolean banIrregularAltFormes, int minBST) {
         List<Pokemon> pickFrom;
         List<Pokemon> withoutBannedPokemon;
 
@@ -7069,6 +7399,17 @@ public abstract class AbstractRomHandler implements RomHandler {
             } else {
                 pickFrom = cachedReplacementLists.get(type);
             }
+        }
+
+        if(minBST > 0) {
+            List<Pokemon> goodPokemon = new ArrayList<Pokemon>();
+            for (Pokemon pk : pickFrom) {
+                if (pk.bst() >= minBST && pk.evolutionsFrom.size() == 0) {
+                    goodPokemon.add(pk);
+                }
+            }
+
+            pickFrom = goodPokemon;
         }
 
         withoutBannedPokemon = pickFrom.stream().filter(pk -> !bannedList.contains(pk)).collect(Collectors.toList());
@@ -7739,4 +8080,8 @@ public abstract class AbstractRomHandler implements RomHandler {
         // default: no
         return false;
     }
+
+        private boolean isGoodCatchable(Pokemon pk) {
+            return pk.isRunnable();
+        }
 }

@@ -24,9 +24,7 @@ package com.dabomstew.pkrandom.constants;
 /*--  along with this program. If not, see <http://www.gnu.org/licenses/>.  --*/
 /*----------------------------------------------------------------------------*/
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import com.dabomstew.pkrandom.pokemon.ItemList;
 import com.dabomstew.pkrandom.pokemon.Trainer;
@@ -236,22 +234,22 @@ public class Gen2Constants {
 
     public static void universalTrainerTags(List<Trainer> allTrainers) {
         // Gym Leaders
-        tbc(allTrainers, 1, 0, "GYM1");
-        tbc(allTrainers, 3, 0, "GYM2");
-        tbc(allTrainers, 2, 0, "GYM3");
-        tbc(allTrainers, 4, 0, "GYM4");
-        tbc(allTrainers, 7, 0, "GYM5");
-        tbc(allTrainers, 6, 0, "GYM6");
-        tbc(allTrainers, 5, 0, "GYM7");
-        tbc(allTrainers, 8, 0, "GYM8");
-        tbc(allTrainers, 17, 0, "GYM9");
-        tbc(allTrainers, 18, 0, "GYM10");
-        tbc(allTrainers, 19, 0, "GYM11");
-        tbc(allTrainers, 21, 0, "GYM12");
-        tbc(allTrainers, 26, 0, "GYM13");
-        tbc(allTrainers, 35, 0, "GYM14");
-        tbc(allTrainers, 46, 0, "GYM15");
-        tbc(allTrainers, 64, 0, "GYM16");
+        tbc(allTrainers, 1, 0, "GYM1-LEADER");
+        tbc(allTrainers, 3, 0, "GYM2-LEADER");
+        tbc(allTrainers, 2, 0, "GYM3-LEADER");
+        tbc(allTrainers, 4, 0, "GYM4-LEADER");
+        tbc(allTrainers, 7, 0, "GYM5-LEADER");
+        tbc(allTrainers, 6, 0, "GYM6-LEADER");
+        tbc(allTrainers, 5, 0, "GYM7-LEADER");
+        tbc(allTrainers, 8, 0, "GYM8-LEADER");
+        tbc(allTrainers, 17, 0, "GYM9-LEADER");
+        tbc(allTrainers, 18, 0, "GYM10-LEADER");
+        tbc(allTrainers, 19, 0, "GYM11-LEADER");
+        tbc(allTrainers, 21, 0, "GYM12-LEADER");
+        tbc(allTrainers, 26, 0, "GYM13-LEADER");
+        tbc(allTrainers, 35, 0, "GYM14-LEADER");
+        tbc(allTrainers, 46, 0, "GYM15-LEADER");
+        tbc(allTrainers, 64, 0, "GYM16-LEADER");
 
         // Elite 4 & Red
         tbc(allTrainers, 11, 0, "ELITE1");
@@ -294,15 +292,23 @@ public class Gen2Constants {
         tbc(allTrainers, 42, 5, "RIVAL7-0");
 
         // Female Rocket Executive (Ariana)
-        tbc(allTrainers, 55, 0, "THEMED:ARIANA");
-        tbc(allTrainers, 55, 1, "THEMED:ARIANA");
+        tbc(allTrainers, 55, 0, "THEMED:ARIANA:BOSS");
+        tbc(allTrainers, 55, 1, "THEMED:ARIANA:BOSS");
 
         // others (unlabeled in this game, using HGSS names)
-        tbc(allTrainers, 51, 2, "THEMED:PETREL");
-        tbc(allTrainers, 51, 3, "THEMED:PETREL");
+        tbc(allTrainers, 51, 2, "THEMED:PETREL:BOSS");
+        tbc(allTrainers, 51, 3, "THEMED:PETREL:BOSS");
 
-        tbc(allTrainers, 51, 1, "THEMED:PROTON");
-        tbc(allTrainers, 31, 0, "THEMED:PROTON");
+        tbc(allTrainers, 51, 1, "THEMED:PROTON:BOSS");
+        tbc(allTrainers, 31, 0, "THEMED:PROTON:BOSS");
+
+        tbc(allTrainers, 51, 0, "THEMED:ARCHER:BOSS");
+
+        tbc(allTrainers, 60, 1, "THEMED:KIMONO:BOSS");
+        tbc(allTrainers, 60, 2, "THEMED:KIMONO:BOSS");
+        tbc(allTrainers, 60, 3, "THEMED:KIMONO:BOSS");
+        tbc(allTrainers, 60, 4, "THEMED:KIMONO:BOSS");
+        tbc(allTrainers, 60, 5, "THEMED:KIMONO:BOSS");
 
         // Sprout Tower
         tbc(allTrainers, 56, 0, "THEMED:SPROUTTOWER");
@@ -431,5 +437,79 @@ public class Gen2Constants {
             }
         }
     }
+
+    public static final List<Integer> consumableHeldItems = Collections.unmodifiableList(Arrays.asList(
+            Gen2Items.berry, Gen2Items.berryJuice, Gen2Items.bitterBerry, Gen2Items.burntBerry,
+    Gen2Items.burntBerry, Gen2Items.goldBerry, Gen2Items.iceBerry, Gen2Items.mintBerry, Gen2Items.miracleBerry,
+    Gen2Items.mysteryBerry, Gen2Items.przCureBerry, Gen2Items.psnCureBerry,
+    Gen2Items.berserkGene));
+
+    public static final Map<Type, List<Integer>> typeBoostingItems = initializeTypeBoostingItems();
+
+    private static Map<Type, List<Integer>> initializeTypeBoostingItems() {
+        Map<Type, List<Integer>> map = new HashMap<>();
+        map.put(Type.BUG, Arrays.asList(Gen2Items.silverPowder));
+        map.put(Type.DARK, Arrays.asList(Gen2Items.blackGlasses));
+        map.put(Type.DRAGON, Arrays.asList(Gen2Items.dragonFang));
+        map.put(Type.ELECTRIC, Arrays.asList(Gen2Items.magnet));
+        map.put(Type.FIGHTING, Arrays.asList(Gen2Items.blackbelt));
+        map.put(Type.FIRE, Arrays.asList(Gen2Items.charcoal));
+        map.put(Type.FLYING, Arrays.asList(Gen2Items.sharpBeak));
+        map.put(Type.GHOST, Arrays.asList(Gen2Items.spellTag));
+        map.put(Type.GRASS, Arrays.asList(Gen2Items.miracleSeed));
+        map.put(Type.GROUND, Arrays.asList(Gen2Items.softSand));
+        map.put(Type.ICE, Arrays.asList(Gen2Items.neverMeltIce));
+        map.put(Type.NORMAL, Arrays.asList(Gen2Items.pinkBow, Gen2Items.polkadotBow));
+        map.put(Type.POISON, Arrays.asList(Gen2Items.poisonBarb));
+        map.put(Type.PSYCHIC, Arrays.asList(Gen2Items.twistedSpoon));
+        map.put(Type.ROCK, Arrays.asList(Gen2Items.hardStone));
+        map.put(Type.STEEL, Arrays.asList(Gen2Items.metalCoat));
+        map.put(Type.WATER, Arrays.asList(Gen2Items.mysticWater));
+        map.put(null, Collections.emptyList()); // ??? type
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final List<Integer> allHeldItems = setupAllHeldItems();
+
+    private static List<Integer> setupAllHeldItems() {
+        List<Integer> list = new ArrayList<>();
+        list.addAll(Arrays.asList(Gen2Items.brightPowder, Gen2Items.quickClaw, Gen2Items.kingsRock,
+                Gen2Items.focusBand, Gen2Items.scopeLens, Gen2Items.leftovers));
+        list.addAll(consumableHeldItems);
+
+        for(var value: typeBoostingItems.values())
+        {
+            list.addAll(value);
+        }
+
+        return Collections.unmodifiableList(list);
+    }
+
+    public static final List<Integer> generalPurposeConsumableItems = Collections.unmodifiableList(Arrays.asList(
+            Gen2Items.berry, Gen2Items.berryJuice, Gen2Items.bitterBerry, Gen2Items.burntBerry,
+            Gen2Items.burntBerry, Gen2Items.goldBerry, Gen2Items.iceBerry, Gen2Items.mintBerry, Gen2Items.miracleBerry,
+            Gen2Items.mysteryBerry, Gen2Items.przCureBerry, Gen2Items.psnCureBerry
+    ));
+
+    public static final List<Integer> generalPurposeItems = Collections.unmodifiableList(Arrays.asList(
+            Gen2Items.brightPowder, Gen2Items.quickClaw, Gen2Items.kingsRock, Gen2Items.focusBand, Gen2Items.scopeLens,
+            Gen2Items.leftovers
+    ));
+
+
+
+    public static final Map<Integer, List<Integer>> speciesBoostingItems = initializeSpeciesBoostingItems();
+
+    private static Map<Integer, List<Integer>> initializeSpeciesBoostingItems() {
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        map.put(Species.pikachu, Arrays.asList(Gen2Items.lightBall));
+        map.put(Species.chansey, Arrays.asList(Gen2Items.luckyPunch));
+        map.put(Species.ditto, Arrays.asList(Gen2Items.metalPowder));
+        map.put(Species.cubone, Arrays.asList(Gen2Items.thickClub));
+        map.put(Species.marowak, Arrays.asList(Gen2Items.thickClub));
+        map.put(Species.farfetchd, Arrays.asList(Gen2Items.stick));
+        return Collections.unmodifiableMap(map);
+    }
+
 
 }

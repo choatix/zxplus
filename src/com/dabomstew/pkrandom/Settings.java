@@ -180,6 +180,8 @@ public class Settings {
     private int trainersForceFullyEvolvedLevel = 30;
     private boolean trainersLevelModified;
     private int trainersLevelModifier = 0; // -50 ~ 50
+    private boolean trainersLevelBossFights = false;
+    private boolean trainersLevelImportantFights = false;
     private int eliteFourUniquePokemonNumber = 0; // 0 ~ 2
     private boolean allowTrainerAlternateFormes;
     private boolean swapTrainerMegaEvos;
@@ -195,6 +197,7 @@ public class Settings {
     private boolean doubleBattleMode;
     private boolean shinyChance;
     private boolean betterTrainerMovesets;
+    private boolean useMovesetTemplates = false;
 
     public enum WildPokemonMod {
         UNCHANGED, RANDOM, AREA_MAPPING, GLOBAL_MAPPING
@@ -600,6 +603,9 @@ public class Settings {
         out.write(makeByteSelected(banLegendaryStarters, onlyLegendaryStarters, condenseEncounterSlots,
                 catchEmAllReasonableSlotsOnly, dontRandomizeRatio, evosBuffStats));
 
+        // 52: Moveset and similar changes here
+        out.write(makeByteSelected(useMovesetTemplates,
+                trainersLevelBossFights, trainersLevelImportantFights));
 
         try {
             byte[] romName = this.romName.getBytes("US-ASCII");
@@ -900,12 +906,38 @@ public class Settings {
         settings.setDontRandomizeRatio(restoreState(data[51], 5));
         settings.setEvosBuffStats(restoreState(data[51], 6));
 
+        settings.setUseMovesetTemplates(restoreState(data[52], 2));
+        settings.setTrainerLevelChangeForBossFights(restoreState(data[52], 3));
+        settings.setTrainerLevelChangeForImportantFights(restoreState(data[52], 4));
+
         int romNameLength = data[LENGTH_OF_SETTINGS_DATA] & 0xFF;
         String romName = new String(data, LENGTH_OF_SETTINGS_DATA + 1, romNameLength, "US-ASCII");
         settings.setRomName(romName);
 
         return settings;
     }
+    public boolean getUseMovesetTemplates() {
+        return this.useMovesetTemplates;
+    }
+    public void setUseMovesetTemplates(boolean useTemplates) {
+        this.useMovesetTemplates = useTemplates;
+    }
+
+    public boolean getTrainerLevelChangeForBossFights() {
+        return this.trainersLevelBossFights;
+    }
+
+    public void setTrainerLevelChangeForBossFights(boolean level) {
+        this.trainersLevelBossFights = level;
+    }
+    public void setTrainerLevelChangeForImportantFights(boolean level) {
+        this.trainersLevelImportantFights = level;
+    }
+
+    public boolean getTrainerLevelChangeForImportantFights() {
+        return this.trainersLevelImportantFights;
+    }
+
 
     public static class TweakForROMFeedback {
         private boolean changedStarter;
@@ -924,7 +956,7 @@ public class Settings {
             return removedCodeTweaks;
         }
 
-        public TweakForROMFeedback setRemovedCodeTweaks(boolean removedCodeTweaks) {
+        public TweakForROMFeedback setRemovedCodeTweaks(boolean removedCodeTweaks) {;
             this.removedCodeTweaks = removedCodeTweaks;
             return this;
         }

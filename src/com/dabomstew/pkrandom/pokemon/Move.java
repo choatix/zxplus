@@ -100,5 +100,24 @@ public class Move {
         return "#" + number + " " + name + " - Power: " + power + ", Base PP: " + pp + ", Type: " + type + ", Hit%: "
                 + (hitratio) + ", Effect: " + effectIndex + ", Priority: " + priority;
     }
+    
+    public boolean isDamaging() {
+        // Some moves are bad
+        if(number == 138 || number == 13 || number == 19 || number == 76 || number == 80 || number == 120 || 
+                number == 139 || number == 143 || number == 153 || number == 91 || number == 248)
+            return false;
+        
+        if(hitratio < 0.69)
+            return false;
+        
+        // Bonemerang is strong enough
+        return power >= 75 || number == 155;
+    }
+    
+    public boolean isSpecial() {
+        return type.equals(Type.WATER) || type.equals(Type.GRASS) || type.equals(Type.FIRE)
+                || type.equals(Type.ELECTRIC) || type.equals(Type.ICE) || type.equals(Type.PSYCHIC)
+                || type.equals(Type.DRAGON) || type.equals(Type.DARK);
+    }
 
 }

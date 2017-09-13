@@ -374,6 +374,41 @@ public class Pokemon implements Comparable<Pokemon> {
         return hp + attack + defense + spatk + spdef + speed;
     }
 
+    public boolean isRunnable() {
+        if(evolutionsFrom.size() > 0) return false;
+
+        int scaled_attack = attack;
+
+        // Normal attackers have a bigger effective attack stat
+        if(primaryType.equals(Type.NORMAL) || (secondaryType != null && secondaryType.equals(Type.NORMAL)))
+            scaled_attack = (int) (scaled_attack * 1.2);
+
+        // Pure power, huge power
+        if(number == 308 || number == 184)
+            scaled_attack *= 2;
+
+        // Truant
+        if(number == 289) {
+            return false;
+        }
+
+        int power = Math.max(scaled_attack, spatk);
+
+        // Mixed attackers get a power boost because they have a better early game
+        if(attack >= 80 && spatk >= 80) {
+            power += 10;
+        }
+
+        if(power >= 95 && speed >= 100) return true;
+        if(power >= 100 && speed >= 80) return true;
+        if(power >= 105 && speed >= 70) return true;
+        if(power >= 110 && speed >= 65) return true;
+        if(power >= 120 && speed >= 60) return true;
+        if(power >= 130 && speed >= 55) return true;
+
+        return false;
+    }
+
     public int bstForPowerLevels() {
         // Take into account Shedinja's purposefully nerfed HP
         if (number == Species.shedinja) {

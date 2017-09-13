@@ -45,6 +45,23 @@ public class Trainer implements Comparable<Trainer> {
     public boolean doubleBattle;
     public boolean female;
 
+    public Trainer() {}
+
+    public Trainer(Trainer t) {
+        this.offset = t.offset;
+        this.pokemon = new ArrayList<TrainerPokemon>();
+        for(TrainerPokemon tp : t.pokemon) {
+            TrainerPokemon tp1 = new TrainerPokemon(tp);
+            this.pokemon.add(tp1);
+        }
+        this.tag = t.tag;
+        this.importantTrainer = t.importantTrainer;
+        this.poketype = t.poketype;
+        this.name = t.name;
+        this.trainerclass = t.trainerclass;
+        this.fullDisplayName = t.fullDisplayName;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder("[");
         if (fullDisplayName != null) {
@@ -100,12 +117,15 @@ public class Trainer implements Comparable<Trainer> {
     }
 
     public boolean isBoss() {
-        return tag != null && (tag.startsWith("ELITE") || tag.startsWith("CHAMPION")
+        return tag != null &&
+
+                (tag.startsWith("ELITE") || tag.startsWith("CHAMPION")
                 || tag.startsWith("UBER") || tag.endsWith("LEADER"));
     }
 
     public boolean isImportant() {
-        return tag != null && (tag.startsWith("RIVAL") || tag.startsWith("FRIEND") || tag.endsWith("STRONG"));
+        return tag != null && (tag.startsWith("RIVAL") || tag.startsWith("FRIEND") || tag.endsWith("STRONG") ||
+                tag.endsWith("BOSS"));
     }
 
     public boolean skipImportant() {

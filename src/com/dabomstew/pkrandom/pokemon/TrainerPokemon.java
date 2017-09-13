@@ -38,6 +38,8 @@ public class TrainerPokemon {
     public int forme;
     public String formeSuffix = "";
 
+    public int AILevel;
+
     public int forcedGenderFlag;
     public byte nature;
     public byte hpEVs;
@@ -56,6 +58,18 @@ public class TrainerPokemon {
     public int strength;
     
     public boolean resetMoves = false;
+
+    public TrainerPokemon(TrainerPokemon tp) {
+        this.pokemon = tp.pokemon;
+        this.level = tp.level;
+        this.moves = tp.moves;
+        this.AILevel = tp.AILevel;
+        this.heldItem = tp.heldItem;
+        this.abilitySlot = tp.abilitySlot;
+        this.resetMoves = tp.resetMoves;
+    }
+
+    public TrainerPokemon() {}
 
     public String toString() {
         String s = pokemon.name + formeSuffix;
