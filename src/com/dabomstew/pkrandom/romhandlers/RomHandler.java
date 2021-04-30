@@ -167,6 +167,8 @@ public interface RomHandler {
 
     Map<Integer,List<Integer>> getAbilityVariations();
 
+    List<Integer> getUselessAbilities();
+
     boolean hasMegaEvolutions();
 
     // Randomizer: wild pokemon

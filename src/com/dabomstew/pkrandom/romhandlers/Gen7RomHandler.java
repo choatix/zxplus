@@ -2702,6 +2702,11 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public List<Integer> getUselessAbilities() {
+        return new ArrayList<>(Gen7Constants.uselessAbilities);
+    }
+
+    @Override
     public boolean hasMegaEvolutions() {
         return true;
     }

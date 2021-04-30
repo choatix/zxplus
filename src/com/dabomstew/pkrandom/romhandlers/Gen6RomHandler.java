@@ -3021,6 +3021,11 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public List<Integer> getUselessAbilities() {
+        return new ArrayList<>(Gen6Constants.uselessAbilities);
+    }
+
+    @Override
     public boolean hasMegaEvolutions() {
         return true;
     }

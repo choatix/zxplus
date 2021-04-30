@@ -546,10 +546,10 @@ public abstract class AbstractRomHandler implements RomHandler {
 
         final boolean hasDWAbilities = (this.abilitiesPerPokemon() == 3);
 
-        final List<Integer> bannedAbilities = new ArrayList<>();
+        final List<Integer> bannedAbilities = this.getUselessAbilities();
 
         if (!allowWonderGuard) {
-            bannedAbilities.add(GlobalConstants.WONDER_GUARD_INDEX);
+            bannedAbilities.add(Abilities.wonderGuard);
         }
 
         if (banTrappingAbilities) {
@@ -567,7 +567,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         if (weighDuplicatesTogether) {
             bannedAbilities.addAll(GlobalConstants.duplicateAbilities);
             if (generationOfPokemon() == 3) {
-                bannedAbilities.add(77); // Special case for Cacophony in gen 3
+                bannedAbilities.add(Gen3Constants.airLockIndex); // Special case for Air Lock in Gen 3
             }
         }
 
@@ -578,9 +578,9 @@ public abstract class AbstractRomHandler implements RomHandler {
             // still keep WG as an exception, though
 
             copyUpEvolutionsHelper(pk -> {
-                if (pk.ability1 != GlobalConstants.WONDER_GUARD_INDEX
-                        && pk.ability2 != GlobalConstants.WONDER_GUARD_INDEX
-                        && pk.ability3 != GlobalConstants.WONDER_GUARD_INDEX) {
+                if (pk.ability1 != Abilities.wonderGuard
+                        && pk.ability2 != Abilities.wonderGuard
+                        && pk.ability3 != Abilities.wonderGuard) {
                     // Pick first ability
                     pk.ability1 = pickRandomAbility(maxAbility, bannedAbilities, weighDuplicatesTogether);
 
@@ -601,9 +601,9 @@ public abstract class AbstractRomHandler implements RomHandler {
                     }
                 }
             }, (evFrom, evTo, toMonIsFinalEvo) -> {
-                if (evTo.ability1 != GlobalConstants.WONDER_GUARD_INDEX
-                        && evTo.ability2 != GlobalConstants.WONDER_GUARD_INDEX
-                        && evTo.ability3 != GlobalConstants.WONDER_GUARD_INDEX) {
+                if (evTo.ability1 != Abilities.wonderGuard
+                        && evTo.ability2 != Abilities.wonderGuard
+                        && evTo.ability3 != Abilities.wonderGuard) {
                     evTo.ability1 = evFrom.ability1;
                     evTo.ability2 = evFrom.ability2;
                     evTo.ability3 = evFrom.ability3;
@@ -617,9 +617,9 @@ public abstract class AbstractRomHandler implements RomHandler {
                 }
 
                 // Don't remove WG if already in place.
-                if (pk.ability1 != GlobalConstants.WONDER_GUARD_INDEX
-                        && pk.ability2 != GlobalConstants.WONDER_GUARD_INDEX
-                        && pk.ability3 != GlobalConstants.WONDER_GUARD_INDEX) {
+                if (pk.ability1 != Abilities.wonderGuard
+                        && pk.ability2 != Abilities.wonderGuard
+                        && pk.ability3 != Abilities.wonderGuard) {
                     // Pick first ability
                     pk.ability1 = this.pickRandomAbility(maxAbility, bannedAbilities, weighDuplicatesTogether);
 
@@ -5546,8 +5546,8 @@ public abstract class AbstractRomHandler implements RomHandler {
                 for (Pokemon pk : pickFrom) {
                     if (pk.bstForPowerLevels() >= minTarget
                             && pk.bstForPowerLevels() <= maxTarget
-                            && (wonderGuardAllowed || (pk.ability1 != GlobalConstants.WONDER_GUARD_INDEX
-                                    && pk.ability2 != GlobalConstants.WONDER_GUARD_INDEX && pk.ability3 != GlobalConstants.WONDER_GUARD_INDEX))) {
+                            && (wonderGuardAllowed || (pk.ability1 != Abilities.wonderGuard
+                                    && pk.ability2 != Abilities.wonderGuard && pk.ability3 != Abilities.wonderGuard))) {
                         canPick.add(pk);
                     }
                 }
@@ -5577,9 +5577,9 @@ public abstract class AbstractRomHandler implements RomHandler {
                 return pickFrom.get(this.random.nextInt(pickFrom.size()));
             } else {
                 Pokemon pk = pickFrom.get(this.random.nextInt(pickFrom.size()));
-                while (pk.ability1 == GlobalConstants.WONDER_GUARD_INDEX
-                        || pk.ability2 == GlobalConstants.WONDER_GUARD_INDEX
-                        || pk.ability3 == GlobalConstants.WONDER_GUARD_INDEX) {
+                while (pk.ability1 == Abilities.wonderGuard
+                        || pk.ability2 == Abilities.wonderGuard
+                        || pk.ability3 == Abilities.wonderGuard) {
                     pk = pickFrom.get(this.random.nextInt(pickFrom.size()));
                 }
                 return pk;
@@ -6050,6 +6050,11 @@ public abstract class AbstractRomHandler implements RomHandler {
     @Override
     public String abilityName(int number) {
         return "";
+    }
+
+    @Override
+    public List<Integer> getUselessAbilities() {
+        return new ArrayList<>();
     }
 
     @Override

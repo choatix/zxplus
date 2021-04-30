@@ -3650,6 +3650,11 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
+    public List<Integer> getUselessAbilities() {
+        return new ArrayList<>(Gen4Constants.uselessAbilities);
+    }
+
+    @Override
     public boolean hasMegaEvolutions() {
         return false;
     }

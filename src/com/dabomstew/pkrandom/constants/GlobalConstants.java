@@ -235,29 +235,25 @@ public class GlobalConstants {
 
     public static final List<Integer> xItems = Arrays.asList(55, 56, 57, 58, 59, 60, 61, 62);
 
-    public static final List<Integer> battleTrappingAbilities = Arrays.asList(23, 42, 71);
+    public static final List<Integer> battleTrappingAbilities = Arrays.asList(Abilities.shadowTag, Abilities.magnetPull,
+            Abilities.arenaTrap);
 
     public static final List<Integer> negativeAbilities = Arrays.asList(
-            129, 112, 54, 59, 161, 103, 100, 121, 176, 197,
-            208, 210, 211, 225, 209);
-    // Defeatist, Slow Start, Truant, Forecast, Zen Mode, Klutz, Stall, Multitype, Stance Change, Shields Down,
-    // Schooling, Battle Bond, Power Construct, RKS System, Disguise
-    // To be tested (Gen 8): Gulp Missile, Ice Face, Hunger Switch
+            Abilities.defeatist, Abilities.slowStart, Abilities.truant, Abilities.klutz, Abilities.stall
+    );
 
     public static final List<Integer> badAbilities = Arrays.asList(
-            58, 57, 107, 108, 119, 118, 132, 131, 140, 180, 188, 217,
-            222, 223);
-    // Minus, Plus, Anticipation, Forewarn, Frisk, Honey Gather, Friend Guard, Healer, Telepathy, Symbiosis, Aura Break,
-    // Battery, Receiver, Power of Alchemy
+            Abilities.minus, Abilities.plus, Abilities.anticipation, Abilities.forewarn, Abilities.frisk,
+            Abilities.honeyGather, Abilities.friendGuard, Abilities.healer, Abilities.telepathy, Abilities.symbiosis,
+            Abilities.auraBreak, Abilities.battery, Abilities.receiver, Abilities.powerOfAlchemy
+    );
 
     public static final List<Integer> duplicateAbilities = Arrays.asList(
-            72, 73, 74, 75, 76, 116, 160, 163, 164, 194, 219, 221, 223, 230, 231, 232, 236, 242
+            Abilities.vitalSpirit, Abilities.whiteSmoke, Abilities.purePower, Abilities.shellArmor, Abilities.airLock,
+            Abilities.solidRock, Abilities.ironBarbs, Abilities.turboblaze, Abilities.teravolt, Abilities.emergencyExit,
+            Abilities.dazzling, Abilities.tanglingHair, Abilities.powerOfAlchemy, Abilities.fullMetalBody,
+            Abilities.shadowShield, Abilities.prismArmor, Abilities.libero, Abilities.stalwart
     );
-    // Vital Spirit, White Smoke, Pure Power, Shell Armor, Air Lock, Solid Rock, Iron Barbs, Turboblaze, Teravolt,
-    // Emergency Exit, Dazzling, Tangling Hair, Power of Alchemy, Full Metal Body, Shadow Shield, Prism Armor, Libero,
-    // Stalwart
-
-    public static final int WONDER_GUARD_INDEX = 25;
 
     public static final int MIN_DAMAGING_MOVE_POWER = 50;
 

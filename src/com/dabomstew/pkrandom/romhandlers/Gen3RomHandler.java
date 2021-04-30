@@ -2722,6 +2722,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     @Override
+    public List<Integer> getUselessAbilities() {
+        return new ArrayList<>(Gen3Constants.uselessAbilities);
+    }
+
+    @Override
     public boolean hasMegaEvolutions() {
         return false;
     }

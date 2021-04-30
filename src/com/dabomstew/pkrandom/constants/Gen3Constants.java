@@ -162,21 +162,22 @@ public class Gen3Constants {
 
     public static final int sunStoneIndex = 93, moonStoneIndex = 94, waterStoneIndex = 97, deepSeaToothIndex = 192, deepSeaScaleIndex = 193;
 
-    public static final int highestAbilityIndex = 77;
+    public static final int cacophonyIndex = 76, airLockIndex = 77, highestAbilityIndex = 77;
 
     public static final Map<Integer,List<Integer>> abilityVariations = setupAbilityVariations();
 
     private static Map<Integer,List<Integer>> setupAbilityVariations() {
         Map<Integer,List<Integer>> map = new HashMap<>();
-        map.put(15,Arrays.asList(15,72)); // Insomnia/Vital Spirit
-        map.put(29,Arrays.asList(29,73)); // Clear Body/White Smoke
-        map.put(37,Arrays.asList(37,74)); // Huge Power/Pure Power
-        map.put(4,Arrays.asList(4,75)); // Battle Armor/Shell Armor
-        map.put(43,Arrays.asList(43,76)); // Soundproof/Cacophony
-        map.put(13,Arrays.asList(13,77)); // Cloud Nine/Air Lock
+        map.put(Abilities.insomnia, Arrays.asList(Abilities.insomnia, Abilities.vitalSpirit));
+        map.put(Abilities.clearBody, Arrays.asList(Abilities.clearBody, Abilities.whiteSmoke));
+        map.put(Abilities.hugePower, Arrays.asList(Abilities.hugePower, Abilities.purePower));
+        map.put(Abilities.battleArmor, Arrays.asList(Abilities.battleArmor, Abilities.shellArmor));
+        map.put(Abilities.cloudNine, Arrays.asList(Abilities.cloudNine, Gen3Constants.airLockIndex));
 
         return map;
     }
+
+    public static final List<Integer> uselessAbilities = Arrays.asList(Abilities.forecast, Gen3Constants.cacophonyIndex);
 
     public static final int frlgMapLabelsStart = 0x58;
 
