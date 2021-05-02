@@ -249,12 +249,15 @@ public class Gen6Constants {
             keeBerry = 0x2af, marangaBerry = 0x2b0, fairyGem = 0x02cb;
     // New non-consumable held items with in-battle NPC effect (not specific to one pokemon family or one move)
     public static final int assaultVest = 0x280, pixiePlate = 0x284, safetyGoggles = 0x28a;
+    // New moves (their move index) affected by items
+    // https://bulbapedia.bulbagarden.net/wiki/List_of_moves
+    public static final int drainingKiss = 577, electricTerrain = 604, grassyTerrain = 580, infestation = 611,
+            mistyTerrain = 581, oblivionWing = 613, parabolicCharge = 570;
 
     public static final List<Integer> consumableHeldItems = setupAllConsumableItems();
 
     private static List<Integer> setupAllConsumableItems() {
-        List<Integer> list = new ArrayList<>();
-        list.addAll(Gen5Constants.consumableHeldItems);
+        List<Integer> list = new ArrayList<>(Gen5Constants.consumableHeldItems);
         list.addAll(Arrays.asList(weaknessPolicy, luminousMoss, snowball, roseliBerry, keeBerry, marangaBerry, fairyGem));
         return list;
     }
@@ -262,12 +265,77 @@ public class Gen6Constants {
     public static final List<Integer> allHeldItems = setupAllHeldItems();
 
     private static List<Integer> setupAllHeldItems() {
-        List<Integer> list = new ArrayList<>();
-        list.addAll(Gen5Constants.allHeldItems);
+        List<Integer> list = new ArrayList<>(Gen5Constants.allHeldItems);
         list.addAll(Arrays.asList(weaknessPolicy, snowball, roseliBerry, keeBerry, marangaBerry, fairyGem));
         list.addAll(Arrays.asList(assaultVest, pixiePlate, safetyGoggles));
         return list;
     }
+
+    public static final List<Integer> generalPurposeConsumableItems = initializeGeneralPurposeConsumableItems();
+
+    private static List<Integer> initializeGeneralPurposeConsumableItems() {
+        List<Integer> list = new ArrayList<>(Gen5Constants.generalPurposeConsumableItems);
+        list.addAll(Arrays.asList(weaknessPolicy, luminousMoss, snowball, keeBerry, marangaBerry));
+        return Collections.unmodifiableList(list);
+    }
+
+    public static final List<Integer> generalPurposeItems = initializeGeneralPurposeItems();
+
+    private static List<Integer> initializeGeneralPurposeItems() {
+        List<Integer> list = new ArrayList<>(Gen5Constants.generalPurposeItems);
+        list.addAll(Arrays.asList(safetyGoggles));
+        return Collections.unmodifiableList(list);
+    }
+
+    public static final Map<Type, Integer> weaknessReducingBerries = initializeWeaknessReducingBerries();
+
+    private static Map<Type, Integer> initializeWeaknessReducingBerries() {
+        Map<Type, Integer> map = new HashMap<>(Gen5Constants.weaknessReducingBerries);
+        map.put(Type.FAIRY, roseliBerry);
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Type, Integer> consumableTypeBoostingItems = initializeConsumableTypeBoostingItems();
+
+    private static Map<Type, Integer> initializeConsumableTypeBoostingItems() {
+        Map<Type, Integer> map = new HashMap<>(Gen5Constants.consumableTypeBoostingItems);
+        map.put(Type.FAIRY, fairyGem);
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Type, List<Integer>> typeBoostingItems = initializeTypeBoostingItems();
+
+    private static Map<Type, List<Integer>> initializeTypeBoostingItems() {
+        Map<Type, List<Integer>> map = new HashMap<>(Gen5Constants.typeBoostingItems);
+        map.put(Type.FAIRY, Arrays.asList(pixiePlate));
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Integer, List<Integer>> moveBoostingItems = initializeMoveBoostingItems();
+
+    private static Map<Integer, List<Integer>> initializeMoveBoostingItems() {
+        Map<Integer, List<Integer>> map = new HashMap<>(Gen5Constants.moveBoostingItems);
+        map.put(drainingKiss, Arrays.asList(Gen4Constants.bigRoot));
+        map.put(infestation, Arrays.asList(Gen4Constants.gripClaw, Gen5Constants.bindingBand));
+        map.put(oblivionWing, Arrays.asList(Gen4Constants.bigRoot));
+        map.put(parabolicCharge, Arrays.asList(Gen4Constants.bigRoot));
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Integer, List<Integer>> abilityBoostingItems = initializeAbilityBoostingItems();
+
+    private static Map<Integer, List<Integer>> initializeAbilityBoostingItems() {
+        Map<Integer, List<Integer>> map = new HashMap<>(Gen5Constants.abilityBoostingItems);
+        // Weather from abilities changed in Gen VI, so these items become relevant.
+        map.put(Abilities.drizzle, Arrays.asList(Gen4Constants.dampRock));
+        map.put(Abilities.drought, Arrays.asList(Gen4Constants.heatRock));
+        map.put(Abilities.sandStream, Arrays.asList(Gen4Constants.smoothRock));
+        map.put(Abilities.snowWarning, Arrays.asList(Gen4Constants.icyRock));
+        return Collections.unmodifiableMap(map);
+    }
+
+    // No new species boosting items in Gen VI
+    public static final Map<Integer, List<Integer>> speciesBoostingItems = Gen5Constants.speciesBoostingItems;
 
     public static String getIngameTradesPrefix(int romType) {
         if (romType == Type_XY) {

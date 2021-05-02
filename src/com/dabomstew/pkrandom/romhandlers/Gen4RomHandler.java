@@ -34,13 +34,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.dabomstew.pkrandom.*;
-import com.dabomstew.pkrandom.constants.Species;
+import com.dabomstew.pkrandom.constants.*;
 import com.dabomstew.pkrandom.pokemon.*;
 import thenewpoketext.PokeTextData;
 import thenewpoketext.TextToPoke;
 
-import com.dabomstew.pkrandom.constants.Gen4Constants;
-import com.dabomstew.pkrandom.constants.GlobalConstants;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import com.dabomstew.pkrandom.newnds.NARCArchive;
 
@@ -4312,5 +4310,75 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     @Override
     public List<Integer> getAllHeldItems() {
         return Gen4Constants.allHeldItems;
+    }
+
+    @Override
+    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, Map<Integer, List<MoveLearnt>> movesets) {
+        List<Integer> items = new ArrayList<>();
+        items.addAll(Gen4Constants.generalPurposeConsumableItems);
+        int frequencyBoostCount = 6; // Make some very good items more common, but not too common
+        if (!consumableOnly) {
+            frequencyBoostCount = 8; // bigger to account for larger item pool.
+            items.addAll(Gen4Constants.generalPurposeItems);
+        }
+        int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.pokemon.number, movesets, tp.level);
+        for (int moveIdx : pokeMoves) {
+            Move move = moves.get(moveIdx);
+            if (move == null) {
+                continue;
+            }
+            if (move.category == MoveCategory.PHYSICAL) {
+                items.add(Gen4Constants.liechiBerry);
+                if (!consumableOnly) {
+                    items.addAll(Gen4Constants.typeBoostingItems.get(move.type));
+                    items.add(Gen4Constants.choiceBand);
+                    items.add(Gen4Constants.muscleBand);
+                }
+            }
+            if (move.category == MoveCategory.SPECIAL) {
+                items.add(Gen4Constants.petayaBerry);
+                if (!consumableOnly) {
+                    items.addAll(Gen4Constants.typeBoostingItems.get(move.type));
+                    items.add(Gen4Constants.wiseGlasses);
+                    items.add(Gen4Constants.choiceSpecs);
+                }
+            }
+            if (!consumableOnly && Gen4Constants.moveBoostingItems.containsKey(moveIdx)) {
+                items.addAll(Gen4Constants.moveBoostingItems.get(moveIdx));
+            }
+        }
+        Map<Type, Effectiveness> byType = Effectiveness.against(tp.pokemon.primaryType, tp.pokemon.secondaryType, 4);
+        for(Map.Entry<Type, Effectiveness> entry : byType.entrySet()) {
+            Integer berry = Gen4Constants.weaknessReducingBerries.get(entry.getKey());
+            if (entry.getValue() == Effectiveness.DOUBLE) {
+                items.add(berry);
+            } else if (entry.getValue() == Effectiveness.QUADRUPLE) {
+                for (int i = 0; i < frequencyBoostCount; i++) {
+                    items.add(berry);
+                }
+            }
+        }
+        if (byType.get(Type.NORMAL) == Effectiveness.NEUTRAL) {
+            items.add(Gen4Constants.chilanBerry);
+        }
+        if (tp.ability == Abilities.levitate) {
+            items.removeAll(Arrays.asList(Gen4Constants.shucaBerry));
+        }
+
+        if (!consumableOnly) {
+            if (Gen4Constants.abilityBoostingItems.containsKey(tp.ability)) {
+                items.addAll(Gen4Constants.abilityBoostingItems.get(tp.ability));
+            }
+            if (tp.pokemon.primaryType == Type.POISON || tp.pokemon.secondaryType == Type.POISON) {
+                items.add(Gen4Constants.blackSludge);
+            }
+            List<Integer> speciesItems = Gen4Constants.speciesBoostingItems.get(tp.pokemon.number);
+            if (speciesItems != null) {
+                for (int i = 0; i < frequencyBoostCount; i++) {
+                    items.addAll(speciesItems);
+                }
+            }
+        }
+        return items;
     }
 }

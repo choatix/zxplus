@@ -199,12 +199,14 @@ public class Gen7Constants {
             mistySeed = 0x373, grassySeed = 0x374;
     // New non-consumable held items with in-battle NPC effect (not specific to one pokemon family or one move)
     public static final int terrainExtender = 0x36F, protectivePads = 0x370;
+    // New moves (their move index) affected by items
+    // https://bulbapedia.bulbagarden.net/wiki/List_of_moves
+    public static final int psychicTerrain = 678, strengthSap = 668;
 
     public static final List<Integer> consumableHeldItems = setupAllConsumableItems();
 
     private static List<Integer> setupAllConsumableItems() {
-        List<Integer> list = new ArrayList<>();
-        list.addAll(Gen6Constants.consumableHeldItems);
+        List<Integer> list = new ArrayList<>(Gen6Constants.consumableHeldItems);
         list.addAll(Arrays.asList(adrenalineOrb, electricSeed, psychicSeed, mistySeed, grassySeed));
         return list;
     }
@@ -214,12 +216,68 @@ public class Gen7Constants {
     private static List<Integer> setupAllHeldItems() {
         // We intentionally do not include Z Crystals in this list. Adding Z-Crystals to random trainers should
         // probably require its own setting if desired.
-        List<Integer> list = new ArrayList<>();
-        list.addAll(Gen6Constants.allHeldItems);
+        List<Integer> list = new ArrayList<>(Gen6Constants.allHeldItems);
         list.addAll(Arrays.asList(adrenalineOrb, electricSeed, psychicSeed, mistySeed, grassySeed));
         list.addAll(Arrays.asList(terrainExtender, protectivePads));
         return list;
     }
+
+    public static final List<Integer> generalPurposeConsumableItems = initializeGeneralPurposeConsumableItems();
+
+    private static List<Integer> initializeGeneralPurposeConsumableItems() {
+        List<Integer> list = new ArrayList<>(Gen6Constants.generalPurposeConsumableItems);
+        // These berries are worth the risk of causing confusion because they heal for half max HP.
+        list.addAll(Arrays.asList(Gen4Constants.figyBerry, Gen4Constants.wikiBerry, Gen4Constants.magoBerry,
+                Gen4Constants.aguavBerry, Gen4Constants.iapapaBerry, adrenalineOrb));
+        return Collections.unmodifiableList(list);
+    }
+
+    public static final List<Integer> generalPurposeItems = initializeGeneralPurposeItems();
+
+    private static List<Integer> initializeGeneralPurposeItems() {
+        List<Integer> list = new ArrayList<>(Gen6Constants.generalPurposeItems);
+        list.addAll(Arrays.asList(protectivePads));
+        return Collections.unmodifiableList(list);
+    }
+
+    public static final Map<Integer, List<Integer>> moveBoostingItems = initializeMoveBoostingItems();
+
+    private static Map<Integer, List<Integer>> initializeMoveBoostingItems() {
+        Map<Integer, List<Integer>> map = new HashMap<>(Gen6Constants.moveBoostingItems);
+        map.put(Gen6Constants.electricTerrain, Arrays.asList(terrainExtender));
+        map.put(Gen6Constants.grassyTerrain, Arrays.asList(terrainExtender));
+        map.put(Gen6Constants.mistyTerrain, Arrays.asList(terrainExtender));
+        map.put(psychicTerrain, Arrays.asList(terrainExtender));
+        map.put(strengthSap, Arrays.asList(Gen4Constants.bigRoot));
+        return Collections.unmodifiableMap(map);
+    }
+    public static final Map<Integer, List<Integer>> abilityBoostingItems = initializeAbilityBoostingItems();
+
+    private static Map<Integer, List<Integer>> initializeAbilityBoostingItems() {
+        Map<Integer, List<Integer>> map = new HashMap<>(Gen6Constants.abilityBoostingItems);
+        map.put(Abilities.electricSurge, Arrays.asList(terrainExtender));
+        map.put(Abilities.grassySurge, Arrays.asList(terrainExtender));
+        map.put(Abilities.mistySurge, Arrays.asList(terrainExtender));
+        map.put(Abilities.psychicSurge, Arrays.asList(terrainExtender));
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Integer, Integer> consumableAbilityBoostingItems = initializeConsumableAbilityBoostingItems();
+
+    private static Map<Integer, Integer> initializeConsumableAbilityBoostingItems() {
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(Abilities.electricSurge, electricSeed);
+        map.put(Abilities.grassySurge, grassySeed);
+        map.put(Abilities.mistySurge, mistySeed);
+        map.put(Abilities.psychicSurge, psychicSeed);
+        return Collections.unmodifiableMap(map);
+    }
+
+    // None of these have new entries in Gen VII.
+    public static final Map<Type, Integer> consumableTypeBoostingItems = Gen6Constants.consumableTypeBoostingItems;
+    public static final Map<Integer, List<Integer>> speciesBoostingItems = Gen6Constants.speciesBoostingItems;
+    public static final Map<Type, List<Integer>> typeBoostingItems = Gen6Constants.typeBoostingItems;
+    public static final Map<Type, Integer> weaknessReducingBerries = Gen6Constants.weaknessReducingBerries;
 
     public static boolean isZCrystal(int itemIndex) {
         // From https://bulbapedia.bulbagarden.net/wiki/List_of_items_by_index_number_(Generation_VII)

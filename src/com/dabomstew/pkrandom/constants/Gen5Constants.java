@@ -353,29 +353,95 @@ public class Gen5Constants {
     // New non-consumable held items with in-battle NPC effect (not specific to one pokemon family or one move)
     public static final int eviolite = 0x21a, floatStone = 0x21b, rockyHelmet = 0x21c, ringTarget = 0x21f,
             bindingBand = 0x220;
+    // New moves (their move index) affected by items
+    // https://bulbapedia.bulbagarden.net/wiki/List_of_moves
+    public static final int hornLeech = 532;
 
     public static final List<Integer> consumableHeldItems = setupAllConsumableItems();
 
     private static List<Integer> setupAllConsumableItems() {
-        List<Integer> list = new ArrayList<>();
-        list.addAll(Gen4Constants.consumableHeldItems);
+        List<Integer> list = new ArrayList<>(Gen4Constants.consumableHeldItems);
         list.addAll(Arrays.asList(airBalloon, redCard, absorbBulb, cellBattery, ejectButton, fireGem, waterGem,
                 electricGem, grassGem, iceGem, fightingGem, poisonGem, groundGem, flyingGem, psychicGem, bugGem,
                 rockGem, ghostGem, dragonGem, darkGem, steelGem, normalGem));
-        return list;
+        return Collections.unmodifiableList(list);
     }
 
     public static final List<Integer> allHeldItems = setupAllHeldItems();
 
     private static List<Integer> setupAllHeldItems() {
-        List<Integer> list = new ArrayList<>();
-        list.addAll(Gen4Constants.allHeldItems);
+        List<Integer> list = new ArrayList<>(Gen4Constants.allHeldItems);
         list.addAll(Arrays.asList(airBalloon, redCard, absorbBulb, cellBattery, ejectButton, fireGem, waterGem,
                 electricGem, grassGem, iceGem, fightingGem, poisonGem, groundGem, flyingGem, psychicGem, bugGem,
                 rockGem, ghostGem, dragonGem, darkGem, steelGem, normalGem));
         list.addAll(Arrays.asList(eviolite, floatStone, rockyHelmet, ringTarget, bindingBand));
-        return list;
+        return Collections.unmodifiableList(list);
     }
+
+    public static final List<Integer> generalPurposeConsumableItems = initializeGeneralPurposeConsumableItems();
+
+    private static List<Integer> initializeGeneralPurposeConsumableItems() {
+        List<Integer> list = new ArrayList<>(Gen4Constants.generalPurposeConsumableItems);
+        list.addAll(Arrays.asList(redCard, absorbBulb, cellBattery, ejectButton));
+        return Collections.unmodifiableList(list);
+    }
+
+    public static final List<Integer> generalPurposeItems = initializeGeneralPurposeItems();
+
+    private static List<Integer> initializeGeneralPurposeItems() {
+        List<Integer> list = new ArrayList<>(Gen4Constants.generalPurposeItems);
+        list.addAll(Arrays.asList(floatStone, rockyHelmet));
+        return Collections.unmodifiableList(list);
+    }
+
+    public static final Map<Type, Integer> consumableTypeBoostingItems = initializeConsumableTypeBoostingItems();
+
+    private static Map<Type, Integer> initializeConsumableTypeBoostingItems() {
+        Map<Type, Integer> map = new HashMap<>();
+        map.put(Type.FIRE, fireGem);
+        map.put(Type.WATER, waterGem);
+        map.put(Type.ELECTRIC, electricGem);
+        map.put(Type.GRASS, grassGem);
+        map.put(Type.ICE, iceGem);
+        map.put(Type.FIGHTING, fightingGem);
+        map.put(Type.POISON, poisonGem);
+        map.put(Type.GROUND, groundGem);
+        map.put(Type.FLYING, flyingGem);
+        map.put(Type.PSYCHIC, psychicGem);
+        map.put(Type.BUG, bugGem);
+        map.put(Type.ROCK, rockGem);
+        map.put(Type.GHOST, ghostGem);
+        map.put(Type.DRAGON, dragonGem);
+        map.put(Type.DARK, darkGem);
+        map.put(Type.STEEL, steelGem);
+        map.put(Type.NORMAL, normalGem);
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Integer, List<Integer>> moveBoostingItems = initializeMoveBoostingItems();
+
+    private static Map<Integer, List<Integer>> initializeMoveBoostingItems() {
+        Map<Integer, List<Integer>> map = new HashMap<>(Gen4Constants.moveBoostingItems);
+        map.put(Gen4Constants.trick, Arrays.asList(Gen4Constants.toxicOrb, Gen4Constants.flameOrb, ringTarget));
+        map.put(Gen4Constants.switcheroo, Arrays.asList(Gen4Constants.toxicOrb, Gen4Constants.flameOrb, ringTarget));
+
+        map.put(Gen4Constants.bind, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Gen4Constants.clamp, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Gen4Constants.fireSpin, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Gen4Constants.magmaStorm, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Gen4Constants.sandTomb, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Gen4Constants.whirlpool, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Gen4Constants.wrap, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+
+        map.put(hornLeech, Arrays.asList(Gen4Constants.bigRoot));
+        return Collections.unmodifiableMap(map);
+    }
+
+    // None of these have new entries in Gen V.
+    public static final Map<Integer, List<Integer>> abilityBoostingItems = Gen4Constants.abilityBoostingItems;
+    public static final Map<Integer, List<Integer>> speciesBoostingItems = Gen4Constants.speciesBoostingItems;
+    public static final Map<Type, List<Integer>> typeBoostingItems = Gen4Constants.typeBoostingItems;
+    public static final Map<Type, Integer> weaknessReducingBerries = Gen4Constants.weaknessReducingBerries;
 
     private static Type[] constructTypeTable() {
         Type[] table = new Type[256];

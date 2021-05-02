@@ -1930,6 +1930,9 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean giveToImportantPokemon = settings.isRandomizeHeldItemsForBossTrainerPokemon();
         boolean giveToRegularPokemon = settings.isRandomizeHeldItemsForBossTrainerPokemon();
         boolean highestLevelOnly = settings.isHighestLevelGetsItemsForTrainers();
+
+        List<Move> moves = this.getMoves();
+        Map<Integer, List<MoveLearnt>> movesets = this.getMovesLearnt();
         List<Trainer> currentTrainers = this.getTrainers();
         for (Trainer t : currentTrainers) {
             if (!giveToRegularPokemon && (!t.isImportant() && !t.isBoss())) {
@@ -1954,17 +1957,17 @@ public abstract class AbstractRomHandler implements RomHandler {
                 if (highestLevelPoke == null) {
                     continue; // should never happen - trainer had zero pokes
                 }
-                randomizeHeldItem(highestLevelPoke, settings);
+                randomizeHeldItem(highestLevelPoke, settings, moves, movesets);
             } else {
                 for (TrainerPokemon tp : t.pokemon) {
-                    randomizeHeldItem(tp, settings);
+                    randomizeHeldItem(tp, settings, moves, movesets);
                 }
             }
         }
         this.setTrainers(currentTrainers, false);
     }
 
-    private void randomizeHeldItem(TrainerPokemon tp, Settings settings) {
+    private void randomizeHeldItem(TrainerPokemon tp, Settings settings, List<Move> moves, Map<Integer, List<MoveLearnt>> movesets) {
         boolean sensibleItemsOnly = settings.isSensibleItemsOnlyForTrainers();
         boolean consumableItemsOnly = settings.isConsumableItemsOnlyForTrainers();
         boolean swapMegaEvolutions = settings.isSwapTrainerMegaEvos();
@@ -1976,7 +1979,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         }
         List<Integer> toChooseFrom;
         if (sensibleItemsOnly) {
-            toChooseFrom = getSensibleHeldItemsFor(tp, consumableItemsOnly);
+            toChooseFrom = getSensibleHeldItemsFor(tp, consumableItemsOnly, moves, movesets);
         } else if (consumableItemsOnly) {
             toChooseFrom = getAllConsumableHeldItems();
         } else {
@@ -6167,7 +6170,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     @Override
-    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly) {
+    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, Map<Integer, List<MoveLearnt>> movesets) {
         return Arrays.asList(0);
     }
 

@@ -36,12 +36,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.dabomstew.pkrandom.*;
-import com.dabomstew.pkrandom.constants.Species;
+import com.dabomstew.pkrandom.constants.*;
 import com.dabomstew.pkrandom.pokemon.*;
 import pptxt.PPTxtHandler;
 
-import com.dabomstew.pkrandom.constants.Gen5Constants;
-import com.dabomstew.pkrandom.constants.GlobalConstants;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import com.dabomstew.pkrandom.newnds.NARCArchive;
 import compressors.DSDecmp;
@@ -3467,5 +3465,84 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     @Override
     public List<Integer> getAllConsumableHeldItems() {
         return Gen5Constants.consumableHeldItems;
+    }
+
+    @Override
+    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, Map<Integer, List<MoveLearnt>> movesets) {
+        List<Integer> items = new ArrayList<>();
+        items.addAll(Gen5Constants.generalPurposeConsumableItems);
+        int frequencyBoostCount = 6; // Make some very good items more common, but not too common
+        if (!consumableOnly) {
+            frequencyBoostCount = 8; // bigger to account for larger item pool.
+            items.addAll(Gen5Constants.generalPurposeItems);
+        }
+        int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.pokemon.number, movesets, tp.level);
+        for (int moveIdx : pokeMoves) {
+            Move move = moves.get(moveIdx);
+            if (move == null) {
+                continue;
+            }
+            if (move.category == MoveCategory.PHYSICAL) {
+                items.add(Gen4Constants.liechiBerry);
+                items.add(Gen5Constants.consumableTypeBoostingItems.get(move.type));
+                if (!consumableOnly) {
+                    items.addAll(Gen5Constants.typeBoostingItems.get(move.type));
+                    items.add(Gen4Constants.choiceBand);
+                    items.add(Gen4Constants.muscleBand);
+                }
+            }
+            if (move.category == MoveCategory.SPECIAL) {
+                items.add(Gen4Constants.petayaBerry);
+                items.add(Gen5Constants.consumableTypeBoostingItems.get(move.type));
+                if (!consumableOnly) {
+                    items.addAll(Gen5Constants.typeBoostingItems.get(move.type));
+                    items.add(Gen4Constants.wiseGlasses);
+                    items.add(Gen4Constants.choiceSpecs);
+                }
+            }
+            if (!consumableOnly && Gen5Constants.moveBoostingItems.containsKey(moveIdx)) {
+                items.addAll(Gen5Constants.moveBoostingItems.get(moveIdx));
+            }
+        }
+        Map<Type, Effectiveness> byType = Effectiveness.against(tp.pokemon.primaryType, tp.pokemon.secondaryType, 5);
+        for(Map.Entry<Type, Effectiveness> entry : byType.entrySet()) {
+            Integer berry = Gen5Constants.weaknessReducingBerries.get(entry.getKey());
+            if (entry.getValue() == Effectiveness.DOUBLE) {
+                items.add(berry);
+            } else if (entry.getValue() == Effectiveness.QUADRUPLE) {
+                for (int i = 0; i < frequencyBoostCount; i++) {
+                    items.add(berry);
+                }
+            }
+        }
+        if (byType.get(Type.NORMAL) == Effectiveness.NEUTRAL) {
+            items.add(Gen4Constants.chilanBerry);
+        }
+        if (tp.ability == Abilities.levitate) {
+            items.removeAll(Arrays.asList(Gen4Constants.shucaBerry));
+        } else if (byType.get(Type.GROUND) == Effectiveness.DOUBLE || byType.get(Type.GROUND) == Effectiveness.QUADRUPLE) {
+            items.add(Gen5Constants.airBalloon);
+        }
+
+        if (!consumableOnly) {
+            if (Gen5Constants.abilityBoostingItems.containsKey(tp.ability)) {
+                items.addAll(Gen5Constants.abilityBoostingItems.get(tp.ability));
+            }
+            if (tp.pokemon.primaryType == Type.POISON || tp.pokemon.secondaryType == Type.POISON) {
+                items.add(Gen4Constants.blackSludge);
+            }
+            List<Integer> speciesItems = Gen5Constants.speciesBoostingItems.get(tp.pokemon.number);
+            if (speciesItems != null) {
+                for (int i = 0; i < frequencyBoostCount; i++) {
+                    items.addAll(speciesItems);
+                }
+            }
+            if (!tp.pokemon.evolutionsFrom.isEmpty() && tp.level >= 20) {
+                // eviolite can be too good for early game, so we gate it behind a minimum level.
+                // We go with the same level as the option for "No early wonder guard".
+                items.add(Gen5Constants.eviolite);
+            }
+        }
+        return items;
     }
 }

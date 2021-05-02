@@ -3418,4 +3418,42 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     public List<Integer> getAllConsumableHeldItems() {
         return Gen3Constants.consumableHeldItems;
     }
+
+    @Override
+    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, Map<Integer, List<MoveLearnt>> movesets) {
+        List<Integer> items = new ArrayList<>();
+        items.addAll(Gen3Constants.generalPurposeConsumableItems);
+        if (!consumableOnly) {
+            items.addAll(Gen3Constants.generalPurposeItems);
+        }
+        int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.pokemon.number, movesets, tp.level);
+        for (int moveIdx : pokeMoves) {
+            Move move = moves.get(moveIdx);
+            if (move == null) {
+                continue;
+            }
+            if (Gen3Constants.physicalTypes.contains(move.type) && move.power > 0) {
+                items.add(Gen3Constants.liechiBerry);
+                if (!consumableOnly) {
+                    items.addAll(Gen3Constants.typeBoostingItems.get(move.type));
+                    items.add(Gen3Constants.choiceBand);
+                }
+            }
+            if (!Gen3Constants.physicalTypes.contains(move.type) && move.power > 0) {
+                items.add(Gen3Constants.petayaBerry);
+                if (!consumableOnly) {
+                    items.addAll(Gen3Constants.typeBoostingItems.get(move.type));
+                }
+            }
+        }
+        if (!consumableOnly) {
+            List<Integer> speciesItems = Gen3Constants.speciesBoostingItems.get(tp.pokemon.number);
+            if (speciesItems != null) {
+                for (int i = 0; i < 6; i++) {  // Increase the likelihood of using species specific items.
+                    items.addAll(speciesItems);
+                }
+            }
+        }
+        return items;
+    }
 }

@@ -49,6 +49,9 @@ public enum Type {
     private static final List<Type> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
     private static final int SIZE = VALUES.size();
 
+    public static final List<Type> GEN2THROUGH5 = Collections.unmodifiableList(Arrays.asList(values()).subList(0, DARK.ordinal()+1));
+    public static final List<Type> GEN6PLUS = Collections.unmodifiableList(Arrays.asList(values()).subList(0, FAIRY.ordinal()+1));
+
     public static Type randomType(Random random) {
         return VALUES.get(random.nextInt(SIZE));
     }

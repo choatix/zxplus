@@ -3079,7 +3079,7 @@ public class NewRandomizerGUI {
         if (tpBossTrainersItemsCheckBox.isSelected() || tpImportantTrainersItemsCheckBox.isSelected() ||
                 tpRegularTrainersItemsCheckBox.isSelected()) {
             tpConsumableItemsOnlyCheckBox.setEnabled(true);
-            tpSensibleItemsCheckBox.setEnabled(false); // not implemented yet
+            tpSensibleItemsCheckBox.setEnabled(true);
             tpHighestLevelGetsItemCheckBox.setEnabled(true);
         } else {
             tpConsumableItemsOnlyCheckBox.setEnabled(false);

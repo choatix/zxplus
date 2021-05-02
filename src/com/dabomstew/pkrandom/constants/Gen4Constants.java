@@ -101,7 +101,8 @@ public class Gen4Constants {
             // status effect berries
             cheriBerry = 0x95, chestoBerry = 0x96, pechaBerry = 0x97, rawstBerry = 0x98, aspearBerry = 0x99,
             leppaBerry = 0x9a, oranBerry = 0x9b, persimBerry = 0x9c, lumBerry = 0x9d, sitrusBerry = 0x9e,
-            // Restore 1/8 HP when below 50% but may cause confusion
+            // Restore 1/8 HP when below 50% but may cause confusion. In Gen 7, these heal 1/2 when
+            // below 25% (and still may cause confusion).
             figyBerry = 0x9f, wikiBerry = 0xa0, magoBerry = 0xa1, aguavBerry = 0xa2, iapapaBerry = 0xa3,
             // Reduce damage from supereffective damage
             occaBerry = 0xb8, passhoBerry = 0xb9, wacanBerry = 0xba, rindoBerry = 0xbb, yacheBerry = 0xbc,
@@ -124,15 +125,19 @@ public class Gen4Constants {
             spellTag = 0x0f7, twistedSpoon = 0x0f8, charcoal = 0x0f9, dragonFang = 0x0fa, silkScarf = 0x0fb,
             shellBell = 0x0fd, seaIncense = 0x0fe, laxIncense = 0x0ff, wideLens = 0x109, muscleBand = 0x10a,
             wiseGlasses = 0x10b, expertBelt = 0x10c, lightClay = 0x10d, lifeOrb = 0x10e, toxicOrb = 0x110,
-            flameOrb = 0x111, quickPowder = 0x112, zoomLens = 0x114, metronome = 0x115, ironBall = 0x116,
-            laggingTail = 0x117, destinyKnot = 0x118, blackSludge = 0x119, icyRock = 0x11a, smoothRock = 0x11b,
+            flameOrb = 0x111, zoomLens = 0x114, metronome = 0x115, ironBall = 0x116, laggingTail = 0x117,
+            destinyKnot = 0x118, blackSludge = 0x119, icyRock = 0x11a, smoothRock = 0x11b,
             heatRock = 0x11c, dampRock = 0x11d, gripClaw = 0x11e, choiceScarf = 0x11f, stickyBarb = 0x120,
             shedShell = 0x127, bigRoot = 0x128, choiceSpecs = 0x129, flamePlate = 0x12a, splashPlate = 0x12b,
             zapPlate = 0x12c, meadowPlate = 0x12d, iciclePlate = 0x12e, fistPlate = 0x12f, toxicPlate = 0x130,
             earthPlate = 0x131, skyPlate = 0x132, mindPlate = 0x133, insectPlate = 0x134, stonePlate = 0x135,
             spookyPlate = 0x136, dracoPlate = 0x137, dreadPlate = 0x138, ironPlate = 0x139, oddIncense = 0x13a,
-            rockIncense = 0x13b, fullIncense = 0x13c, waveIncense = 0x13d, roseIncense = 0x13e, pureIncense = 0x140,
+            rockIncense = 0x13b, fullIncense = 0x13c, waveIncense = 0x13d, roseIncense = 0x13e,
             razorClaw = 0x146, razorFang = 0x147;
+    // species-specific held items.
+    public static final int adamantOrb = 0x087, lustrousOrb = 0x088, soulDew = 0x0e1, deepSeaTooth = 0x0e2,
+            deepSeaScale = 0x0e3, lightBall = 0x0ec, luckyPunch = 0x100, metalPowder = 0x101, thickClub = 0x102,
+            stick = 0x103, quickPowder = 0x112;
 
     public static final List<Integer> consumableHeldItems = Arrays.asList(
             cheriBerry, chestoBerry, pechaBerry, rawstBerry, aspearBerry, leppaBerry, oranBerry, persimBerry,
@@ -150,14 +155,168 @@ public class Gen4Constants {
                 scopeLens, metalCoat, leftovers, softSand, hardStone, miracleSeed, blackGlasses, blackBelt, magnet,
                 mysticWater, sharpBeak, poisonBarb, neverMeltIce, spellTag, twistedSpoon, charcoal, dragonFang,
                 silkScarf, shellBell, seaIncense, laxIncense, wideLens, muscleBand, wiseGlasses, expertBelt, lightClay,
-                lifeOrb, toxicOrb, flameOrb, quickPowder, zoomLens, metronome, ironBall, laggingTail, destinyKnot,
+                lifeOrb, toxicOrb, flameOrb, zoomLens, metronome, ironBall, laggingTail, destinyKnot,
                 blackSludge, icyRock, smoothRock, heatRock, dampRock, gripClaw, choiceScarf, stickyBarb, shedShell,
                 bigRoot, choiceSpecs, flamePlate, splashPlate, zapPlate, meadowPlate, iciclePlate, fistPlate,
                 toxicPlate, earthPlate, skyPlate, mindPlate, insectPlate, stonePlate, spookyPlate, dracoPlate,
-                dreadPlate, ironPlate, oddIncense, rockIncense, fullIncense, waveIncense, roseIncense, pureIncense,
+                dreadPlate, ironPlate, oddIncense, rockIncense, fullIncense, waveIncense, roseIncense,
                 razorClaw, razorFang));
         list.addAll(consumableHeldItems);
         return list;
+    }
+
+    // Moves (their move index) affected by items
+    // https://bulbapedia.bulbagarden.net/wiki/List_of_moves
+    public static final int absorb = 71, aquaRing = 392, bind = 20, bounce = 340, clamp = 128, dig = 91, dive = 291,
+            drainPunch = 409, dreamEater = 138, facade = 263, fireSpin = 83, fling = 374, fly = 19,
+            gigaDrain = 202, hail = 258, ingrain = 275, leechLife = 141, leechSeed = 73, lightScreen = 113,
+            magmaStorm = 463, megaDrain = 72, outrage = 200, psychoShift = 375, rainDance = 240, razorWind = 13,
+            reflect = 115, sandstorm = 201, sandTomb = 328, skullBash = 130, skyAttack = 143, solarBeam = 76,
+            sunnyDay = 241, switcheroo = 415, trick = 271, trickRoom = 433, uproar = 253, whirlpool = 250, wrap = 35;
+
+    public static final List<Integer> generalPurposeConsumableItems = Collections.unmodifiableList(Arrays.asList(
+            cheriBerry, chestoBerry, pechaBerry, rawstBerry, aspearBerry, leppaBerry,
+            oranBerry, persimBerry, lumBerry, sitrusBerry, ganlonBerry, salacBerry,
+            // An NPC pokemon's nature is generated randomly with IVs during gameplay. Therefore, we do not include
+            // the flavor berries because, prior to Gen 7, they aren't worth the risk.
+            apicotBerry, lansatBerry, starfBerry, enigmaBerry, micleBerry, custapBerry,
+            jabocaBerry, rowapBerry, berryJuice, whiteHerb, mentalHerb, focusSash));
+
+    public static final List<Integer> generalPurposeItems = Collections.unmodifiableList(Arrays.asList(
+            brightPowder, quickClaw, kingsRock, focusBand, scopeLens, leftovers, shellBell, laxIncense,
+            wideLens, expertBelt, lifeOrb, zoomLens, destinyKnot, shedShell, razorClaw, razorFang));
+
+    public static final Map<Type, List<Integer>> typeBoostingItems = initializeTypeBoostingItems();
+
+    private static Map<Type, List<Integer>> initializeTypeBoostingItems() {
+        Map<Type, List<Integer>> map = new HashMap<>();
+        map.put(Type.BUG, Arrays.asList(silverPowder, insectPlate));
+        map.put(Type.DARK, Arrays.asList(blackGlasses, dreadPlate));
+        map.put(Type.DRAGON, Arrays.asList(dragonFang, dracoPlate));
+        map.put(Type.ELECTRIC, Arrays.asList(magnet, zapPlate));
+        map.put(Type.FIGHTING, Arrays.asList(blackBelt, fistPlate));
+        map.put(Type.FIRE, Arrays.asList(charcoal, flamePlate));
+        map.put(Type.FLYING, Arrays.asList(sharpBeak, skyPlate));
+        map.put(Type.GHOST, Arrays.asList(spellTag, spookyPlate));
+        map.put(Type.GRASS, Arrays.asList(miracleSeed, meadowPlate, roseIncense));
+        map.put(Type.GROUND, Arrays.asList(softSand, earthPlate));
+        map.put(Type.ICE, Arrays.asList(neverMeltIce, iciclePlate));
+        map.put(Type.NORMAL, Arrays.asList(silkScarf));
+        map.put(Type.POISON, Arrays.asList(poisonBarb, toxicPlate));
+        map.put(Type.PSYCHIC, Arrays.asList(twistedSpoon, mindPlate, oddIncense));
+        map.put(Type.ROCK, Arrays.asList(hardStone, stonePlate, rockIncense));
+        map.put(Type.STEEL, Arrays.asList(metalCoat, ironPlate));
+        map.put(Type.WATER, Arrays.asList(mysticWater, seaIncense, splashPlate, waveIncense));
+        map.put(null, Collections.emptyList()); // ??? type
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Integer, List<Integer>> moveBoostingItems = initializeMoveBoostingItems();
+
+    private static Map<Integer, List<Integer>> initializeMoveBoostingItems() {
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        map.put(bounce, Arrays.asList(powerHerb));
+        map.put(dig, Arrays.asList(powerHerb));
+        map.put(dive, Arrays.asList(powerHerb));
+        map.put(fly, Arrays.asList(powerHerb));
+        map.put(razorWind, Arrays.asList(powerHerb));
+        map.put(skullBash, Arrays.asList(powerHerb));
+        map.put(skyAttack, Arrays.asList(powerHerb));
+        map.put(solarBeam, Arrays.asList(powerHerb));
+
+        map.put(fling, Arrays.asList(toxicOrb, flameOrb, ironBall));
+
+        map.put(trick, Arrays.asList(toxicOrb, flameOrb, fullIncense, laggingTail));
+        map.put(switcheroo, Arrays.asList(toxicOrb, flameOrb, fullIncense, laggingTail));
+
+        map.put(trickRoom, Arrays.asList(ironBall));
+
+        map.put(facade, Arrays.asList(toxicOrb, flameOrb));
+
+        map.put(psychoShift, Arrays.asList(toxicOrb, flameOrb));
+
+        map.put(lightScreen, Arrays.asList(lightClay));
+        map.put(reflect, Arrays.asList(lightClay));
+
+        map.put(hail, Arrays.asList(icyRock));
+
+        map.put(sandstorm, Arrays.asList(smoothRock));
+
+        map.put(sunnyDay, Arrays.asList(heatRock));
+
+        map.put(rainDance, Arrays.asList(dampRock));
+
+        map.put(bind, Arrays.asList(gripClaw));
+        map.put(clamp, Arrays.asList(gripClaw));
+        map.put(fireSpin, Arrays.asList(gripClaw));
+        map.put(magmaStorm, Arrays.asList(gripClaw));
+        map.put(outrage, Arrays.asList(gripClaw));
+        map.put(sandTomb, Arrays.asList(gripClaw));
+        map.put(uproar, Arrays.asList(gripClaw));
+        map.put(whirlpool, Arrays.asList(gripClaw));
+        map.put(wrap, Arrays.asList(gripClaw));
+
+        map.put(absorb, Arrays.asList(bigRoot));
+        map.put(aquaRing, Arrays.asList(bigRoot));
+        map.put(drainPunch, Arrays.asList(bigRoot));
+        map.put(dreamEater, Arrays.asList(bigRoot));
+        map.put(gigaDrain, Arrays.asList(bigRoot));
+        map.put(ingrain, Arrays.asList(bigRoot));
+        map.put(leechLife, Arrays.asList(bigRoot));
+        map.put(leechSeed, Arrays.asList(bigRoot));
+        map.put(megaDrain, Arrays.asList(bigRoot));
+
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Type, Integer> weaknessReducingBerries = initializeWeaknessReducingBerries();
+
+    private static Map<Type, Integer> initializeWeaknessReducingBerries() {
+        Map<Type, Integer> map = new HashMap<>();
+        map.put(Type.FIRE, occaBerry);
+        map.put(Type.WATER, passhoBerry);
+        map.put(Type.ELECTRIC, wacanBerry);
+        map.put(Type.GRASS, rindoBerry);
+        map.put(Type.ICE, yacheBerry);
+        map.put(Type.FIGHTING, chopleBerry);
+        map.put(Type.POISON, kebiaBerry);
+        map.put(Type.GROUND, shucaBerry);
+        map.put(Type.FLYING, cobaBerry);
+        map.put(Type.PSYCHIC, payapaBerry);
+        map.put(Type.BUG, tangaBerry);
+        map.put(Type.ROCK, chartiBerry);
+        map.put(Type.GHOST, kasibBerry);
+        map.put(Type.DRAGON, habanBerry);
+        map.put(Type.DARK, colburBerry);
+        map.put(Type.STEEL, babiriBerry);
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Integer, List<Integer>> speciesBoostingItems = initializeSpeciesBoostingItems();
+
+    private static Map<Integer, List<Integer>> initializeSpeciesBoostingItems() {
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        map.put(Species.dialga, Arrays.asList(adamantOrb));
+        map.put(Species.palkia, Arrays.asList(lustrousOrb));
+        map.put(Species.latias, Arrays.asList(soulDew));
+        map.put(Species.latios, Arrays.asList(soulDew));
+        map.put(Species.clamperl, Arrays.asList(deepSeaTooth, deepSeaScale));
+        map.put(Species.pikachu, Arrays.asList(lightBall));
+        map.put(Species.chansey, Arrays.asList(luckyPunch));
+        map.put(Species.ditto, Arrays.asList(metalPowder, quickPowder));
+        map.put(Species.cubone, Arrays.asList(thickClub));
+        map.put(Species.marowak, Arrays.asList(thickClub));
+        map.put(Species.farfetchd, Arrays.asList(stick));
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Integer, List<Integer>> abilityBoostingItems = initializeAbilityBoostingItems();
+
+    private static Map<Integer, List<Integer>> initializeAbilityBoostingItems() {
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        map.put(Abilities.guts, Arrays.asList(flameOrb, toxicOrb));
+        map.put(Abilities.magicGuard, Arrays.asList(stickyBarb, lifeOrb));
+        return Collections.unmodifiableMap(map);
     }
 
     public static final Map<Integer,List<Integer>> abilityVariations = setupAbilityVariations();

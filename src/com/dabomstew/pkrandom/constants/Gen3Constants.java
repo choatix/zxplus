@@ -220,13 +220,16 @@ public class Gen3Constants {
             softSand = 0x0cb, hardStone = 0x0cc, miracleSeed = 0x0cd, blackGlasses = 0x0ce, blackBelt = 0x0cf,
             magnet = 0x0d0, mysticWater = 0x0d1, sharpBeak = 0x0d2, poisonBarb = 0x0d3, neverMeltIce = 0x0d4,
             spellTag = 0x0d5, twistedSpoon = 0x0d6, charcoal = 0x0d7, dragonFang = 0x0d8, silkScarf = 0x0d9,
-            shellBell = 0x0db, seaIncense = 0x0dc, laxIncense = 0x0de;
+            shellBell = 0x0db, seaIncense = 0x0dc, laxIncense = 0x0dd;
+    // species-specific held items.
+    public static final int soulDew = 0x0bf, lightBall = 0x0ca, luckyPunch = 0x0de, metalPowder = 0x0df,
+            thickClub = 0x0e0, stick = 0x0e1;
 
-    public static final List<Integer> consumableHeldItems = Arrays.asList(
+    public static final List<Integer> consumableHeldItems = Collections.unmodifiableList(Arrays.asList(
             cheriBerry, chestoBerry, pechaBerry, rawstBerry, aspearBerry, leppaBerry, oranBerry, persimBerry,
             lumBerry, sitrusBerry, figyBerry, wikiBerry, magoBerry, aguavBerry, iapapaBerry, liechiBerry,
             ganlonBerry, salacBerry, petayaBerry, apicotBerry, lansatBerry, starfBerry, berryJuice, whiteHerb,
-            mentalHerb);
+            mentalHerb));
 
     public static final List<Integer> allHeldItems = setupAllHeldItems();
 
@@ -237,8 +240,65 @@ public class Gen3Constants {
                 mysticWater, sharpBeak, poisonBarb, neverMeltIce, spellTag, twistedSpoon, charcoal, dragonFang,
                 silkScarf, shellBell, seaIncense, laxIncense));
         list.addAll(consumableHeldItems);
-        return list;
+        return Collections.unmodifiableList(list);
     }
+
+    public static final List<Integer> generalPurposeConsumableItems = Collections.unmodifiableList(Arrays.asList(
+            cheriBerry, chestoBerry, pechaBerry, rawstBerry, aspearBerry, leppaBerry,
+            oranBerry, persimBerry, lumBerry, sitrusBerry, ganlonBerry, salacBerry,
+            // An NPC pokemon's nature is generated randomly with IVs during gameplay. Therefore, we do not include
+            // the flavor berries because, prior to Gen 7, they aren't worth the risk.
+            apicotBerry, lansatBerry, starfBerry, berryJuice, whiteHerb, mentalHerb
+    ));
+
+    public static final List<Integer> generalPurposeItems = Collections.unmodifiableList(Arrays.asList(
+            brightPowder, quickClaw, kingsRock, focusBand, scopeLens, leftovers, shellBell, laxIncense
+    ));
+
+    public static final Map<Type, List<Integer>> typeBoostingItems = initializeTypeBoostingItems();
+
+    private static Map<Type, List<Integer>> initializeTypeBoostingItems() {
+        Map<Type, List<Integer>> map = new HashMap<>();
+        map.put(Type.BUG, Arrays.asList(silverPowder));
+        map.put(Type.DARK, Arrays.asList(blackGlasses));
+        map.put(Type.DRAGON, Arrays.asList(dragonFang));
+        map.put(Type.ELECTRIC, Arrays.asList(magnet));
+        map.put(Type.FIGHTING, Arrays.asList(blackBelt));
+        map.put(Type.FIRE, Arrays.asList(charcoal));
+        map.put(Type.FLYING, Arrays.asList(sharpBeak));
+        map.put(Type.GHOST, Arrays.asList(spellTag));
+        map.put(Type.GRASS, Arrays.asList(miracleSeed));
+        map.put(Type.GROUND, Arrays.asList(softSand));
+        map.put(Type.ICE, Arrays.asList(neverMeltIce));
+        map.put(Type.NORMAL, Arrays.asList(silkScarf));
+        map.put(Type.POISON, Arrays.asList(poisonBarb));
+        map.put(Type.PSYCHIC, Arrays.asList(twistedSpoon));
+        map.put(Type.ROCK, Arrays.asList(hardStone));
+        map.put(Type.STEEL, Arrays.asList(metalCoat));
+        map.put(Type.WATER, Arrays.asList(mysticWater, seaIncense));
+        map.put(null, Collections.emptyList()); // ??? type
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Map<Integer, List<Integer>> speciesBoostingItems = initializeSpeciesBoostingItems();
+
+    private static Map<Integer, List<Integer>> initializeSpeciesBoostingItems() {
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        map.put(Species.latias, Arrays.asList(soulDew));
+        map.put(Species.latios, Arrays.asList(soulDew));
+        map.put(Species.clamperl, Arrays.asList(deepSeaToothIndex, deepSeaScaleIndex));
+        map.put(Species.pikachu, Arrays.asList(lightBall));
+        map.put(Species.chansey, Arrays.asList(luckyPunch));
+        map.put(Species.ditto, Arrays.asList(metalPowder));
+        map.put(Species.cubone, Arrays.asList(thickClub));
+        map.put(Species.marowak, Arrays.asList(thickClub));
+        map.put(Species.farfetchd, Arrays.asList(stick));
+        return Collections.unmodifiableMap(map);
+    }
+
+    public static final Set<Type> physicalTypes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            Type.NORMAL, Type.FIGHTING, Type.POISON, Type.GROUND, Type.FLYING, Type.BUG,
+            Type.ROCK, Type.GHOST, Type.STEEL)));
 
     private static Type[] constructTypeTable() {
         Type[] table = new Type[256];
