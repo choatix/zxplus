@@ -3159,11 +3159,31 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     }
                 }
             }
+
+            // In ORAS, it's possible to encounter the sparkling Mega Stone items on the field
+            // before you finish the game. Thus, we want to randomize them as well.
+            if (romEntry.romType == Gen6Constants.Type_ORAS) {
+                List<Integer> fieldMegaStones = this.getFieldMegaStonesORAS(scriptGarc);
+                fieldItems.addAll(fieldMegaStones);
+            }
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
 
         return fieldItems;
+    }
+
+    private List<Integer> getFieldMegaStonesORAS(GARCArchive scriptGarc) throws IOException {
+        List<Integer> fieldMegaStones = new ArrayList<>();
+        int megaStoneItemScriptFile = romEntry.getInt("MegaStoneItemScriptNumber");
+        byte[] megaStoneItemEventBytes = scriptGarc.getFile(megaStoneItemScriptFile);
+        AMX megaStoneItemEvent = new AMX(megaStoneItemEventBytes);
+        for (int i = 0; i < Gen6Constants.megastoneTableLengthORAS; i++) {
+            int offset = Gen6Constants.megastoneTableStartingOffsetORAS + (i * Gen6Constants.megastoneTableEntrySizeORAS);
+            int item = FileFunctions.read2ByteInt(megaStoneItemEvent.decData, offset);
+            fieldMegaStones.add(item);
+        }
+        return fieldMegaStones;
     }
 
     public void setFieldItems(List<Integer> items) {
@@ -3202,6 +3222,30 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                         FileFunctions.write2ByteInt(code,offsHidden + (i * 0xE) + 2, item);
                     }
                 }
+            }
+
+            // Sparkling Mega Stone items for ORAS only
+            if (romEntry.romType == Gen6Constants.Type_ORAS) {
+                List<Integer> fieldMegaStones = this.getFieldMegaStonesORAS(scriptGarc);
+                Map<Integer, Integer> megaStoneMap = new HashMap<>();
+                int megaStoneItemScriptFile = romEntry.getInt("MegaStoneItemScriptNumber");
+                byte[] megaStoneItemEventBytes = scriptGarc.getFile(megaStoneItemScriptFile);
+                AMX megaStoneItemEvent = new AMX(megaStoneItemEventBytes);
+                for (int i = 0; i < Gen6Constants.megastoneTableLengthORAS; i++) {
+                    int offset = Gen6Constants.megastoneTableStartingOffsetORAS + (i * Gen6Constants.megastoneTableEntrySizeORAS);
+                    int oldItem = fieldMegaStones.get(i);
+                    int newItem = iterItems.next();
+                    if (megaStoneMap.containsKey(oldItem)) {
+                        // There are some duplicate entries for certain Mega Stones, and we're not quite sure why.
+                        // Set them to the same item for sanity's sake.
+                        int replacementItem = megaStoneMap.get(oldItem);
+                        FileFunctions.write2ByteInt(megaStoneItemEvent.decData, offset, replacementItem);
+                    } else {
+                        FileFunctions.write2ByteInt(megaStoneItemEvent.decData, offset, newItem);
+                        megaStoneMap.put(oldItem, newItem);
+                    }
+                }
+                scriptGarc.setFile(megaStoneItemScriptFile, megaStoneItemEvent.getBytes());
             }
 
             writeGARC(romEntry.getString("Scripts"),scriptGarc);
