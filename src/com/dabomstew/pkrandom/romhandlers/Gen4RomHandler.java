@@ -174,6 +174,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                         } else if (r[0].endsWith("Tweak")) {
                             current.tweakFiles.put(r[0], r[1]);
                         } else if (r[0].endsWith("MarillCryScripts")) {
+                            current.marillCryScriptEntries.clear();
                             String[] offsets = r[1].substring(1, r[1].length() - 1).split(",");
                             for (String off : offsets) {
                                 String[] parts = off.split(":");
@@ -330,7 +331,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         // want to allow the option of randomizing the enemy Pokemon too. Unfortunately, the latter can
         // occur *before* the former, but there's no guarantee that it will even happen. Since we *know*
         // we'll need to do this patch eventually, just expand the arm9 here to make things easy.
-        if (romEntry.romType == Gen4Constants.Type_HGSS) {
+        if (romEntry.romType == Gen4Constants.Type_HGSS && romEntry.tweakFiles.containsKey("NewCatchingTutorialSubroutineTweak")) {
             int extendBy = romEntry.getInt("NewCatchingTutorialSubroutineSize");
             arm9 = extendARM9(arm9, extendBy, romEntry.getString("TCMCopyingPrefix"), Gen4Constants.arm9Offset);
             genericIPSPatch(arm9, "NewCatchingTutorialSubroutineTweak");
@@ -3593,15 +3594,17 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     replaceAllStringsInEntry(textOffsets[i], replacements, Gen4Constants.textCharsPerLine);
                 }
 
-                // Lastly, modify the catching tutorial to use the new Pokemon
-                String catchingTutorialMonTablePrefix = romEntry.getString("CatchingTutorialMonTablePrefix");
-                offset = find(arm9, catchingTutorialMonTablePrefix);
-                if (offset > 0) {
-                    offset += catchingTutorialMonTablePrefix.length() / 2; // because it was a prefix
+                // Lastly, modify the catching tutorial to use the new Pokemon if we're capable of doing so
+                if (romEntry.tweakFiles.containsKey("NewCatchingTutorialSubroutineTweak")) {
+                    String catchingTutorialMonTablePrefix = romEntry.getString("CatchingTutorialMonTablePrefix");
+                    offset = find(arm9, catchingTutorialMonTablePrefix);
+                    if (offset > 0) {
+                        offset += catchingTutorialMonTablePrefix.length() / 2; // because it was a prefix
 
-                    // As part of our catching tutorial patch, the player Pokemon's ID is just pc-relative
-                    // loaded, and offset is now pointing to it.
-                    writeWord(arm9, offset, marillReplacementId);
+                        // As part of our catching tutorial patch, the player Pokemon's ID is just pc-relative
+                        // loaded, and offset is now pointing to it.
+                        writeWord(arm9, offset, marillReplacementId);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -4046,7 +4049,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     private void randomizeCatchingTutorial() {
         int opponentOffset = romEntry.getInt("CatchingTutorialOpponentMonOffset");
 
-        if (romEntry.romType == Gen4Constants.Type_HGSS) {
+        if (romEntry.tweakFiles.containsKey("NewCatchingTutorialSubroutineTweak")) {
             String catchingTutorialMonTablePrefix = romEntry.getString("CatchingTutorialMonTablePrefix");
             int offset = find(arm9, catchingTutorialMonTablePrefix);
             if (offset > 0) {
@@ -4057,11 +4060,22 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 // tutorial patch, the player and enemy species IDs are pc-relative loaded, with the
                 // enemy ID occurring right after the player ID (which is what offset is pointing to).
                 Pokemon opponent = randomPokemonLimited(Integer.MAX_VALUE, false);
-                // writeWord(arm9, offset + 4, opponent.number);
                 writeWord(arm9, offset + 4, opponent.number);
             }
+        } else if (romEntry.romType == Gen4Constants.Type_HGSS) {
+            // For non-US HGSS, just handle it in the old-school way. Can randomize both Pokemon, but both limited to 1-255
+            // Make sure to raise the level of Lyra/Ethan's Pokemon to 10 to prevent softlocks
+            int playerOffset = romEntry.getInt("CatchingTutorialPlayerMonOffset");
+            int levelOffset = romEntry.getInt("CatchingTutorialPlayerLevelOffset");
+            Pokemon opponent = randomPokemonLimited(255, false);
+            Pokemon player = randomPokemonLimited(255, false);
+            if (opponent != null && player != null) {
+                arm9[opponentOffset] = (byte) opponent.number;
+                arm9[playerOffset] = (byte) player.number;
+                arm9[levelOffset] = 10;
+            }
         } else {
-            // Only opponent, but enough space for any mon
+            // DPPt only supports randomizing the opponent, but enough space for any mon
             Pokemon opponent = randomPokemonLimited(Integer.MAX_VALUE, false);
 
             if (opponent != null) {
