@@ -1225,7 +1225,9 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                     tpk.level = level;
                     tpk.pokemon = pokes[species];
                     tpk.AILevel = ailevel;
-                    tpk.ability = trpoke[pokeOffs + 1] & 0xFF;
+                    int abilityAndFlag = trpoke[pokeOffs + 1];
+                    tpk.ability = (abilityAndFlag >>> 4) & 0xF;
+                    tpk.mysteryFlag = (abilityAndFlag & 0xF);
                     tpk.forme = formnum;
                     tpk.formeSuffix = Gen5Constants.getFormeSuffixByBaseForme(species,formnum);
                     tpk.absolutePokeNumber = Gen5Constants.getAbsolutePokeNumByBaseForme(species,formnum);

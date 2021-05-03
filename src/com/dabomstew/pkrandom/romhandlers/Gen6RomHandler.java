@@ -1718,7 +1718,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     // There's also a trainer flag to force gender, but
                     // this allows fixed teams with mixed genders.
 
-                    // int secondbyte = trpoke[pokeOffs + 1] & 0xFF;
                     int level = readWord(trpoke, pokeOffs + 2);
                     int species = readWord(trpoke, pokeOffs + 4);
                     int formnum = readWord(trpoke, pokeOffs + 6);
@@ -1726,7 +1725,9 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     tpk.level = level;
                     tpk.pokemon = pokes[species];
                     tpk.AILevel = trainerAILevel;
-                    tpk.ability = trpoke[pokeOffs + 1] & 0xFF;
+                    int abilityAndFlag = trpoke[pokeOffs + 1];
+                    tpk.ability = (abilityAndFlag >>> 4) & 0xF;
+                    tpk.mysteryFlag = (abilityAndFlag & 0xF);
                     tpk.forme = formnum;
                     tpk.formeSuffix = Gen6Constants.getFormeSuffixByBaseForme(species,formnum);
                     tpk.absolutePokeNumber = absolutePokeNumByBaseForme

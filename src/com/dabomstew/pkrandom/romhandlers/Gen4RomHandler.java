@@ -2100,7 +2100,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     tpk.level = level;
                     tpk.pokemon = pokes[species];
                     tpk.AILevel = ailevel;
-                    tpk.ability = trpoke[pokeOffs + 1] & 0xFF;
+                    tpk.ability = (trpoke[pokeOffs + 1] >>> 4) & 0xF;
                     tpk.forme = formnum;
                     tpk.formeSuffix = Gen4Constants.getFormeSuffixByBaseForme(species,formnum);
                     tpk.absolutePokeNumber = Gen4Constants.getAbsolutePokeNumByBaseForme(species,formnum);
