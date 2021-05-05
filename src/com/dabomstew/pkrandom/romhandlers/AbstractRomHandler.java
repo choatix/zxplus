@@ -1927,8 +1927,8 @@ public abstract class AbstractRomHandler implements RomHandler {
     @Override
     public void randomizeTrainerHeldItems(Settings settings) {
         boolean giveToBossPokemon = settings.isRandomizeHeldItemsForBossTrainerPokemon();
-        boolean giveToImportantPokemon = settings.isRandomizeHeldItemsForBossTrainerPokemon();
-        boolean giveToRegularPokemon = settings.isRandomizeHeldItemsForBossTrainerPokemon();
+        boolean giveToImportantPokemon = settings.isRandomizeHeldItemsForImportantTrainerPokemon();
+        boolean giveToRegularPokemon = settings.isRandomizeHeldItemsForRegularTrainerPokemon();
         boolean highestLevelOnly = settings.isHighestLevelGetsItemsForTrainers();
 
         List<Move> moves = this.getMoves();
