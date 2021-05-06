@@ -169,6 +169,8 @@ public interface RomHandler {
 
     List<Integer> getUselessAbilities();
 
+    int getAbilityForTrainerPokemon(TrainerPokemon tp);
+
     boolean hasMegaEvolutions();
 
     // Randomizer: wild pokemon

@@ -1636,6 +1636,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                         tp.absolutePokeNumber = newPK.number;
                         tp.pokemon = newPK;
                         setFormeForTrainerPokemon(tp, newPK);
+                        tp.abilitySlot = getRandomAbilitySlot(newPK);
                     }
                     else { // pure random when trainer not in pool
                         newPK =
@@ -1653,6 +1654,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                         tp.absolutePokeNumber = newPK.number;
                         tp.pokemon = newPK;
                         setFormeForTrainerPokemon(tp, newPK);
+                        tp.abilitySlot = getRandomAbilitySlot(newPK);
                     }
                 } else {
                     newPK =
@@ -1673,6 +1675,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     tp.absolutePokeNumber = newPK.number;
                     tp.pokemon = newPK;
                     setFormeForTrainerPokemon(tp, newPK);
+                    tp.abilitySlot = getRandomAbilitySlot(newPK);
                 }
 
                 if (swapThisMegaEvo) {
@@ -1841,6 +1844,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     tp.absolutePokeNumber = newPK.number;
                     tp.pokemon = newPK;
                     setFormeForTrainerPokemon(tp, newPK);
+                    tp.abilitySlot = getRandomAbilitySlot(newPK);
 
                     if (swapThisMegaEvo) {
                         tp.heldItem = newPK
@@ -1902,6 +1906,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     tp.absolutePokeNumber = newPK.number;
                     tp.pokemon = newPK;
                     setFormeForTrainerPokemon(tp, newPK);
+                    tp.abilitySlot = getRandomAbilitySlot(newPK);
 
                     if (swapThisMegaEvo) {
                         tp.heldItem = newPK
@@ -2011,6 +2016,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                         tp.pokemon = newPokemon;
                         tp.absolutePokeNumber = newPokemon.number;
                         setFormeForTrainerPokemon(tp, newPokemon);
+                        tp.abilitySlot = getValidAbilitySlotFromOriginal(newPokemon, tp.abilitySlot);
                         tp.resetMoves = true;
                     }
                 }
@@ -2110,6 +2116,25 @@ public abstract class AbstractRomHandler implements RomHandler {
             t.pokemon.add(t.pokemon.get(0).copy());
         }
         this.setTrainers(currentTrainers, true);
+    }
+
+    public int getRandomAbilitySlot(Pokemon pokemon) {
+        List<Integer> abilitiesList = Arrays.asList(pokemon.ability1, pokemon.ability2, pokemon.ability3);
+        int slot = random.nextInt(this.abilitiesPerPokemon());
+        while (abilitiesList.get(slot) == 0) {
+            slot = random.nextInt(this.abilitiesPerPokemon());
+        }
+        return slot + 1;
+    }
+
+    public int getValidAbilitySlotFromOriginal(Pokemon pokemon, int originalAbilitySlot) {
+        // This is used in cases where one Trainer Pokemon evolves into another. If the unevolved Pokemon
+        // is using slot 2, but the evolved Pokemon doesn't actually have a second ability, then we
+        // want the evolved Pokemon to use slot 1 for safety's sake.
+        if (originalAbilitySlot == 2 && pokemon.ability2 == 0) {
+            return 1;
+        }
+        return originalAbilitySlot;
     }
 
     // MOVE DATA
@@ -5239,39 +5264,41 @@ public abstract class AbstractRomHandler implements RomHandler {
             // The rival's starter is index 1
             Pokemon rivalStarter = starters.get(1);
             int timesEvolves = numEvolutions(rivalStarter, 2);
+            // Yellow does not have abilities
+            int abilitySlot = 0;
             // Apply evolutions as appropriate
             if (timesEvolves == 0) {
                 for (int j = 1; j <= 3; j++) {
-                    changeStarterWithTag(currentTrainers, prefix + j + "-0", rivalStarter);
+                    changeStarterWithTag(currentTrainers, prefix + j + "-0", rivalStarter, abilitySlot);
                 }
                 for (int j = 4; j <= 7; j++) {
                     for (int i = 0; i < 3; i++) {
-                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, rivalStarter);
+                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, rivalStarter, abilitySlot);
                     }
                 }
             } else if (timesEvolves == 1) {
                 for (int j = 1; j <= 3; j++) {
-                    changeStarterWithTag(currentTrainers, prefix + j + "-0", rivalStarter);
+                    changeStarterWithTag(currentTrainers, prefix + j + "-0", rivalStarter, abilitySlot);
                 }
                 rivalStarter = pickRandomEvolutionOf(rivalStarter, false);
                 for (int j = 4; j <= 7; j++) {
                     for (int i = 0; i < 3; i++) {
-                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, rivalStarter);
+                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, rivalStarter, abilitySlot);
                     }
                 }
             } else if (timesEvolves == 2) {
                 for (int j = 1; j <= 2; j++) {
-                    changeStarterWithTag(currentTrainers, prefix + j + "-" + 0, rivalStarter);
+                    changeStarterWithTag(currentTrainers, prefix + j + "-" + 0, rivalStarter, abilitySlot);
                 }
                 rivalStarter = pickRandomEvolutionOf(rivalStarter, true);
-                changeStarterWithTag(currentTrainers, prefix + "3-0", rivalStarter);
+                changeStarterWithTag(currentTrainers, prefix + "3-0", rivalStarter, abilitySlot);
                 for (int i = 0; i < 3; i++) {
-                    changeStarterWithTag(currentTrainers, prefix + "4-" + i, rivalStarter);
+                    changeStarterWithTag(currentTrainers, prefix + "4-" + i, rivalStarter, abilitySlot);
                 }
                 rivalStarter = pickRandomEvolutionOf(rivalStarter, false);
                 for (int j = 5; j <= 7; j++) {
                     for (int i = 0; i < 3; i++) {
-                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, rivalStarter);
+                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, rivalStarter, abilitySlot);
                     }
                 }
             }
@@ -5283,11 +5310,16 @@ public abstract class AbstractRomHandler implements RomHandler {
                 int starterToUse = (i + pokemonOffset) % 3;
                 Pokemon thisStarter = starters.get(starterToUse);
                 int timesEvolves = numEvolutions(thisStarter, 2);
+                int abilitySlot = getRandomAbilitySlot(thisStarter);
+                while (abilitySlot == 3) {
+                    // Since starters never have hidden abilities, the rival's starter shouldn't either
+                    abilitySlot = getRandomAbilitySlot(thisStarter);
+                }
                 // If a fully evolved pokemon, use throughout
                 // Otherwise split by evolutions as appropriate
                 if (timesEvolves == 0) {
                     for (int j = 1; j <= highestRivalNum; j++) {
-                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter);
+                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter, abilitySlot);
                     }
                 } else if (timesEvolves == 1) {
                     int j = 1;
@@ -5295,11 +5327,12 @@ public abstract class AbstractRomHandler implements RomHandler {
                         if (getLevelOfStarter(currentTrainers, prefix + j + "-" + i) >= 30) {
                             break;
                         }
-                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter);
+                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter, abilitySlot);
                     }
                     thisStarter = pickRandomEvolutionOf(thisStarter, false);
+                    int evolvedAbilitySlot = getValidAbilitySlotFromOriginal(thisStarter, abilitySlot);
                     for (; j <= highestRivalNum; j++) {
-                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter);
+                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter, evolvedAbilitySlot);
                     }
                 } else if (timesEvolves == 2) {
                     int j = 1;
@@ -5307,18 +5340,20 @@ public abstract class AbstractRomHandler implements RomHandler {
                         if (getLevelOfStarter(currentTrainers, prefix + j + "-" + i) >= 16) {
                             break;
                         }
-                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter);
+                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter, abilitySlot);
                     }
                     thisStarter = pickRandomEvolutionOf(thisStarter, true);
+                    int evolvedAbilitySlot = getValidAbilitySlotFromOriginal(thisStarter, abilitySlot);
                     for (; j <= highestRivalNum; j++) {
                         if (getLevelOfStarter(currentTrainers, prefix + j + "-" + i) >= 36) {
                             break;
                         }
-                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter);
+                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter, evolvedAbilitySlot);
                     }
                     thisStarter = pickRandomEvolutionOf(thisStarter, false);
+                    evolvedAbilitySlot = getValidAbilitySlotFromOriginal(thisStarter, abilitySlot);
                     for (; j <= highestRivalNum; j++) {
-                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter);
+                        changeStarterWithTag(currentTrainers, prefix + j + "-" + i, thisStarter, evolvedAbilitySlot);
                     }
                 }
             }
@@ -5367,7 +5402,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         return 0;
     }
 
-    private void changeStarterWithTag(List<Trainer> currentTrainers, String tag, Pokemon starter) {
+    private void changeStarterWithTag(List<Trainer> currentTrainers, String tag, Pokemon starter, int abilitySlot) {
         for (Trainer t : currentTrainers) {
             if (t.tag != null && t.tag.equals(tag)) {
 
@@ -5392,6 +5427,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                 bestPoke.absolutePokeNumber = starter.number;
                 setFormeForTrainerPokemon(bestPoke,starter);
                 bestPoke.resetMoves = true;
+                bestPoke.abilitySlot = abilitySlot;
             }
         }
 
@@ -6058,6 +6094,11 @@ public abstract class AbstractRomHandler implements RomHandler {
     @Override
     public List<Integer> getUselessAbilities() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public int getAbilityForTrainerPokemon(TrainerPokemon tp) {
+        return 0;
     }
 
     @Override

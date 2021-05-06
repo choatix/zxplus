@@ -2727,6 +2727,12 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     @Override
+    public int getAbilityForTrainerPokemon(TrainerPokemon tp) {
+        // In Gen 3, Trainer Pokemon *always* use the first Ability, no matter what
+        return tp.pokemon.ability1;
+    }
+
+    @Override
     public boolean hasMegaEvolutions() {
         return false;
     }

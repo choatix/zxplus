@@ -381,6 +381,9 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         pkmn.ability1 = stats[Gen7Constants.bsAbility1Offset] & 0xFF;
         pkmn.ability2 = stats[Gen7Constants.bsAbility2Offset] & 0xFF;
         pkmn.ability3 = stats[Gen7Constants.bsAbility3Offset] & 0xFF;
+        if (pkmn.ability1 == pkmn.ability2) {
+            pkmn.ability2 = 0;
+        }
 
         pkmn.callRate = stats[Gen7Constants.bsCallRateOffset] & 0xFF;
 
@@ -1467,8 +1470,8 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                     int species = readWord(trpoke, pokeOffs + 16);
                     int formnum = readWord(trpoke, pokeOffs + 18);
                     TrainerPokemon tpk = new TrainerPokemon();
-                    tpk.ability = (abilityAndFlag >>> 4) & 0xF;
-                    tpk.mysteryFlag = (abilityAndFlag & 0xF);
+                    tpk.abilitySlot = (abilityAndFlag >>> 4) & 0xF;
+                    tpk.forcedGenderFlag = (abilityAndFlag & 0xF);
                     tpk.nature = trpoke[pokeOffs + 1];
                     tpk.hpEVs = trpoke[pokeOffs + 2];
                     tpk.atkEVs = trpoke[pokeOffs + 3];
@@ -1487,7 +1490,6 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                     }
                     tpk.pokemon = pokes[species];
                     tpk.AILevel = trainerAILevel;
-                    tpk.ability = trpoke[pokeOffs + 1] & 0xFF;
                     tpk.forme = formnum;
                     tpk.formeSuffix = Gen7Constants.getFormeSuffixByBaseForme(species,formnum);
                     tpk.absolutePokeNumber = absolutePokeNumByBaseForme
@@ -1563,7 +1565,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                 Iterator<TrainerPokemon> tpokes = tr.pokemon.iterator();
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon tp = tpokes.next();
-                    byte abilityAndFlag = (byte)((tp.ability << 4) | tp.mysteryFlag);
+                    byte abilityAndFlag = (byte)((tp.abilitySlot << 4) | tp.forcedGenderFlag);
                     trpoke[pokeOffs] = abilityAndFlag;
                     trpoke[pokeOffs + 1] = tp.nature;
                     trpoke[pokeOffs + 2] = tp.hpEVs;
@@ -2704,6 +2706,20 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public int getAbilityForTrainerPokemon(TrainerPokemon tp) {
+        // Before randomizing Trainer Pokemon, one possible value for abilitySlot is 0,
+        // which represents "Either Ability 1 or 2". During randomization, we make sure to
+        // to set abilitySlot to some non-zero value, but if you call this method without
+        // randomization, then you'll hit this case.
+        if (tp.abilitySlot < 1 || tp.abilitySlot > 3) {
+            return 0;
+        }
+
+        List<Integer> abilityList = Arrays.asList(tp.pokemon.ability1, tp.pokemon.ability2, tp.pokemon.ability3);
+        return abilityList.get(tp.abilitySlot - 1);
+    }
+
+    @Override
     public boolean hasMegaEvolutions() {
         return true;
     }
@@ -3256,18 +3272,20 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         if (byType.get(Type.NORMAL) == Effectiveness.NEUTRAL) {
             items.add(Gen4Constants.chilanBerry);
         }
-        if (tp.ability == Abilities.levitate) {
+
+        int ability = this.getAbilityForTrainerPokemon(tp);
+        if (ability == Abilities.levitate) {
             items.removeAll(Arrays.asList(Gen4Constants.shucaBerry));
         } else if (byType.get(Type.GROUND) == Effectiveness.DOUBLE || byType.get(Type.GROUND) == Effectiveness.QUADRUPLE) {
             items.add(Gen5Constants.airBalloon);
         }
-        if (Gen7Constants.consumableAbilityBoostingItems.containsKey(tp.ability)) {
-            items.add(Gen7Constants.consumableAbilityBoostingItems.get(tp.ability));
+        if (Gen7Constants.consumableAbilityBoostingItems.containsKey(ability)) {
+            items.add(Gen7Constants.consumableAbilityBoostingItems.get(ability));
         }
 
         if (!consumableOnly) {
-            if (Gen7Constants.abilityBoostingItems.containsKey(tp.ability)) {
-                items.addAll(Gen7Constants.abilityBoostingItems.get(tp.ability));
+            if (Gen7Constants.abilityBoostingItems.containsKey(ability)) {
+                items.addAll(Gen7Constants.abilityBoostingItems.get(ability));
             }
             if (tp.pokemon.primaryType == Type.POISON || tp.pokemon.secondaryType == Type.POISON) {
                 items.add(Gen4Constants.blackSludge);

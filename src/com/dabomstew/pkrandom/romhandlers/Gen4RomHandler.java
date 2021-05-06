@@ -2098,7 +2098,12 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     tpk.level = level;
                     tpk.pokemon = pokes[species];
                     tpk.AILevel = ailevel;
-                    tpk.ability = (trpoke[pokeOffs + 1] >>> 4) & 0xF;
+                    int abilitySlot = (trpoke[pokeOffs + 1] >>> 4) & 0xF;
+                    if (abilitySlot == 0) {
+                        // All Gen 4 games represent the first ability as ability 0.
+                        abilitySlot = 1;
+                    }
+                    tpk.abilitySlot = abilitySlot;
                     tpk.forme = formnum;
                     tpk.formeSuffix = Gen4Constants.getFormeSuffixByBaseForme(species,formnum);
                     tpk.absolutePokeNumber = Gen4Constants.getAbsolutePokeNumByBaseForme(species,formnum);
@@ -2202,7 +2207,13 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 Iterator<TrainerPokemon> tpokes = tr.pokemon.iterator();
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon tp = tpokes.next();
+                    int ability = tp.abilitySlot << 4;
+                    if (tp.abilitySlot == 1) {
+                        // All Gen 4 games represent the first ability as ability 0.
+                        ability = 0;
+                    }
                     writeWord(trpoke, pokeOffs, tp.AILevel);
+                    writeWord(trpoke, pokeOffs + 1, ability);
                     writeWord(trpoke, pokeOffs + 2, tp.level);
                     writeWord(trpoke, pokeOffs + 4, tp.pokemon.number);
                     trpoke[pokeOffs + 5] |= (tp.forme << 2);
@@ -3656,6 +3667,23 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
+    public int getAbilityForTrainerPokemon(TrainerPokemon tp) {
+        // In Gen 4, alt formes for Trainer Pokemon use the base forme's ability
+        Pokemon pkmn = tp.pokemon;
+        while (pkmn.baseForme != null) {
+            pkmn = pkmn.baseForme;
+        }
+
+        if (romEntry.romType == Gen4Constants.Type_DP || romEntry.romType == Gen4Constants.Type_Plat) {
+            // In DPPt, Trainer Pokemon *always* use the first Ability, no matter what
+            return pkmn.ability1;
+        } else {
+            // In HGSS, Trainer Pokemon can specify which ability they want to use.
+            return tp.abilitySlot == 2 ? pkmn.ability2 : pkmn.ability1;
+        }
+    }
+
+    @Override
     public boolean hasMegaEvolutions() {
         return false;
     }
@@ -4361,13 +4389,15 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         if (byType.get(Type.NORMAL) == Effectiveness.NEUTRAL) {
             items.add(Gen4Constants.chilanBerry);
         }
-        if (tp.ability == Abilities.levitate) {
+
+        int ability = this.getAbilityForTrainerPokemon(tp);
+        if (ability == Abilities.levitate) {
             items.removeAll(Arrays.asList(Gen4Constants.shucaBerry));
         }
 
         if (!consumableOnly) {
-            if (Gen4Constants.abilityBoostingItems.containsKey(tp.ability)) {
-                items.addAll(Gen4Constants.abilityBoostingItems.get(tp.ability));
+            if (Gen4Constants.abilityBoostingItems.containsKey(ability)) {
+                items.addAll(Gen4Constants.abilityBoostingItems.get(ability));
             }
             if (tp.pokemon.primaryType == Type.POISON || tp.pokemon.secondaryType == Type.POISON) {
                 items.add(Gen4Constants.blackSludge);

@@ -38,12 +38,12 @@ public class TrainerPokemon {
     public int heldItem = 0;
     public boolean hasMegaStone;
     public boolean hasZCrystal;
-    public int ability;
+    public int abilitySlot;
     public int forme;
     public String formeSuffix = "";
     public int absolutePokeNumber = 0;
 
-    public int mysteryFlag;
+    public int forcedGenderFlag;
     public byte nature;
     public byte hpEVs;
     public byte atkEVs;
@@ -88,7 +88,7 @@ public class TrainerPokemon {
 
         tpk.AILevel = AILevel;
         tpk.heldItem = heldItem;
-        tpk.ability = ability;
+        tpk.abilitySlot = abilitySlot;
         tpk.forme = forme;
         tpk.formeSuffix = formeSuffix;
         tpk.absolutePokeNumber = absolutePokeNumber;

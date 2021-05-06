@@ -1224,8 +1224,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                     tpk.pokemon = pokes[species];
                     tpk.AILevel = ailevel;
                     int abilityAndFlag = trpoke[pokeOffs + 1];
-                    tpk.ability = (abilityAndFlag >>> 4) & 0xF;
-                    tpk.mysteryFlag = (abilityAndFlag & 0xF);
+                    tpk.abilitySlot = (abilityAndFlag >>> 4) & 0xF;
+                    tpk.forcedGenderFlag = (abilityAndFlag & 0xF);
                     tpk.forme = formnum;
                     tpk.formeSuffix = Gen5Constants.getFormeSuffixByBaseForme(species,formnum);
                     tpk.absolutePokeNumber = Gen5Constants.getAbsolutePokeNumByBaseForme(species,formnum);
@@ -1353,8 +1353,9 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 Iterator<TrainerPokemon> tpokes = tr.pokemon.iterator();
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon tp = tpokes.next();
+                    byte abilityAndFlag = (byte)((tp.abilitySlot << 4) | tp.forcedGenderFlag);
                     trpoke[pokeOffs] = (byte) tp.AILevel;
-                    // no gender or ability info, so no byte 1
+                    trpoke[pokeOffs + 1] = abilityAndFlag;
                     writeWord(trpoke, pokeOffs + 2, tp.level);
                     writeWord(trpoke, pokeOffs + 4, tp.pokemon.number);
                     writeWord(trpoke, pokeOffs + 6, tp.forme);
@@ -2882,6 +2883,26 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
+    public int getAbilityForTrainerPokemon(TrainerPokemon tp) {
+        // Before randomizing Trainer Pokemon, one possible value for abilitySlot is 0,
+        // which represents "Either Ability 1 or 2". During randomization, we make sure to
+        // to set abilitySlot to some non-zero value, but if you call this method without
+        // randomization, then you'll hit this case.
+        if (tp.abilitySlot < 1 || tp.abilitySlot > 3) {
+            return 0;
+        }
+
+        // In Gen 5, alt formes for Trainer Pokemon use the base forme's ability
+        Pokemon pkmn = tp.pokemon;
+        while (pkmn.baseForme != null) {
+            pkmn = pkmn.baseForme;
+        }
+
+        List<Integer> abilityList = Arrays.asList(pkmn.ability1, pkmn.ability2, pkmn.ability3);
+        return abilityList.get(tp.abilitySlot - 1);
+    }
+
+    @Override
     public boolean hasMegaEvolutions() {
         return false;
     }
@@ -3518,15 +3539,17 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         if (byType.get(Type.NORMAL) == Effectiveness.NEUTRAL) {
             items.add(Gen4Constants.chilanBerry);
         }
-        if (tp.ability == Abilities.levitate) {
+
+        int ability = this.getAbilityForTrainerPokemon(tp);
+        if (ability == Abilities.levitate) {
             items.removeAll(Arrays.asList(Gen4Constants.shucaBerry));
         } else if (byType.get(Type.GROUND) == Effectiveness.DOUBLE || byType.get(Type.GROUND) == Effectiveness.QUADRUPLE) {
             items.add(Gen5Constants.airBalloon);
         }
 
         if (!consumableOnly) {
-            if (Gen5Constants.abilityBoostingItems.containsKey(tp.ability)) {
-                items.addAll(Gen5Constants.abilityBoostingItems.get(tp.ability));
+            if (Gen5Constants.abilityBoostingItems.containsKey(ability)) {
+                items.addAll(Gen5Constants.abilityBoostingItems.get(ability));
             }
             if (tp.pokemon.primaryType == Type.POISON || tp.pokemon.secondaryType == Type.POISON) {
                 items.add(Gen4Constants.blackSludge);
