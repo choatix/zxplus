@@ -86,6 +86,15 @@ public class Pokemon implements Comparable<Pokemon> {
     }
     
     public void copyShuffledStatsUpEvolution(Pokemon evolvesFrom) {
+        // If stats were already shuffled once, un-shuffle them
+        shuffledStatsOrder = Arrays.asList(
+                shuffledStatsOrder.indexOf(0),
+                shuffledStatsOrder.indexOf(1),
+                shuffledStatsOrder.indexOf(2),
+                shuffledStatsOrder.indexOf(3),
+                shuffledStatsOrder.indexOf(4),
+                shuffledStatsOrder.indexOf(5));
+        applyShuffledOrderToStats();
         shuffledStatsOrder = evolvesFrom.shuffledStatsOrder;
         applyShuffledOrderToStats();
     }
