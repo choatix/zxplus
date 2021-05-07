@@ -744,6 +744,19 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             replaceStarterFiles(starterNARC, pokespritesNARC, 1, newStarters.get(1).number);
             replaceStarterFiles(starterNARC, pokespritesNARC, 2, newStarters.get(2).number);
             writeNARC(romEntry.getString("StarterGraphics"), starterNARC);
+
+            // Starter cries
+            byte[] starterCryOverlay = this.readOverlay(romEntry.getInt("StarterCryOvlNumber"));
+            String starterCryTablePrefix = romEntry.getString("StarterCryTablePrefix");
+            int offset = find(starterCryOverlay, starterCryTablePrefix);
+            if (offset > 0) {
+                offset += starterCryTablePrefix.length() / 2; // because it was a prefix
+                for (Pokemon newStarter : newStarters) {
+                    writeWord(starterCryOverlay, offset, newStarter.number);
+                    offset += 2;
+                }
+                this.writeOverlay(romEntry.getInt("StarterCryOvlNumber"), starterCryOverlay);
+            }
         } catch (IOException  ex) {
             throw new RandomizerIOException(ex);
         }
