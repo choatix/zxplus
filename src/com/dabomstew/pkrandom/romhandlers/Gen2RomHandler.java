@@ -35,10 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.dabomstew.pkrandom.*;
-import com.dabomstew.pkrandom.constants.GBConstants;
-import com.dabomstew.pkrandom.constants.Gen2Constants;
-import com.dabomstew.pkrandom.constants.GlobalConstants;
-import com.dabomstew.pkrandom.constants.Species;
+import com.dabomstew.pkrandom.constants.*;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import com.dabomstew.pkrandom.pokemon.*;
 import compressors.Gen2Decmp;
@@ -390,7 +387,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             moves[i].pp = rom[offs + (i - 1) * 7 + 5] & 0xFF;
             moves[i].type = Gen2Constants.typeTable[rom[offs + (i - 1) * 7 + 3]];
 
-            if (i == GlobalConstants.SWIFT_INDEX) {
+            if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;
             }
 
@@ -398,7 +395,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                 moves[i].hitCount = 3;
             } else if (GlobalConstants.doubleHitMoves.contains(i)) {
                 moves[i].hitCount = 2;
-            } else if (i == GlobalConstants.TRIPLE_KICK_INDEX) {
+            } else if (i == Moves.tripleKick) {
                 moves[i].hitCount = 2.71; // this assumes the first hit lands
             }
         }
@@ -1028,7 +1025,6 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
 
     @Override
     public List<Integer> getMovesBannedFromLevelup() {
-        // ban thief because trainers are broken with it
         return Gen2Constants.bannedLevelupMoves;
     }
 

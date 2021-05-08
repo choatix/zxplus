@@ -354,7 +354,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 moves[i].type = Gen4Constants.typeTable[moveData[4] & 0xFF];
                 moves[i].category = Gen4Constants.moveCategoryIndices[moveData[2] & 0xFF];
 
-                if (i == GlobalConstants.SWIFT_INDEX) {
+                if (i == Moves.swift) {
                     perfectAccuracy = (int)moves[i].hitratio;
                 }
 
@@ -362,7 +362,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     moves[i].hitCount = 3;
                 } else if (GlobalConstants.doubleHitMoves.contains(i)) {
                     moves[i].hitCount = 2;
-                } else if (i == GlobalConstants.TRIPLE_KICK_INDEX) {
+                } else if (i == Moves.tripleKick) {
                     moves[i].hitCount = 2.71; // this assumes the first hit
                                               // lands
                 }

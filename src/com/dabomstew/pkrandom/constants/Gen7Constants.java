@@ -84,9 +84,7 @@ public class Gen7Constants {
         }
     }
 
-    public static List<Integer> bannedMoves = Arrays.asList(
-            464, 621 // Ban Dark Void, Hyperspace Fury
-    );
+    public static List<Integer> bannedMoves = Arrays.asList(Moves.darkVoid, Moves.hyperspaceFury);
 
     public static final Type[] typeTable = constructTypeTable();
 
@@ -199,9 +197,6 @@ public class Gen7Constants {
             mistySeed = 0x373, grassySeed = 0x374;
     // New non-consumable held items with in-battle NPC effect (not specific to one pokemon family or one move)
     public static final int terrainExtender = 0x36F, protectivePads = 0x370;
-    // New moves (their move index) affected by items
-    // https://bulbapedia.bulbagarden.net/wiki/List_of_moves
-    public static final int psychicTerrain = 678, strengthSap = 668;
 
     public static final List<Integer> consumableHeldItems = setupAllConsumableItems();
 
@@ -244,11 +239,11 @@ public class Gen7Constants {
 
     private static Map<Integer, List<Integer>> initializeMoveBoostingItems() {
         Map<Integer, List<Integer>> map = new HashMap<>(Gen6Constants.moveBoostingItems);
-        map.put(Gen6Constants.electricTerrain, Arrays.asList(terrainExtender));
-        map.put(Gen6Constants.grassyTerrain, Arrays.asList(terrainExtender));
-        map.put(Gen6Constants.mistyTerrain, Arrays.asList(terrainExtender));
-        map.put(psychicTerrain, Arrays.asList(terrainExtender));
-        map.put(strengthSap, Arrays.asList(Gen4Constants.bigRoot));
+        map.put(Moves.electricTerrain, Arrays.asList(terrainExtender));
+        map.put(Moves.grassyTerrain, Arrays.asList(terrainExtender));
+        map.put(Moves.mistyTerrain, Arrays.asList(terrainExtender));
+        map.put(Moves.psychicTerrain, Arrays.asList(terrainExtender));
+        map.put(Moves.strengthSap, Arrays.asList(Gen4Constants.bigRoot));
         return Collections.unmodifiableMap(map);
     }
     public static final Map<Integer, List<Integer>> abilityBoostingItems = initializeAbilityBoostingItems();

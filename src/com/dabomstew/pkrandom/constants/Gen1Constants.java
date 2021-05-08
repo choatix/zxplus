@@ -55,13 +55,16 @@ public class Gen1Constants {
 
     public static final List<Integer> singularTrainers = Arrays.asList(28, 32, 33, 34, 35, 36, 37, 38, 39, 43, 45, 46);
 
-    public static final List<Integer> bannedMovesWithXAccBanned = Arrays.asList(49, 82, 147);
+    public static final List<Integer> bannedMovesWithXAccBanned = Arrays.asList(
+            Moves.sonicBoom, Moves.dragonRage, Moves.spore);
 
-    public static final List<Integer> bannedMovesWithoutXAccBanned = Arrays.asList(49, 82, 32, 90, 12, 147);
+    public static final List<Integer> bannedMovesWithoutXAccBanned = Arrays.asList(
+            Moves.sonicBoom, Moves.dragonRage, Moves.spore, Moves.hornDrill, Moves.fissure, Moves.guillotine);
 
-    public static final List<Integer> fieldMoves = Arrays.asList(15, 19, 57, 70, 148, 91, 100);
+    public static final List<Integer> fieldMoves = Arrays.asList(
+            Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport);
 
-    public static final List<Integer> earlyRequiredHMs = Collections.singletonList(15);
+    public static final List<Integer> earlyRequiredHMs = Collections.singletonList(Moves.cut);
 
     public static final int hmsStartIndex = 0xC4, tmsStartIndex = 0xC9;
 

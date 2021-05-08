@@ -106,7 +106,8 @@ public class Gen3Constants {
 
     public static final int tmCount = 50, hmCount = 8;
 
-    public static final List<Integer> hmMoves = Arrays.asList(0xf, 0x13, 0x39, 0x46, 0x94, 0xf9, 0x7f, 0x123);
+    public static final List<Integer> hmMoves = Arrays.asList(
+            Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.rockSmash, Moves.waterfall, Moves.dive);
 
     public static final int tmItemOffset = 289;
 
@@ -190,14 +191,17 @@ public class Gen3Constants {
     public static final List<Integer> frlgRequiredFieldTMs = Arrays.asList(1, 2, 7, 8, 9, 11, 12, 14,
             17, 18, 21, 22, 25, 32, 36, 37, 40, 41, 44, 46, 47, 48, 49, 50);
 
-    public static final List<Integer> rseFieldMoves = Arrays.asList(15, 19, 57, 70, 148, 91, 100, 127, 249, 230, 291,
-            290);
+    public static final List<Integer> rseFieldMoves = Arrays.asList(
+            Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport,
+            Moves.waterfall, Moves.rockSmash, Moves.sweetScent, Moves.dive, Moves.secretPower);
 
-    public static final List<Integer> frlgFieldMoves = Arrays.asList(15, 19, 57, 70, 148, 91, 100, 127, 249, 230);
+    public static final List<Integer> frlgFieldMoves = Arrays.asList(
+            Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport,
+            Moves.waterfall, Moves.rockSmash, Moves.sweetScent);
 
-    public static final List<Integer> rseEarlyRequiredHMMoves = Collections.singletonList(249);
+    public static final List<Integer> rseEarlyRequiredHMMoves = Collections.singletonList(Moves.rockSmash);
 
-    public static final List<Integer> frlgEarlyRequiredHMMoves = Collections.singletonList(15);
+    public static final List<Integer> frlgEarlyRequiredHMMoves = Collections.singletonList(Moves.cut);
     
     public static final int luckyEggIndex = 0xC5;
 

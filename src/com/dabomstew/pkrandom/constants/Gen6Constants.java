@@ -92,9 +92,7 @@ public class Gen6Constants {
         }
     }
 
-    public static List<Integer> bannedMoves = Collections.singletonList(
-            621 // Ban Hyperspace Fury
-    );
+    public static List<Integer> bannedMoves = Collections.singletonList(Moves.hyperspaceFury);
 
     public static final Type[] typeTable = constructTypeTable();
 
@@ -221,8 +219,12 @@ public class Gen6Constants {
             37, 32, 62, 11, 86, 29, 59, 43, 53, 69, 6, 2, 13, 18, 22, 61, 30, 97, 7, 90, 26, 55, 34, 35, 64, 65, 66,
             74, 79, 80, 81, 84, 89, 91, 93, 95);
 
-    public static final List<Integer> fieldMovesXY = Arrays.asList(15, 19, 57, 70, 148, 91, 100, 127, 230, 249);
-    public static final List<Integer> fieldMovesORAS = Arrays.asList(15, 19, 57, 70, 148, 91, 100, 127, 230, 249, 290, 291);
+    public static final List<Integer> fieldMovesXY = Arrays.asList(
+            Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport,
+            Moves.waterfall, Moves.sweetScent, Moves.rockSmash);
+    public static final List<Integer> fieldMovesORAS = Arrays.asList(
+            Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport,
+            Moves.waterfall, Moves.sweetScent, Moves.rockSmash, Moves.secretPower, Moves.dive);
 
     public static final int fallingEncounterOffset = 0xF4270, fallingEncounterCount = 55, fieldEncounterSize = 0x3C,
                             rustlingBushEncounterOffset = 0xF40CC, rustlingBushEncounterCount = 7;
@@ -249,10 +251,6 @@ public class Gen6Constants {
             keeBerry = 0x2af, marangaBerry = 0x2b0, fairyGem = 0x02cb;
     // New non-consumable held items with in-battle NPC effect (not specific to one pokemon family or one move)
     public static final int assaultVest = 0x280, pixiePlate = 0x284, safetyGoggles = 0x28a;
-    // New moves (their move index) affected by items
-    // https://bulbapedia.bulbagarden.net/wiki/List_of_moves
-    public static final int drainingKiss = 577, electricTerrain = 604, grassyTerrain = 580, infestation = 611,
-            mistyTerrain = 581, oblivionWing = 613, parabolicCharge = 570;
 
     public static final List<Integer> consumableHeldItems = setupAllConsumableItems();
 
@@ -315,10 +313,10 @@ public class Gen6Constants {
 
     private static Map<Integer, List<Integer>> initializeMoveBoostingItems() {
         Map<Integer, List<Integer>> map = new HashMap<>(Gen5Constants.moveBoostingItems);
-        map.put(drainingKiss, Arrays.asList(Gen4Constants.bigRoot));
-        map.put(infestation, Arrays.asList(Gen4Constants.gripClaw, Gen5Constants.bindingBand));
-        map.put(oblivionWing, Arrays.asList(Gen4Constants.bigRoot));
-        map.put(parabolicCharge, Arrays.asList(Gen4Constants.bigRoot));
+        map.put(Moves.drainingKiss, Arrays.asList(Gen4Constants.bigRoot));
+        map.put(Moves.infestation, Arrays.asList(Gen4Constants.gripClaw, Gen5Constants.bindingBand));
+        map.put(Moves.oblivionWing, Arrays.asList(Gen4Constants.bigRoot));
+        map.put(Moves.parabolicCharge, Arrays.asList(Gen4Constants.bigRoot));
         return Collections.unmodifiableMap(map);
     }
 

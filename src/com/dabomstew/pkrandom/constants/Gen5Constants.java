@@ -327,12 +327,13 @@ public class Gen5Constants {
             22, 26, 28, 29, 30, 36, 39, 41, 46, 47, 50, 52, 53, 56, 58, 61, 63, 65, 66, 67, 69, 71, 80, 81, 84, 85, 86,
             90, 91, 92, 93);
 
-    public static final List<Integer> bw1EarlyRequiredHMMoves = Collections.singletonList(15);
+    public static final List<Integer> bw1EarlyRequiredHMMoves = Collections.singletonList(Moves.cut);
 
-    @SuppressWarnings("unchecked")
-    public static final List<Integer> bw2EarlyRequiredHMMoves = Collections.EMPTY_LIST;
+    public static final List<Integer> bw2EarlyRequiredHMMoves = Collections.emptyList();
 
-    public static final List<Integer> fieldMoves = Arrays.asList(15, 19, 57, 70, 148, 91, 100, 127, 230, 291);
+    public static final List<Integer> fieldMoves = Arrays.asList(
+            Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport,
+            Moves.waterfall, Moves.sweetScent, Moves.dive);
 
     public static final String shedinjaFunctionLocator = "F8B582B0061C30680F1C";
 
@@ -353,9 +354,6 @@ public class Gen5Constants {
     // New non-consumable held items with in-battle NPC effect (not specific to one pokemon family or one move)
     public static final int eviolite = 0x21a, floatStone = 0x21b, rockyHelmet = 0x21c, ringTarget = 0x21f,
             bindingBand = 0x220;
-    // New moves (their move index) affected by items
-    // https://bulbapedia.bulbagarden.net/wiki/List_of_moves
-    public static final int hornLeech = 532;
 
     public static final List<Integer> consumableHeldItems = setupAllConsumableItems();
 
@@ -422,18 +420,18 @@ public class Gen5Constants {
 
     private static Map<Integer, List<Integer>> initializeMoveBoostingItems() {
         Map<Integer, List<Integer>> map = new HashMap<>(Gen4Constants.moveBoostingItems);
-        map.put(Gen4Constants.trick, Arrays.asList(Gen4Constants.toxicOrb, Gen4Constants.flameOrb, ringTarget));
-        map.put(Gen4Constants.switcheroo, Arrays.asList(Gen4Constants.toxicOrb, Gen4Constants.flameOrb, ringTarget));
+        map.put(Moves.trick, Arrays.asList(Gen4Constants.toxicOrb, Gen4Constants.flameOrb, ringTarget));
+        map.put(Moves.switcheroo, Arrays.asList(Gen4Constants.toxicOrb, Gen4Constants.flameOrb, ringTarget));
 
-        map.put(Gen4Constants.bind, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
-        map.put(Gen4Constants.clamp, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
-        map.put(Gen4Constants.fireSpin, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
-        map.put(Gen4Constants.magmaStorm, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
-        map.put(Gen4Constants.sandTomb, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
-        map.put(Gen4Constants.whirlpool, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
-        map.put(Gen4Constants.wrap, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Moves.bind, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Moves.clamp, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Moves.fireSpin, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Moves.magmaStorm, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Moves.sandTomb, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Moves.whirlpool, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
+        map.put(Moves.wrap, Arrays.asList(Gen4Constants.gripClaw, bindingBand));
 
-        map.put(hornLeech, Arrays.asList(Gen4Constants.bigRoot));
+        map.put(Moves.hornLeech, Arrays.asList(Gen4Constants.bigRoot));
         return Collections.unmodifiableMap(map);
     }
 

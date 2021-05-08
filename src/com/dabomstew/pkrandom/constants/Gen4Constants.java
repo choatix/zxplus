@@ -165,15 +165,6 @@ public class Gen4Constants {
         return list;
     }
 
-    // Moves (their move index) affected by items
-    // https://bulbapedia.bulbagarden.net/wiki/List_of_moves
-    public static final int absorb = 71, aquaRing = 392, bind = 20, bounce = 340, clamp = 128, dig = 91, dive = 291,
-            drainPunch = 409, dreamEater = 138, facade = 263, fireSpin = 83, fling = 374, fly = 19,
-            gigaDrain = 202, hail = 258, ingrain = 275, leechLife = 141, leechSeed = 73, lightScreen = 113,
-            magmaStorm = 463, megaDrain = 72, outrage = 200, psychoShift = 375, rainDance = 240, razorWind = 13,
-            reflect = 115, sandstorm = 201, sandTomb = 328, skullBash = 130, skyAttack = 143, solarBeam = 76,
-            sunnyDay = 241, switcheroo = 415, trick = 271, trickRoom = 433, uproar = 253, whirlpool = 250, wrap = 35;
-
     public static final List<Integer> generalPurposeConsumableItems = Collections.unmodifiableList(Arrays.asList(
             cheriBerry, chestoBerry, pechaBerry, rawstBerry, aspearBerry, leppaBerry,
             oranBerry, persimBerry, lumBerry, sitrusBerry, ganlonBerry, salacBerry,
@@ -215,56 +206,56 @@ public class Gen4Constants {
 
     private static Map<Integer, List<Integer>> initializeMoveBoostingItems() {
         Map<Integer, List<Integer>> map = new HashMap<>();
-        map.put(bounce, Arrays.asList(powerHerb));
-        map.put(dig, Arrays.asList(powerHerb));
-        map.put(dive, Arrays.asList(powerHerb));
-        map.put(fly, Arrays.asList(powerHerb));
-        map.put(razorWind, Arrays.asList(powerHerb));
-        map.put(skullBash, Arrays.asList(powerHerb));
-        map.put(skyAttack, Arrays.asList(powerHerb));
-        map.put(solarBeam, Arrays.asList(powerHerb));
+        map.put(Moves.bounce, Arrays.asList(powerHerb));
+        map.put(Moves.dig, Arrays.asList(powerHerb));
+        map.put(Moves.dive, Arrays.asList(powerHerb));
+        map.put(Moves.fly, Arrays.asList(powerHerb));
+        map.put(Moves.razorWind, Arrays.asList(powerHerb));
+        map.put(Moves.skullBash, Arrays.asList(powerHerb));
+        map.put(Moves.skyAttack, Arrays.asList(powerHerb));
+        map.put(Moves.solarBeam, Arrays.asList(powerHerb));
 
-        map.put(fling, Arrays.asList(toxicOrb, flameOrb, ironBall));
+        map.put(Moves.fling, Arrays.asList(toxicOrb, flameOrb, ironBall));
 
-        map.put(trick, Arrays.asList(toxicOrb, flameOrb, fullIncense, laggingTail));
-        map.put(switcheroo, Arrays.asList(toxicOrb, flameOrb, fullIncense, laggingTail));
+        map.put(Moves.trick, Arrays.asList(toxicOrb, flameOrb, fullIncense, laggingTail));
+        map.put(Moves.switcheroo, Arrays.asList(toxicOrb, flameOrb, fullIncense, laggingTail));
 
-        map.put(trickRoom, Arrays.asList(ironBall));
+        map.put(Moves.trickRoom, Arrays.asList(ironBall));
 
-        map.put(facade, Arrays.asList(toxicOrb, flameOrb));
+        map.put(Moves.facade, Arrays.asList(toxicOrb, flameOrb));
 
-        map.put(psychoShift, Arrays.asList(toxicOrb, flameOrb));
+        map.put(Moves.psychoShift, Arrays.asList(toxicOrb, flameOrb));
 
-        map.put(lightScreen, Arrays.asList(lightClay));
-        map.put(reflect, Arrays.asList(lightClay));
+        map.put(Moves.lightScreen, Arrays.asList(lightClay));
+        map.put(Moves.reflect, Arrays.asList(lightClay));
 
-        map.put(hail, Arrays.asList(icyRock));
+        map.put(Moves.hail, Arrays.asList(icyRock));
 
-        map.put(sandstorm, Arrays.asList(smoothRock));
+        map.put(Moves.sandstorm, Arrays.asList(smoothRock));
 
-        map.put(sunnyDay, Arrays.asList(heatRock));
+        map.put(Moves.sunnyDay, Arrays.asList(heatRock));
 
-        map.put(rainDance, Arrays.asList(dampRock));
+        map.put(Moves.rainDance, Arrays.asList(dampRock));
 
-        map.put(bind, Arrays.asList(gripClaw));
-        map.put(clamp, Arrays.asList(gripClaw));
-        map.put(fireSpin, Arrays.asList(gripClaw));
-        map.put(magmaStorm, Arrays.asList(gripClaw));
-        map.put(outrage, Arrays.asList(gripClaw));
-        map.put(sandTomb, Arrays.asList(gripClaw));
-        map.put(uproar, Arrays.asList(gripClaw));
-        map.put(whirlpool, Arrays.asList(gripClaw));
-        map.put(wrap, Arrays.asList(gripClaw));
+        map.put(Moves.bind, Arrays.asList(gripClaw));
+        map.put(Moves.clamp, Arrays.asList(gripClaw));
+        map.put(Moves.fireSpin, Arrays.asList(gripClaw));
+        map.put(Moves.magmaStorm, Arrays.asList(gripClaw));
+        map.put(Moves.outrage, Arrays.asList(gripClaw));
+        map.put(Moves.sandTomb, Arrays.asList(gripClaw));
+        map.put(Moves.uproar, Arrays.asList(gripClaw));
+        map.put(Moves.whirlpool, Arrays.asList(gripClaw));
+        map.put(Moves.wrap, Arrays.asList(gripClaw));
 
-        map.put(absorb, Arrays.asList(bigRoot));
-        map.put(aquaRing, Arrays.asList(bigRoot));
-        map.put(drainPunch, Arrays.asList(bigRoot));
-        map.put(dreamEater, Arrays.asList(bigRoot));
-        map.put(gigaDrain, Arrays.asList(bigRoot));
-        map.put(ingrain, Arrays.asList(bigRoot));
-        map.put(leechLife, Arrays.asList(bigRoot));
-        map.put(leechSeed, Arrays.asList(bigRoot));
-        map.put(megaDrain, Arrays.asList(bigRoot));
+        map.put(Moves.absorb, Arrays.asList(bigRoot));
+        map.put(Moves.aquaRing, Arrays.asList(bigRoot));
+        map.put(Moves.drainPunch, Arrays.asList(bigRoot));
+        map.put(Moves.dreamEater, Arrays.asList(bigRoot));
+        map.put(Moves.gigaDrain, Arrays.asList(bigRoot));
+        map.put(Moves.ingrain, Arrays.asList(bigRoot));
+        map.put(Moves.leechLife, Arrays.asList(bigRoot));
+        map.put(Moves.leechSeed, Arrays.asList(bigRoot));
+        map.put(Moves.megaDrain, Arrays.asList(bigRoot));
 
         return Collections.unmodifiableMap(map);
     }
@@ -724,18 +715,17 @@ public class Gen4Constants {
     public static final List<Integer> ptRequiredFieldTMs = Arrays.asList(2, 3, 5, 7, 9, 11, 12, 18, 19,
             23, 28, 34, 37, 39, 41, 43, 46, 47, 49, 50, 62, 69, 79, 80, 82, 84, 85, 87);
 
-    // DPPt:
-    // cut, fly, surf, strength, flash, dig, teleport, waterfall,
-    // rock smash, sweet scent, defog, rock climb
-    public static final List<Integer> dpptFieldMoves = Arrays.asList(15, 19, 57, 70, 148, 91, 100, 127, 249, 230, 432,
-            431);
+    public static final List<Integer> dpptFieldMoves = Arrays.asList(
+            Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport,
+            Moves.waterfall, Moves.rockSmash, Moves.sweetScent, Moves.defog, Moves.rockClimb);
 
-    public static final List<Integer> hgssFieldMoves = Arrays.asList(15, 19, 57, 70, 148, 91, 100, 250, 127, 249, 29,
-            230, 431);
-    // DPPt: rock smash, cut
-    public static final List<Integer> dpptEarlyRequiredHMMoves = Arrays.asList(249, 15);
-    // HGSS: just cut
-    public static final List<Integer> hgssEarlyRequiredHMMoves = Collections.singletonList(15);
+    public static final List<Integer> hgssFieldMoves = Arrays.asList(
+            Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport,
+            Moves.whirlpool, Moves.waterfall, Moves.rockSmash, Moves.headbutt, Moves.sweetScent, Moves.rockClimb);
+
+    public static final List<Integer> dpptEarlyRequiredHMMoves = Arrays.asList(Moves.rockSmash, Moves.cut);
+
+    public static final List<Integer> hgssEarlyRequiredHMMoves = Collections.singletonList(Moves.cut);
 
     public static ItemList allowedItems, nonBadItems;
     public static List<Integer> regularShopItems, opShopItems;

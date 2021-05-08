@@ -2895,7 +2895,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
         MoveLearnt metronomeML = new MoveLearnt();
         metronomeML.level = 1;
-        metronomeML.move = GlobalConstants.METRONOME_MOVE;
+        metronomeML.move = Moves.metronome;
 
         for (List<MoveLearnt> ms : movesets.values()) {
             if (ms != null && ms.size() > 0) {
@@ -2922,7 +2922,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         List<Integer> tmMoves = this.getTMMoves();
 
         for (int i = 0; i < tmMoves.size(); i++) {
-            tmMoves.set(i, GlobalConstants.METRONOME_MOVE);
+            tmMoves.set(i, Moves.metronome);
         }
 
         this.setTMMoves(tmMoves);
@@ -2932,7 +2932,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             List<Integer> mtMoves = this.getMoveTutorMoves();
 
             for (int i = 0; i < mtMoves.size(); i++) {
-                mtMoves.set(i, GlobalConstants.METRONOME_MOVE);
+                mtMoves.set(i, Moves.metronome);
             }
 
             this.setMoveTutorMoves(mtMoves);
@@ -2941,7 +2941,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         // move tweaks
         List<Move> moveData = this.getMoves();
 
-        Move metronome = moveData.get(GlobalConstants.METRONOME_MOVE);
+        Move metronome = moveData.get(Moves.metronome);
 
         metronome.pp = 40;
 

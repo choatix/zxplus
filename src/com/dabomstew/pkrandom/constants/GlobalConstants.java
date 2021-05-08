@@ -37,127 +37,76 @@ import java.util.stream.Stream;
 
 public class GlobalConstants {
 
-    public static final boolean[] bannedRandomMoves = new boolean[796], bannedForDamagingMove = new boolean[796];
+    public static final boolean[] bannedRandomMoves = new boolean[827], bannedForDamagingMove = new boolean[827];
     static {
-        bannedRandomMoves[144] = true; // Transform, glitched in RBY
-        bannedRandomMoves[165] = true; // Struggle, self explanatory
+        bannedRandomMoves[Moves.transform] = true; // glitched in RBY
+        bannedRandomMoves[Moves.struggle] = true; //  self explanatory
 
-        bannedForDamagingMove[120] = true; // SelfDestruct
-        bannedForDamagingMove[138] = true; // Dream Eater
-        bannedForDamagingMove[153] = true; // Explosion
-        bannedForDamagingMove[173] = true; // Snore
-        bannedForDamagingMove[206] = true; // False Swipe
-        bannedForDamagingMove[248] = true; // Future Sight
-        bannedForDamagingMove[252] = true; // Fake Out
-        bannedForDamagingMove[264] = true; // Focus Punch
-        bannedForDamagingMove[353] = true; // Doom Desire
-        bannedForDamagingMove[364] = true; // Feint
-        bannedForDamagingMove[387] = true; // Last Resort
-        bannedForDamagingMove[389] = true; // Sucker Punch
+        bannedForDamagingMove[Moves.selfDestruct] = true;
+        bannedForDamagingMove[Moves.dreamEater] = true;
+        bannedForDamagingMove[Moves.explosion] = true;
+        bannedForDamagingMove[Moves.snore] = true;
+        bannedForDamagingMove[Moves.falseSwipe] = true;
+        bannedForDamagingMove[Moves.futureSight] = true;
+        bannedForDamagingMove[Moves.fakeOut] = true;
+        bannedForDamagingMove[Moves.focusPunch] = true;
+        bannedForDamagingMove[Moves.doomDesire] = true;
+        bannedForDamagingMove[Moves.feint] = true;
+        bannedForDamagingMove[Moves.lastResort] = true;
+        bannedForDamagingMove[Moves.suckerPunch] = true;
 
         // new 160
-        bannedForDamagingMove[132] = true; // Constrict, overly weak
-        bannedForDamagingMove[99] = true; // Rage, lock-in in gen1
-        bannedForDamagingMove[205] = true; // Rollout, lock-in
-        bannedForDamagingMove[301] = true; // Ice Ball, Rollout clone
+        bannedForDamagingMove[Moves.constrict] = true; // overly weak
+        bannedForDamagingMove[Moves.rage] = true; // lock-in in gen1
+        bannedForDamagingMove[Moves.rollout] = true; // lock-in
+        bannedForDamagingMove[Moves.iceBall] = true; // Rollout clone
 
         // make sure these cant roll
-        bannedForDamagingMove[39] = true; // Sonicboom
-        bannedForDamagingMove[82] = true; // Dragon Rage
-        bannedForDamagingMove[32] = true; // Horn Drill
-        bannedForDamagingMove[12] = true; // Guillotine
-        bannedForDamagingMove[90] = true; // Fissure
-        bannedForDamagingMove[329] = true; // Sheer Cold
+        bannedForDamagingMove[Moves.sonicBoom] = true;
+        bannedForDamagingMove[Moves.dragonRage] = true;
+        bannedForDamagingMove[Moves.hornDrill] = true;
+        bannedForDamagingMove[Moves.guillotine] = true;
+        bannedForDamagingMove[Moves.fissure] = true;
+        bannedForDamagingMove[Moves.sheerCold] = true;
 
     }
 
     /* @formatter:off */
     public static final List<Integer> normalMultihitMoves = Arrays.asList(
-            292, // Arm Thrust
-            140, // Barrage
-            198, // Bone Rush
-            331, // Bullet Seed
-            4, // Comet Punch
-            3, // DoubleSlap
-            31, // Fury Attack
-            154, // Fury Swipes
-            333, // Icicle Spear
-            42, // Pin Missile
-            350, // Rock Blast
-            131, // Spike Cannon
-            541, // Tail Slap
-            594 // Water Shuriken
-            );
+            Moves.armThrust, Moves.barrage, Moves.boneRush, Moves.bulletSeed, Moves.cometPunch, Moves.doubleSlap,
+            Moves.furyAttack, Moves.furySwipes, Moves.icicleSpear, Moves.pinMissile, Moves.rockBlast, Moves.spikeCannon,
+            Moves.tailSlap, Moves.waterShuriken);
     
     public static final List<Integer> doubleHitMoves = Arrays.asList(
-            155, // Bonemerang
-            458, // Double Hit
-            742, // Double Iron Bash
-            24, // Double Kick
-            751, // Dragon Darts
-            530, // Dual Chop
-            544, // Gear Grind
-            41 // Twineedle
-            );
+            Moves.bonemerang, Moves.doubleHit, Moves.doubleIronBash, Moves.doubleKick, Moves.dragonDarts,
+            Moves.dualChop, Moves.gearGrind, Moves.twineedle);
 
     public static final List<Integer> varyingPowerZMoves = Arrays.asList(
-            622, // Breakneck Blitz (Physical)
-            623, // Breakneck Blitz (Special)
-            624, // All-Out Pummeling (Physical)
-            625, // All-Out Pummeling (Special)
-            626, // Supersonic Skystrike (Physical)
-            627, // Supersonic Skystrike (Special)
-            628, // Acid Downpour (Physical)
-            629, // Acid Downpour (Special)
-            630, // Tectonic Rage (Physical)
-            631, // Tectonic Rage (Special)
-            632, // Continental Crush (Physical)
-            633, // Continental Crush (Special)
-            634, // Savage Spin-Out (Physical)
-            635, // Savage Spin-Out (Special)
-            636, // Never-Ending Nightmare (Physical)
-            637, // Never-Ending Nightmare (Special)
-            638, // Corkscrew Crash (Physical)
-            639, // Corkscrew Crash (Special)
-            640, // Inferno Overdrive (Physical)
-            641, // Inferno Overdrive (Special)
-            642, // Hydro Vortex (Physical)
-            643, // Hydro Vortex (Special)
-            644, // Bloom Doom (Physical)
-            645, // Bloom Doom (Special)
-            646, // Gigavolt Havoc (Physical)
-            647, // Gigavolt Havoc (Special)
-            648, // Shattered Psyche (Physical)
-            649, // Shattered Psyche (Special)
-            650, // Subzero Slammer (Physical)
-            651, // Subzero Slammer (Special)
-            652, // Devastating Drake (Physical)
-            653, // Devastating Drake (Special)
-            654, // Black Hole Eclipse (Physical)
-            655, // Black Hole Eclipse (Special)
-            656, // Twinkle Tackle (Physical)
-            657 // Twinkle Tackle (Special)
-            );
+            Moves.breakneckBlitzPhysical, Moves.breakneckBlitzSpecial,
+            Moves.allOutPummelingPhysical, Moves.allOutPummelingSpecial,
+            Moves.supersonicSkystrikePhysical, Moves.supersonicSkystrikeSpecial,
+            Moves.acidDownpourPhysical, Moves.acidDownpourSpecial,
+            Moves.tectonicRagePhysical, Moves.tectonicRageSpecial,
+            Moves.continentalCrushPhysical, Moves.continentalCrushSpecial,
+            Moves.savageSpinOutPhysical, Moves.savageSpinOutSpecial,
+            Moves.neverEndingNightmarePhysical, Moves.neverEndingNightmareSpecial,
+            Moves.corkscrewCrashPhysical, Moves.corkscrewCrashSpecial,
+            Moves.infernoOverdrivePhysical, Moves.infernoOverdriveSpecial,
+            Moves.hydroVortexPhysical, Moves.hydroVortexSpecial,
+            Moves.bloomDoomPhysical, Moves.bloomDoomSpecial,
+            Moves.gigavoltHavocPhysical, Moves.gigavoltHavocSpecial,
+            Moves.shatteredPsychePhysical, Moves.shatteredPsycheSpecial,
+            Moves.subzeroSlammerPhysical, Moves.subzeroSlammerSpecial,
+            Moves.devastatingDrakePhysical, Moves.devastatingDrakeSpecial,
+            Moves.blackHoleEclipsePhysical, Moves.blackHoleEclipseSpecial,
+            Moves.twinkleTacklePhysical, Moves.twinkleTackleSpecial);
 
     public static final List<Integer> fixedPowerZMoves = Arrays.asList(
-            658, // Catastropika
-            695, // Sinister Arrow Raid
-            696, // Malicious Moonsault
-            697, // Oceanic Operetta
-            698, // Guardian of Alola
-            699, // Soul-Stealing 7-Star Strike
-            700, // Stoked Sparksurfer
-            701, // Pulverizing Pancake
-            702, // Extreme Evoboost
-            703, // Genesis Supernova
-            719, // 10,000,000 Volt Thunderbolt
-            723, // Light That Burns the Sky
-            724, // Searing Sunraze Smash
-            725, // Menacing Moonraze Maelstrom
-            726, // Let's Snuggle Forever
-            727, // Splintered Stormshards
-            728 // Clangorous Soulblaze
-            );
+            Moves.catastropika, Moves.sinisterArrowRaid, Moves.maliciousMoonsault, Moves.oceanicOperetta,
+            Moves.guardianOfAlola, Moves.soulStealing7StarStrike, Moves.stokedSparksurfer, Moves.pulverizingPancake,
+            Moves.extremeEvoboost, Moves.genesisSupernova, Moves.tenMillionVoltThunderbolt, Moves.lightThatBurnsTheSky,
+            Moves.searingSunrazeSmash, Moves.menacingMoonrazeMaelstrom, Moves.letsSnuggleForever,
+            Moves.splinteredStormshards, Moves.clangorousSoulblaze);
 
     public static final List<Integer> zMoves = Stream.concat(fixedPowerZMoves.stream(),
             varyingPowerZMoves.stream()).collect(Collectors.toList());
@@ -256,12 +205,6 @@ public class GlobalConstants {
     );
 
     public static final int MIN_DAMAGING_MOVE_POWER = 50;
-
-    public static final int METRONOME_MOVE = 118;
-
-    public static final int TRIPLE_KICK_INDEX = 167;
-
-    public static final int SWIFT_INDEX = 129;
 
     public static final int HIGHEST_POKEMON_GEN = 8;
 

@@ -35,6 +35,7 @@ import java.util.zip.CRC32;
 import com.dabomstew.pkrandom.*;
 import com.dabomstew.pkrandom.constants.Gen3Constants;
 import com.dabomstew.pkrandom.constants.GlobalConstants;
+import com.dabomstew.pkrandom.constants.Moves;
 import com.dabomstew.pkrandom.constants.Species;
 import com.dabomstew.pkrandom.exceptions.RandomizationException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
@@ -796,7 +797,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             moves[i].pp = rom[offs + i * 0xC + 4] & 0xFF;
             moves[i].type = Gen3Constants.typeTable[rom[offs + i * 0xC + 2]];
 
-            if (i == GlobalConstants.SWIFT_INDEX) {
+            if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;
             }
 
@@ -804,7 +805,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 moves[i].hitCount = 3;
             } else if (GlobalConstants.doubleHitMoves.contains(i)) {
                 moves[i].hitCount = 2;
-            } else if (i == GlobalConstants.TRIPLE_KICK_INDEX) {
+            } else if (i == Moves.tripleKick) {
                 moves[i].hitCount = 2.71; // this assumes the first hit lands
             }
         }
