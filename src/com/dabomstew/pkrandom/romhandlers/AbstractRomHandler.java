@@ -2080,7 +2080,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             // six Pokemon and have a 6v12 battle
             int maxPokemon = t.couldBeMultiBattle ? 3 : 6;
             for (int i = 0; i < additional; i++) {
-                if (t.pokemon.size() == maxPokemon) break;
+                if (t.pokemon.size() >= maxPokemon) break;
 
                 // We want to preserve the original last Pokemon because the order is sometimes used to
                 // determine the rival's starter
