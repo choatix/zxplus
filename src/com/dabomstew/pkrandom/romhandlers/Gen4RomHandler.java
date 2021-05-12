@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 
 import com.dabomstew.pkrandom.*;
 import com.dabomstew.pkrandom.constants.*;
+import com.dabomstew.pkrandom.exceptions.RandomizationException;
 import com.dabomstew.pkrandom.pokemon.*;
 import thenewpoketext.PokeTextData;
 import thenewpoketext.TextToPoke;
@@ -2252,12 +2253,17 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             // To fix this, the below code patches the executable to skip the case for the special
             // double battle intro (by changing a beq to an unconditional branch); this slightly breaks
             // battles that are double battles in the original game, but the trade-off is worth it.
+
+            // Then, also patch various subroutines that control the "Trainer Eye" event and text boxes
+            // related to this in order to make double battles work on all trainers
             if (doubleBattleMode) {
                 String doubleBattleFixPrefix = Gen4Constants.getDoubleBattleFixPrefix(romEntry.romType);
                 int offset = find(arm9, doubleBattleFixPrefix);
                 if (offset > 0) {
                     offset += doubleBattleFixPrefix.length() / 2; // because it was a prefix
                     arm9[offset] = (byte) 0xE0;
+                } else {
+                    throw new RandomizationException("Double Battle Mode not supported for this game");
                 }
 
                 String doubleBattleFlagReturnPrefix = romEntry.getString("DoubleBattleFlagReturnPrefix");
@@ -2271,6 +2277,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 if (offset > 0) {
                     offset += doubleBattleFlagReturnPrefix.length() / 2; // because it was a prefix
                     writeWord(arm9, offset, 0xBD08);
+                } else {
+                    throw new RandomizationException("Double Battle Mode not supported for this game");
                 }
 
                 // Instead of doing "double trainer walk" for nonzero values, do it only for value == 2
@@ -2279,6 +2287,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     offset += doubleBattleWalkingPrefix1.length() / 2; // because it was a prefix
                     arm9[offset] = (byte) 0x2;      // cmp r0, #0x2
                     arm9[offset+3] = (byte) 0xD0;   // beq DOUBLE_TRAINER_WALK
+                } else {
+                    throw new RandomizationException("Double Battle Mode not supported for this game");
                 }
 
                 // Instead of checking if the value was exactly 1 after checking that it was nonzero, check that it's
@@ -2287,6 +2297,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 if (offset > 0) {
                     offset += doubleBattleWalkingPrefix2.length() / 2; // because it was a prefix
                     arm9[offset] = (byte) 0x2;
+                } else {
+                    throw new RandomizationException("Double Battle Mode not supported for this game");
                 }
 
                 // Once again, compare a value to 2 instead of just checking that it's nonzero
@@ -2296,6 +2308,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     writeWord(arm9, offset, 0x46C0);
                     writeWord(arm9, offset+2, 0x2802);
                     arm9[offset+5] = (byte) 0xD0;
+                } else {
+                    throw new RandomizationException("Double Battle Mode not supported for this game");
                 }
 
                 // This NARC has some data that controls how text boxes are handled at the end of a trainer battle.

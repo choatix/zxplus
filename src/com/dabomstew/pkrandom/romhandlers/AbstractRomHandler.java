@@ -2102,12 +2102,6 @@ public abstract class AbstractRomHandler implements RomHandler {
         List<Trainer> currentTrainers = this.getTrainers();
         for (Trainer t: currentTrainers) {
 
-            if (generationOfPokemon() == 5) {
-                if (!t.isBoss() && !t.isImportant()) {
-                    continue;
-                }
-            }
-
             if (t.pokemon.size() != 1 || t.couldBeMultiBattle || (t.tag != null && (t.tag.startsWith("RIVAL1-") || t.tag.startsWith("FRIEND1-") || t.tag.endsWith("NOTSTRONG")))) {
                 continue;
             }
