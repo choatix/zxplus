@@ -18,12 +18,9 @@ public class CliRandomizer {
 
     private final static ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/dabomstew/pkrandom/newgui/Bundle");
 
-    private static boolean performDirectRandomization(
-            String settingsFilePath,
-            String sourceRomFilePath,
-            String destinationRomFilePath,
-            boolean saveAsDirectory
-    ) {
+    private static boolean performDirectRandomization(String settingsFilePath, String sourceRomFilePath,
+                                                      String destinationRomFilePath, boolean saveAsDirectory,
+                                                      String updateFilePath) {
         // borrowed directly from NewRandomizerGUI()
         RomHandler.Factory[] checkHandlers = new RomHandler.Factory[] {
                 new Gen1RomHandler.Factory(),
@@ -65,6 +62,13 @@ public class CliRandomizer {
                 if (rhf.isLoadable(romFileHandler.getAbsolutePath())) {
                     romHandler = rhf.create(RandomSource.instance());
                     romHandler.loadRom(romFileHandler.getAbsolutePath());
+                    if (updateFilePath != null && romHandler.generationOfPokemon() == 6 || romHandler.generationOfPokemon() == 7) {
+                        romHandler.loadGameUpdate(updateFilePath);
+                        if (!saveAsDirectory) {
+                            System.err.println("WARNING: Forcing save as directory since a game update was supplied");
+                        }
+                        saveAsDirectory = true;
+                    }
                     if (saveAsDirectory && romHandler.generationOfPokemon() != 6 && romHandler.generationOfPokemon() != 7) {
                         saveAsDirectory = false;
                         System.err.println("WARNING: Saving as directory does not make sense for non-3DS games, ignoring \"-d\" flag...");
@@ -90,7 +94,7 @@ public class CliRandomizer {
 
                     Randomizer randomizer = new Randomizer(settings, romHandler, saveAsDirectory);
                     randomizer.randomize(fh.getAbsolutePath());
-                    System.out.println("Randomized succesfully!");
+                    System.out.println("Randomized successfully!");
                     // this is the only successful exit, everything else will return false at the end of the function
                     return true;
                 }
@@ -118,13 +122,9 @@ public class CliRandomizer {
         String sourceRomFilePath = null;
         String outputRomFilePath = null;
         boolean saveAsDirectory = false;
+        String updateFilePath = null;
 
-        if (args.length > 0 && Arrays.asList(args).contains("--help")) {
-            printUsage();
-            return 0;
-        }
-
-        List<String> allowedFlags = Arrays.asList("-i", "-o", "-s", "-d");
+        List<String> allowedFlags = Arrays.asList("-i", "-o", "-s", "-d", "--help", "-u");
         for (int i = 0; i < args.length; i++) {
             if (allowedFlags.contains(args[i])) {
                 switch(args[i]) {
@@ -140,6 +140,12 @@ public class CliRandomizer {
                     case "-d":
                         saveAsDirectory = true;
                         break;
+                    case "-u":
+                        updateFilePath = args[i+1];
+                        break;
+                    case "--help":
+                        printUsage();
+                        return 0;
                     default:
                         break;
                 }
@@ -178,7 +184,8 @@ public class CliRandomizer {
                 settingsFilePath,
                 sourceRomFilePath,
                 outputRomFilePath,
-                saveAsDirectory
+                saveAsDirectory,
+                updateFilePath
         );
         if (!processResult) {
             System.err.println("Error: randomization failed");
@@ -189,7 +196,8 @@ public class CliRandomizer {
     }
 
     private static void printUsage() {
-        System.err.println("Usage: java -jar PokeRandoZX.jar cli -s <path to settings file> -i <path to source ROM> -o <path for new ROM> [-d]");
+        System.err.println("Usage: java [-Xmx4096M] -jar PokeRandoZX.jar cli -s <path to settings file> " +
+                "-i <path to source ROM> -o <path for new ROM> [-d][-u <path to 3DS game update>]");
         System.err.println("-d: Save 3DS game as directory (LayeredFS)");
     }
 }
