@@ -2699,7 +2699,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
                 if (!GlobalConstants.bannedForDamagingMove[mv.number]) {
                     if ((mv.power * mv.hitCount) >= 2 * GlobalConstants.MIN_DAMAGING_MOVE_POWER
-                            || ((mv.power * mv.hitCount) >= GlobalConstants.MIN_DAMAGING_MOVE_POWER && mv.hitratio >= 90)) {
+                            || ((mv.power * mv.hitCount) >= GlobalConstants.MIN_DAMAGING_MOVE_POWER && (mv.hitratio >= 90 || mv.hitratio == perfectAccuracy))) {
                         validDamagingMoves.add(mv);
                         if (mv.type != null) {
                             if (!validTypeDamagingMoves.containsKey(mv.type)) {
@@ -3459,7 +3459,8 @@ public abstract class AbstractRomHandler implements RomHandler {
                     hms.contains(mv.number) || banned.contains(mv.number)) {
                 unusableMoves.add(mv);
             } else if (GlobalConstants.bannedForDamagingMove[mv.number]
-                    || mv.power < GlobalConstants.MIN_DAMAGING_MOVE_POWER) {
+                    || (mv.power * mv.hitCount) < GlobalConstants.MIN_DAMAGING_MOVE_POWER
+                    || ((mv.power * mv.hitCount) < GlobalConstants.MIN_DAMAGING_MOVE_POWER * 2 && mv.hitratio < 90 && mv.hitratio != perfectAccuracy)) {
                 unusableDamagingMoves.add(mv);
             }
         }
@@ -3718,7 +3719,8 @@ public abstract class AbstractRomHandler implements RomHandler {
                     || banned.contains(mv.number) || GlobalConstants.zMoves.contains(mv.number)) {
                 unusableMoves.add(mv);
             } else if (GlobalConstants.bannedForDamagingMove[mv.number]
-                    || mv.power < GlobalConstants.MIN_DAMAGING_MOVE_POWER) {
+                    || (mv.power * mv.hitCount) < GlobalConstants.MIN_DAMAGING_MOVE_POWER
+                    || ((mv.power * mv.hitCount) < GlobalConstants.MIN_DAMAGING_MOVE_POWER * 2 && mv.hitratio < 90 && mv.hitratio != perfectAccuracy)) {
                 unusableDamagingMoves.add(mv);
             }
         }
