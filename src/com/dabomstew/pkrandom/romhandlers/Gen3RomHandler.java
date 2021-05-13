@@ -33,14 +33,12 @@ import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
 import com.dabomstew.pkrandom.*;
-import com.dabomstew.pkrandom.constants.Gen3Constants;
-import com.dabomstew.pkrandom.constants.GlobalConstants;
-import com.dabomstew.pkrandom.constants.Moves;
-import com.dabomstew.pkrandom.constants.Species;
+import com.dabomstew.pkrandom.constants.*;
 import com.dabomstew.pkrandom.exceptions.RandomizationException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import com.dabomstew.pkrandom.pokemon.*;
 import compressors.DSDecmp;
+import jdk.nashorn.internal.objects.Global;
 
 public class Gen3RomHandler extends AbstractGBRomHandler {
 
@@ -796,6 +794,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             moves[i].power = rom[offs + i * 0xC + 1] & 0xFF;
             moves[i].pp = rom[offs + i * 0xC + 4] & 0xFF;
             moves[i].type = Gen3Constants.typeTable[rom[offs + i * 0xC + 2]];
+            moves[i].category = GBConstants.physicalTypes.contains(moves[i].type) ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL;
 
             if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;
@@ -3440,14 +3439,14 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             if (move == null) {
                 continue;
             }
-            if (Gen3Constants.physicalTypes.contains(move.type) && move.power > 0) {
+            if (GBConstants.physicalTypes.contains(move.type) && move.power > 0) {
                 items.add(Gen3Constants.liechiBerry);
                 if (!consumableOnly) {
                     items.addAll(Gen3Constants.typeBoostingItems.get(move.type));
                     items.add(Gen3Constants.choiceBand);
                 }
             }
-            if (!Gen3Constants.physicalTypes.contains(move.type) && move.power > 0) {
+            if (!GBConstants.physicalTypes.contains(move.type) && move.power > 0) {
                 items.add(Gen3Constants.petayaBerry);
                 if (!consumableOnly) {
                     items.addAll(Gen3Constants.typeBoostingItems.get(move.type));

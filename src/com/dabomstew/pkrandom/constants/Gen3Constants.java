@@ -300,10 +300,6 @@ public class Gen3Constants {
         return Collections.unmodifiableMap(map);
     }
 
-    public static final Set<Type> physicalTypes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            Type.NORMAL, Type.FIGHTING, Type.POISON, Type.GROUND, Type.FLYING, Type.BUG,
-            Type.ROCK, Type.GHOST, Type.STEEL)));
-
     private static Type[] constructTypeTable() {
         Type[] table = new Type[256];
         table[0x00] = Type.NORMAL;

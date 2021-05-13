@@ -386,6 +386,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             moves[i].power = rom[offs + (i - 1) * 7 + 2] & 0xFF;
             moves[i].pp = rom[offs + (i - 1) * 7 + 5] & 0xFF;
             moves[i].type = Gen2Constants.typeTable[rom[offs + (i - 1) * 7 + 3]];
+            moves[i].category = GBConstants.physicalTypes.contains(moves[i].type) ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL;
 
             if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;

@@ -2666,7 +2666,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean noBroken = settings.isBlockBrokenMovesetMoves();
         boolean forceStartingMoves = supportsFourStartingMoves() && settings.isStartWithGuaranteedMoves();
         int forceStartingMoveCount = settings.getGuaranteedMoveCount();
-        double goodDamagingProbability =
+        double goodDamagingPercentage =
                 settings.isMovesetsForceGoodDamaging() ? settings.getMovesetsGoodDamagingPercent() / 100.0 : 0;
         boolean evolutionMovesForAll = settings.isEvolutionMovesForAll();
 
@@ -2712,13 +2712,34 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
         }
 
+//        for (Type theType: validTypeMoves.keySet()) {
+//            System.out.println(theType);
+//            List<Move> typeMoves = validTypeMoves.get(theType);
+//            int attackingSum = 0;
+//            int statusSum = 0;
+//            for (Move typeMove: typeMoves) {
+//                if (typeMove.power > 0) {
+//                    attackingSum += typeMove.power;
+//                } else {
+//                    statusSum += 1;
+//                }
+//            }
+//            System.out.println("TOTAL MOVES: " + typeMoves.size());
+//            System.out.println("TOTAL POWER: " + attackingSum);
+//            System.out.println("AVG POWER: " + (double)attackingSum / (double)typeMoves.size());
+//            System.out.println("STATUS MOVES: " + statusSum);
+//        }
+
         for (Integer pkmnNum : movesets.keySet()) {
-            Set<Integer> learnt = new TreeSet<>();
+            List<Integer> learnt = new ArrayList<>();
             List<MoveLearnt> moves = movesets.get(pkmnNum);
+            int lv1AttackingMove = 0;
             Pokemon pkmn = findPokemonInPoolWithSpeciesID(mainPokemonListInclFormes, pkmnNum);
             if (pkmn == null) {
                 continue;
             }
+
+            double atkSpAtkRatio = (double)pkmn.attack / ((double)pkmn.attack + (double)pkmn.spatk);
 
             // 4 starting moves?
             if (forceStartingMoves) {
@@ -2766,10 +2787,13 @@ public abstract class AbstractRomHandler implements RomHandler {
                 lv1index--;
             }
 
+            // Force a certain amount of good damaging moves depending on the percentage
+            int goodDamagingLeft = (int)Math.round(goodDamagingPercentage * moves.size());
+
             // Replace moves as needed
             for (int i = 0; i < moves.size(); i++) {
                 // should this move be forced damaging?
-                boolean attemptDamaging = i == lv1index || random.nextDouble() < goodDamagingProbability;
+                boolean attemptDamaging = i == lv1index || goodDamagingLeft > 0;
 
                 // type themed?
                 Type typeOfMove = null;
@@ -2817,6 +2841,11 @@ public abstract class AbstractRomHandler implements RomHandler {
                     } else if (checkForUnusedMove(validDamagingMoves, learnt)) {
                         pickList = validDamagingMoves;
                     }
+                    MoveCategory forcedCategory = random.nextDouble() < atkSpAtkRatio ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL;
+                    List<Move> filteredList = pickList.stream().filter(mv -> mv.category == forcedCategory).collect(Collectors.toList());
+                    if (!filteredList.isEmpty() && checkForUnusedMove(filteredList, learnt)) {
+                        pickList = filteredList;
+                    }
                 } else if (typeOfMove != null) {
                     if (validTypeMoves.containsKey(typeOfMove)
                             && checkForUnusedMove(validTypeMoves.get(typeOfMove), learnt)) {
@@ -2830,14 +2859,33 @@ public abstract class AbstractRomHandler implements RomHandler {
                     mv = pickList.get(random.nextInt(pickList.size()));
                 }
 
-                // write it
-                moves.get(i).move = mv.number;
+                if (i == lv1index) {
+                    lv1AttackingMove = mv.number;
+                } else {
+                    goodDamagingLeft--;
+                }
+                learnt.add(mv.number);
+
+            }
+
+            Collections.shuffle(learnt, random);
+            if (learnt.get(lv1index) != lv1AttackingMove) {
+                for (int i = 0; i < learnt.size(); i++) {
+                    if (learnt.get(i) == lv1AttackingMove) {
+                        learnt.set(i, learnt.get(lv1index));
+                        learnt.set(lv1index, lv1AttackingMove);
+                        break;
+                    }
+                }
+            }
+
+            // write all moves for the pokemon
+            for (int i = 0; i < learnt.size(); i++) {
+                moves.get(i).move = learnt.get(i);
                 if (i == lv1index) {
                     // just in case, set this to lv1
                     moves.get(i).level = 1;
                 }
-                learnt.add(mv.number);
-
             }
         }
         // Done, save
@@ -3427,7 +3475,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     public void randomizeTMMoves(Settings settings) {
         boolean noBroken = settings.isBlockBrokenTMMoves();
         boolean preserveField = settings.isKeepFieldMoveTMs();
-        double goodDamagingProbability = settings.isTmsForceGoodDamaging() ? settings.getTmsGoodDamagingPercent() / 100.0 : 0;
+        double goodDamagingPercentage = settings.isTmsForceGoodDamaging() ? settings.getTmsGoodDamagingPercent() / 100.0 : 0;
 
         // Pick some random TM moves.
         int tmCount = this.getTMCount();
@@ -3472,9 +3520,12 @@ public abstract class AbstractRomHandler implements RomHandler {
         // pick (tmCount - preservedFieldMoveCount) moves
         List<Integer> pickedMoves = new ArrayList<>();
 
+        // Force a certain amount of good damaging moves depending on the percentage
+        int goodDamagingLeft = (int)Math.round(goodDamagingPercentage * (tmCount - preservedFieldMoveCount));
+
         for (int i = 0; i < tmCount - preservedFieldMoveCount; i++) {
             Move chosenMove;
-            if (random.nextDouble() < goodDamagingProbability && usableDamagingMoves.size() > 0) {
+            if (goodDamagingLeft > 0 && usableDamagingMoves.size() > 0) {
                 chosenMove = usableDamagingMoves.get(random.nextInt(usableDamagingMoves.size()));
             } else {
                 chosenMove = usableMoves.get(random.nextInt(usableMoves.size()));
@@ -3482,10 +3533,11 @@ public abstract class AbstractRomHandler implements RomHandler {
             pickedMoves.add(chosenMove.number);
             usableMoves.remove(chosenMove);
             usableDamagingMoves.remove(chosenMove);
+            goodDamagingLeft--;
         }
 
-        // shuffle the picked moves because high goodDamagingProbability
-        // could bias them towards early numbers otherwise
+        // shuffle the picked moves because high goodDamagingPercentage
+        // will bias them towards early numbers otherwise
 
         Collections.shuffle(pickedMoves, random);
 
@@ -3682,7 +3734,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     public void randomizeMoveTutorMoves(Settings settings) {
         boolean noBroken = settings.isBlockBrokenTutorMoves();
         boolean preserveField = settings.isKeepFieldMoveTutors();
-        double goodDamagingProbability = settings.isTutorsForceGoodDamaging() ? settings.getTutorsGoodDamagingPercent() / 100.0 : 0;
+        double goodDamagingPercentage = settings.isTutorsForceGoodDamaging() ? settings.getTutorsGoodDamagingPercent() / 100.0 : 0;
 
         if (!this.hasMoveTutors()) {
             return;
@@ -3732,9 +3784,12 @@ public abstract class AbstractRomHandler implements RomHandler {
         // pick (tmCount - preservedFieldMoveCount) moves
         List<Integer> pickedMoves = new ArrayList<>();
 
+        // Force a certain amount of good damaging moves depending on the percentage
+        int goodDamagingLeft = (int)Math.round(goodDamagingPercentage * (mtCount - preservedFieldMoveCount));
+
         for (int i = 0; i < mtCount - preservedFieldMoveCount; i++) {
             Move chosenMove;
-            if (random.nextDouble() < goodDamagingProbability && usableDamagingMoves.size() > 0) {
+            if (goodDamagingLeft > 0 && usableDamagingMoves.size() > 0) {
                 chosenMove = usableDamagingMoves.get(random.nextInt(usableDamagingMoves.size()));
             } else {
                 chosenMove = usableMoves.get(random.nextInt(usableMoves.size()));
@@ -3742,10 +3797,11 @@ public abstract class AbstractRomHandler implements RomHandler {
             pickedMoves.add(chosenMove.number);
             usableMoves.remove(chosenMove);
             usableDamagingMoves.remove(chosenMove);
+            goodDamagingLeft--;
         }
 
-        // shuffle the picked moves because high goodDamagingProbability
-        // could bias them towards early numbers otherwise
+        // shuffle the picked moves because high goodDamagingPercentage
+        // will bias them towards early numbers otherwise
 
         Collections.shuffle(pickedMoves, random);
 
@@ -5150,7 +5206,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         copyUpEvolutionsHelper(bpAction, epAction, true);
     }
 
-    private boolean checkForUnusedMove(List<Move> potentialList, Set<Integer> alreadyUsed) {
+    private boolean checkForUnusedMove(List<Move> potentialList, List<Integer> alreadyUsed) {
         for (Move mv : potentialList) {
             if (!alreadyUsed.contains(mv.number)) {
                 return true;
