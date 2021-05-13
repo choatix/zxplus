@@ -1174,7 +1174,8 @@ public class NewRandomizerGUI {
                         int settingsStringVersionNumber = Integer.parseInt(configString.substring(0, 3));
                         if (settingsStringVersionNumber < Version.VERSION) {
                             JOptionPane.showMessageDialog(frame,bundle.getString("GUI.settingsStringOlder"));
-                            Settings settings = Settings.fromString(configString.substring(3));
+                            String updatedSettingsString = new SettingsUpdater().update(settingsStringVersionNumber, configString.substring(3));
+                            Settings settings = Settings.fromString(updatedSettingsString);
                             settings.tweakForRom(this.romHandler);
                             restoreStateFromSettings(settings);
                             JOptionPane.showMessageDialog(frame,bundle.getString("GUI.settingsStringLoaded"));
