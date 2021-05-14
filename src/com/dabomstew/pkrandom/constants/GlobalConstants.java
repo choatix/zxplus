@@ -60,6 +60,7 @@ public class GlobalConstants {
         bannedForDamagingMove[Moves.iceBall] = true; // Rollout clone
         bannedForDamagingMove[Moves.synchronoise] = true; // hard to use
         bannedForDamagingMove[Moves.shellTrap] = true; // hard to use
+        bannedForDamagingMove[Moves.foulPlay] = true; // doesn't depend on your own attacking stat
 
         // make sure these cant roll
         bannedForDamagingMove[Moves.sonicBoom] = true;
