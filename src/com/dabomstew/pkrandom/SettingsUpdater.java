@@ -149,14 +149,6 @@ public class SettingsUpdater {
             insertIntField(23, hasBWPatch);
         }
 
-        // 160 bug:
-        // check if all of the WPAdditionalRule bitfields are unset
-        // (None, Type Themed, Catch Em All)
-        // if they are all unset, switch "similar strength" on
-        if ((dataBlock[12] & (0x01 | 0x04 | 0x08)) == 0) {
-            dataBlock[13] |= 0x04;
-        }
-
         // 160 to 161: no change
         // the only changes were in implementation, which broke presets, but
         // leaves settings files the same
