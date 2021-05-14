@@ -47,10 +47,7 @@ import com.dabomstew.pkrandom.FileFunctions;
 import com.dabomstew.pkrandom.GFXFunctions;
 import com.dabomstew.pkrandom.MiscTweak;
 import com.dabomstew.pkrandom.Settings;
-import com.dabomstew.pkrandom.constants.GBConstants;
-import com.dabomstew.pkrandom.constants.Gen1Constants;
-import com.dabomstew.pkrandom.constants.GlobalConstants;
-import com.dabomstew.pkrandom.constants.Species;
+import com.dabomstew.pkrandom.constants.*;
 import com.dabomstew.pkrandom.exceptions.RandomizationException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import com.dabomstew.pkrandom.pokemon.*;
@@ -1165,6 +1162,11 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
             return true;
         }
         return romEntry.extraTypeReverse.containsKey(type);
+    }
+
+    @Override
+    public List<Integer> getMovesBannedFromLevelup() {
+        return Gen1Constants.bannedLevelupMoves;
     }
 
     private void fixTypeEffectiveness() {

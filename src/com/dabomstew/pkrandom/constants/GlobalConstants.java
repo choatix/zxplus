@@ -39,7 +39,6 @@ public class GlobalConstants {
 
     public static final boolean[] bannedRandomMoves = new boolean[827], bannedForDamagingMove = new boolean[827];
     static {
-        bannedRandomMoves[Moves.transform] = true; // glitched in RBY
         bannedRandomMoves[Moves.struggle] = true; //  self explanatory
 
         bannedForDamagingMove[Moves.selfDestruct] = true;

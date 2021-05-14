@@ -61,6 +61,9 @@ public class Gen1Constants {
     public static final List<Integer> bannedMovesWithoutXAccBanned = Arrays.asList(
             Moves.sonicBoom, Moves.dragonRage, Moves.spore, Moves.hornDrill, Moves.fissure, Moves.guillotine);
 
+    // ban transform because of Transform assumption glitch
+    public static final List<Integer> bannedLevelupMoves = Collections.singletonList(Moves.transform);
+
     public static final List<Integer> fieldMoves = Arrays.asList(
             Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport);
 

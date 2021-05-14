@@ -82,7 +82,8 @@ public class Gen2Constants {
     public static final List<Integer> earlyRequiredHMMoves = Collections.singletonList(Moves.cut);
 
     // ban thief because trainers are broken with it (items are not returned).
-    public static final List<Integer> bannedLevelupMoves = Collections.singletonList(Moves.thief);
+    // ban transform because of Transform assumption glitch
+    public static final List<Integer> bannedLevelupMoves = Arrays.asList(Moves.transform, Moves.thief);
 
     public static final List<Integer> brokenMoves = Arrays.asList(
             Moves.sonicBoom, Moves.dragonRage, Moves.hornDrill, Moves.fissure, Moves.guillotine);
