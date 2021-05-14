@@ -3388,8 +3388,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 .collect(Collectors.toList());
         int shopCount = romEntry.getInt("ShopCount");
         Map<Integer,List<Integer>> shopItemsMap = new TreeMap<>();
-        int offset = find(arm9,Gen4Constants.getShopDataPrefix(romEntry.romType));
-        offset += Gen4Constants.getShopDataPrefix(romEntry.romType).length() / 2;
+        String shopDataPrefix = romEntry.getString("ShopDataPrefix");
+        int offset = find(arm9,shopDataPrefix);
+        offset += shopDataPrefix.length() / 2;
 
         for (int i = 0; i < shopCount; i++) {
             if (!skipShops.contains(i)) {
@@ -3418,8 +3419,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     public void setShopItems(Map<Integer, List<Integer>> shopItems) {
 
         int shopCount = romEntry.getInt("ShopCount");
-        int offset = find(arm9,Gen4Constants.getShopDataPrefix(romEntry.romType));
-        offset += Gen4Constants.getShopDataPrefix(romEntry.romType).length() / 2;
+        String shopDataPrefix = romEntry.getString("ShopDataPrefix");
+        int offset = find(arm9,shopDataPrefix);
+        offset += shopDataPrefix.length() / 2;
 
         for (int i = 0; i < shopCount; i++) {
             List<Integer> thisShopItems = shopItems.get(i);
