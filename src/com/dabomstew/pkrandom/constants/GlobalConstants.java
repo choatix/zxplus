@@ -54,12 +54,12 @@ public class GlobalConstants {
         bannedForDamagingMove[Moves.feint] = true;
         bannedForDamagingMove[Moves.lastResort] = true;
         bannedForDamagingMove[Moves.suckerPunch] = true;
-
-        // new 160
         bannedForDamagingMove[Moves.constrict] = true; // overly weak
         bannedForDamagingMove[Moves.rage] = true; // lock-in in gen1
         bannedForDamagingMove[Moves.rollout] = true; // lock-in
         bannedForDamagingMove[Moves.iceBall] = true; // Rollout clone
+        bannedForDamagingMove[Moves.synchronoise] = true; // hard to use
+        bannedForDamagingMove[Moves.shellTrap] = true; // hard to use
 
         // make sure these cant roll
         bannedForDamagingMove[Moves.sonicBoom] = true;
