@@ -334,21 +334,6 @@ public class Gen4Constants {
     
     public static final int luckyEggIndex = 0xE7;
 
-    private static final String dpShopDataPrefix = "4D10040295100402C910040201110402391104027511040285AF0302A5AF0302";
-    private static final String ptShopDataPrefix = "017F0402397F0402817F0402B57F0402ED7F0402258004026180040281800402";
-    private static final String hgssShopDataPrefix = "2D8D0402758D0402BD8D0402F18D0402298E0402618E0402998E0402B98E0402";
-
-    public static String getShopDataPrefix(int romType) {
-        if (romType == Type_DP) {
-            return dpShopDataPrefix;
-        } else if (romType == Type_Plat) {
-            return ptShopDataPrefix;
-        } else if (romType == Type_HGSS) {
-            return hgssShopDataPrefix;
-        }
-        return "";
-    }
-
     private static List<String> dpShopNames = Arrays.asList(
             "Sunyshore Secondary",
             "Jubilife Secondary",
