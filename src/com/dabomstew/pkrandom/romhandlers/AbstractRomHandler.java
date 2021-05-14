@@ -2718,23 +2718,72 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
         }
 
-//        for (Type theType: validTypeMoves.keySet()) {
-//            System.out.println(theType);
-//            List<Move> typeMoves = validTypeMoves.get(theType);
-//            int attackingSum = 0;
-//            int statusSum = 0;
-//            for (Move typeMove: typeMoves) {
-//                if (typeMove.power > 0) {
-//                    attackingSum += typeMove.power;
-//                } else {
-//                    statusSum += 1;
-//                }
-//            }
-//            System.out.println("TOTAL MOVES: " + typeMoves.size());
-//            System.out.println("TOTAL POWER: " + attackingSum);
-//            System.out.println("AVG POWER: " + (double)attackingSum / (double)typeMoves.size());
-//            System.out.println("STATUS MOVES: " + statusSum);
-//        }
+        Map<Type,Double> avgTypePowers = new TreeMap<>();
+        double totalAvgPower = 0;
+
+        for (Type type: validTypeMoves.keySet()) {
+            System.out.println(type);
+            List<Move> typeMoves = validTypeMoves.get(type);
+            int attackingSum = 0;
+            for (Move typeMove: typeMoves) {
+                if (typeMove.power > 0) {
+                    attackingSum += (typeMove.power * typeMove.hitCount);
+                }
+            }
+            avgTypePowers.put(type, (double)attackingSum / (double)typeMoves.size());
+            totalAvgPower += ((double)attackingSum / (double)typeMoves.size());
+            System.out.println("AVG POWER: " + (double)attackingSum / (double)typeMoves.size());
+        }
+
+        totalAvgPower /= (double)validTypeMoves.keySet().size();
+
+        // Want the average power of each type to be within 25% both directions
+        double minAvg = totalAvgPower * 0.75;
+        double maxAvg = totalAvgPower * 1.25;
+
+        for (Type type: avgTypePowers.keySet()) {
+            double avgPowerForType = avgTypePowers.get(type);
+            List<Move> typeMoves = validTypeMoves.get(type);
+            List<Move> alreadyPicked = new ArrayList<>();
+            while (avgPowerForType < minAvg) {
+                final double finalAvgPowerForType = avgPowerForType;
+                List<Move> strongerThanAvgTypeMoves = typeMoves
+                        .stream()
+                        .filter(mv -> mv.power * mv.hitCount > finalAvgPowerForType)
+                        .collect(Collectors.toList());
+                if (strongerThanAvgTypeMoves.isEmpty()) break;
+                if (alreadyPicked.containsAll(strongerThanAvgTypeMoves)) {
+                    alreadyPicked = new ArrayList<>();
+                } else {
+                    strongerThanAvgTypeMoves.removeAll(alreadyPicked);
+                }
+                Move extraMove = strongerThanAvgTypeMoves.get(random.nextInt(strongerThanAvgTypeMoves.size()));
+                avgPowerForType = (avgPowerForType * typeMoves.size() + extraMove.power * extraMove.hitCount)
+                        / (typeMoves.size() + 1);
+                typeMoves.add(extraMove);
+                alreadyPicked.add(extraMove);
+            }
+            while (avgPowerForType > maxAvg) {
+                final double finalAvgPowerForType = avgPowerForType;
+                List<Move> weakerThanAvgTypeMoves = typeMoves
+                        .stream()
+                        .filter(mv -> mv.power * mv.hitCount < finalAvgPowerForType)
+                        .collect(Collectors.toList());
+                if (weakerThanAvgTypeMoves.isEmpty()) break;
+                if (alreadyPicked.containsAll(weakerThanAvgTypeMoves)) {
+                    alreadyPicked = new ArrayList<>();
+                } else {
+                    weakerThanAvgTypeMoves.removeAll(alreadyPicked);
+                }
+                Move extraMove = weakerThanAvgTypeMoves.get(random.nextInt(weakerThanAvgTypeMoves.size()));
+                avgPowerForType = (avgPowerForType * typeMoves.size() + extraMove.power * extraMove.hitCount)
+                        / (typeMoves.size() + 1);
+                typeMoves.add(extraMove);
+                alreadyPicked.add(extraMove);
+            }
+            System.out.println(type + ", AFTER BALANCING");
+            System.out.println("AVG POWER: " + avgPowerForType);
+        }
 
         for (Integer pkmnNum : movesets.keySet()) {
             List<Integer> learnt = new ArrayList<>();
