@@ -5230,7 +5230,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     private List<Pokemon> pokemonOfTypeInclFormes(Type type, boolean noLegendaries) {
         List<Pokemon> typedPokes = new ArrayList<>();
         for (Pokemon pk : mainPokemonListInclFormes) {
-            if (pk != null && (!noLegendaries || !pk.isLegendary())) {
+            if (pk != null && !pk.actuallyCosmetic && (!noLegendaries || !pk.isLegendary())) {
                 if (pk.primaryType == type || pk.secondaryType == type) {
                     typedPokes.add(pk);
                 }
