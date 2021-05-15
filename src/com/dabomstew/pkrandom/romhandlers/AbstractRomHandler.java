@@ -2722,7 +2722,6 @@ public abstract class AbstractRomHandler implements RomHandler {
         double totalAvgPower = 0;
 
         for (Type type: validTypeMoves.keySet()) {
-            System.out.println(type);
             List<Move> typeMoves = validTypeMoves.get(type);
             int attackingSum = 0;
             for (Move typeMove: typeMoves) {
@@ -2730,9 +2729,9 @@ public abstract class AbstractRomHandler implements RomHandler {
                     attackingSum += (typeMove.power * typeMove.hitCount);
                 }
             }
-            avgTypePowers.put(type, (double)attackingSum / (double)typeMoves.size());
-            totalAvgPower += ((double)attackingSum / (double)typeMoves.size());
-            System.out.println("AVG POWER: " + (double)attackingSum / (double)typeMoves.size());
+            double avgTypePower = (double)attackingSum / (double)typeMoves.size();
+            avgTypePowers.put(type, avgTypePower);
+            totalAvgPower += (avgTypePower);
         }
 
         totalAvgPower /= (double)validTypeMoves.keySet().size();
@@ -2740,6 +2739,8 @@ public abstract class AbstractRomHandler implements RomHandler {
         // Want the average power of each type to be within 25% both directions
         double minAvg = totalAvgPower * 0.75;
         double maxAvg = totalAvgPower * 1.25;
+
+        // Add extra moves to type lists outside of the range to balance the average power of each type
 
         for (Type type: avgTypePowers.keySet()) {
             double avgPowerForType = avgTypePowers.get(type);
@@ -2781,8 +2782,6 @@ public abstract class AbstractRomHandler implements RomHandler {
                 typeMoves.add(extraMove);
                 alreadyPicked.add(extraMove);
             }
-            System.out.println(type + ", AFTER BALANCING");
-            System.out.println("AVG POWER: " + avgPowerForType);
         }
 
         for (Integer pkmnNum : movesets.keySet()) {
