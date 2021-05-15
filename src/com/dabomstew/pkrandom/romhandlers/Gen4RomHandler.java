@@ -4134,13 +4134,16 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     private void patchForNationalDex() {
         byte[] pokedexScript = scriptNarc.files.get(romEntry.getInt("NationalDexScriptOffset"));
 
-        // Our patcher breaks if the output file is larger than the input file. In our case, we want
-        // to expand the script by four bytes to add an instruction to enable the national dex. Thus,
-        // the IPS patch was created with us adding four 0x00 bytes to the end of the script in mind.
-        byte[] expandedPokedexScript = new byte[pokedexScript.length + 4];
-        System.arraycopy(pokedexScript, 0, expandedPokedexScript, 0, pokedexScript.length);
-        genericIPSPatch(expandedPokedexScript, "NationalDexAtStartTweak");
-        scriptNarc.files.set(romEntry.getInt("NationalDexScriptOffset"), expandedPokedexScript);
+        if (romEntry.romType == Gen4Constants.Type_HGSS) {
+            // Our patcher breaks if the output file is larger than the input file. For HGSS, we want
+            // to expand the script by four bytes to add an instruction to enable the national dex. Thus,
+            // the IPS patch was created with us adding four 0x00 bytes to the end of the script in mind.
+            byte[] expandedPokedexScript = new byte[pokedexScript.length + 4];
+            System.arraycopy(pokedexScript, 0, expandedPokedexScript, 0, pokedexScript.length);
+            pokedexScript = expandedPokedexScript;
+        }
+        genericIPSPatch(pokedexScript, "NationalDexAtStartTweak");
+        scriptNarc.files.set(romEntry.getInt("NationalDexScriptOffset"), pokedexScript);
     }
 
     private void applyRunWithoutRunningShoesPatch() {
