@@ -733,6 +733,94 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 writeWord(starterData, romEntry.getInt("StarterPokemonOffset"), newStarters.get(0).number);
                 writeWord(starterData, romEntry.getInt("StarterPokemonOffset") + 4, newStarters.get(1).number);
                 writeWord(starterData, romEntry.getInt("StarterPokemonOffset") + 8, newStarters.get(2).number);
+
+                if (romEntry.romType == Gen4Constants.Type_DP || romEntry.romType == Gen4Constants.Type_Plat) {
+                    String starterPokemonGraphicsPrefix = romEntry.getString("StarterPokemonGraphicsPrefix");
+                    int offset = find(starterData, starterPokemonGraphicsPrefix);
+                    if (offset > 0) {
+
+                        // The original subroutine for handling the starter graphics is optimized by the compiler to use
+                        // a value as a pointer offset and then adding to that value to get the Pokemon's index.
+                        // We will keep this logic, but in order to make place for an extra instruction that will let
+                        // us set the Pokemon index to any Gen 4 value we want, we change the base address of the
+                        // pointer that the offset is used for; this also requires some changes to the instructions
+                        // that utilize this pointer.
+                        offset += starterPokemonGraphicsPrefix.length() / 2;
+
+                        // Move down a section of instructions to make place for an add instruction that modifies the
+                        // pointer. A PC-relative load and a BL have to be slightly modified to point to the correct
+                        // thing.
+                        writeWord(starterData, offset+0xC, readWord(starterData, offset+0xA));
+                        if (offset % 4 == 0) {
+                            starterData[offset+0xC] = (byte)(starterData[offset+0xC] - 1);
+                        }
+                        writeWord(starterData, offset+0xA, readWord(starterData, offset+0x8));
+                        starterData[offset+0xA] = (byte)(starterData[offset+0xA] - 1);
+                        writeWord(starterData, offset+0x8, readWord(starterData, offset+0x6));
+                        writeWord(starterData, offset+0x6, readWord(starterData, offset+0x4));
+                        writeWord(starterData, offset+0x4, readWord(starterData, offset+0x2));
+                        // This instruction normally uses the value in r0 (0x200) as an offset for an ldr that uses
+                        // the pointer as its base address; we change this to not use an offset at all because we
+                        // change the instruction before it to add that 0x200 to the base address.
+                        writeWord(starterData, offset+0x2, 0x6828);
+                        writeWord(starterData, offset, 0x182D);
+
+                        offset += 0x16;
+                        // Change another ldr to not use any offset since we changed the base address
+                        writeWord(starterData, offset, 0x6828);
+
+                        offset += 0xA;
+
+                        // This is where we write the actual starter numbers, as two adds/subs
+
+                        for (int i = 0; i < 3; i++) {
+                            // The offset that we want to use for the pointer is 4, then 8, then 0xC.
+                            // We take the difference of the Pokemon's index and the offset, because we want to add
+                            // (or subtract) that to/from the offset to get the Pokemon's index later.
+                            int starterDiff = newStarters.get(i).number - (4*(i+1));
+
+                            // Prepare two "add r0, #0x0" instructions where we'll modify the immediate
+                            int instr1 = 0x3200;
+                            int instr2 = 0x3200;
+
+                            if (starterDiff < 0) {
+                                // Pokemon's index is below the offset, change to a sub instruction
+                                instr1 |= 0x800;
+                                starterDiff = Math.abs(starterDiff);
+                            } else if (starterDiff > 255) {
+                                // Pokemon's index is above (offset + 255), need to utilize the second add instruction
+                                instr2 |= 0xFF;
+                                starterDiff -= 255;
+                            }
+
+                            // Modify the first add instruction's immediate value
+                            instr1 |= (starterDiff & 0xFF);
+
+                            // Change the original offset that's loaded, then move an instruction up one step
+                            // and insert our add instructions
+                            starterData[offset] = (byte)(4*(i+1));
+                            writeWord(starterData, offset+2, readWord(starterData, offset+4));
+                            writeWord(starterData, offset+4, instr1);
+                            writeWord(starterData, offset+8, instr2);
+
+                            // Repeat for each starter
+                            offset += 0xE;
+                        }
+
+                        // Change a loaded value to be 1 instead of 0x81 because we changed the pointer
+                        starterData[offset] = 1;
+
+                        // Also need to change one usage of the pointer we changed, in the inner function
+                        String starterPokemonGraphicsPrefixInner = romEntry.getString("StarterPokemonGraphicsPrefixInner");
+                        offset = find(starterData, starterPokemonGraphicsPrefixInner);
+
+                        if (offset > 0) {
+                            offset += starterPokemonGraphicsPrefixInner.length() / 2;
+                            starterData[offset+1] = 0x68;
+                        }
+                    }
+                }
+
                 writeOverlay(romEntry.getInt("StarterPokemonOvlNumber"), starterData);
                 // Patch DPPt-style rival scripts
                 // these have a series of IfJump commands
