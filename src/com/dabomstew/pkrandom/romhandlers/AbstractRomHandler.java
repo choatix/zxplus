@@ -2139,7 +2139,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     public void randomizeMovePowers() {
         List<Move> moves = this.getMoves();
         for (Move mv : moves) {
-            if (mv != null && mv.internalId != 165 && mv.power >= 10) {
+            if (mv != null && mv.internalId != Moves.struggle && mv.power >= 10) {
                 // "Generic" damaging move to randomize power
                 if (random.nextInt(3) != 2) {
                     // "Regular" move
@@ -2171,7 +2171,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     public void randomizeMovePPs() {
         List<Move> moves = this.getMoves();
         for (Move mv : moves) {
-            if (mv != null && mv.internalId != 165) {
+            if (mv != null && mv.internalId != Moves.struggle) {
                 if (random.nextInt(3) != 2) {
                     // "average" PP: 15-25
                     mv.pp = random.nextInt(3) * 5 + 15;
@@ -2187,7 +2187,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     public void randomizeMoveAccuracies() {
         List<Move> moves = this.getMoves();
         for (Move mv : moves) {
-            if (mv != null && mv.internalId != 165 && mv.hitratio >= 5) {
+            if (mv != null && mv.internalId != Moves.struggle && mv.hitratio >= 5) {
                 // "Sane" accuracy randomization
                 // Broken into three tiers based on original accuracy
                 // Designed to limit the chances of 100% accurate OHKO moves and
@@ -2236,7 +2236,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     public void randomizeMoveTypes() {
         List<Move> moves = this.getMoves();
         for (Move mv : moves) {
-            if (mv != null && mv.internalId != 165 && mv.type != null) {
+            if (mv != null && mv.internalId != Moves.struggle && mv.type != null) {
                 mv.type = randomType();
             }
         }
@@ -2249,7 +2249,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         }
         List<Move> moves = this.getMoves();
         for (Move mv : moves) {
-            if (mv != null && mv.internalId != 165 && mv.category != MoveCategory.STATUS) {
+            if (mv != null && mv.internalId != Moves.struggle && mv.category != MoveCategory.STATUS) {
                 if (random.nextInt(2) == 0) {
                     mv.category = (mv.category == MoveCategory.PHYSICAL) ? MoveCategory.SPECIAL : MoveCategory.PHYSICAL;
                 }
@@ -2267,383 +2267,389 @@ public abstract class AbstractRomHandler implements RomHandler {
         if (generation >= 2 && generationOfPokemon() < 2) {
             // gen1
             // Karate Chop => FIGHTING (gen1)
-            updateMoveType(moves, 2, Type.FIGHTING);
+            updateMoveType(moves, Moves.karateChop, Type.FIGHTING);
             // Gust => FLYING (gen1)
-            updateMoveType(moves, 16, Type.FLYING);
+            updateMoveType(moves, Moves.gust, Type.FLYING);
             // Wing Attack => 60 power (gen1)
-            updateMovePower(moves, 17, 60);
+            updateMovePower(moves, Moves.wingAttack, 60);
             // Whirlwind => 100 accuracy (gen1)
-            updateMoveAccuracy(moves, 18, 100);
+            updateMoveAccuracy(moves, Moves.whirlwind, 100);
             // Sand Attack => GROUND (gen1)
-            updateMoveType(moves, 28, Type.GROUND);
+            updateMoveType(moves, Moves.sandAttack, Type.GROUND);
             // Double-Edge => 120 power (gen1)
-            updateMovePower(moves, 38, 120);
+            updateMovePower(moves, Moves.doubleEdge, 120);
             // Move 44, Bite, becomes dark (but doesn't exist anyway)
             // Blizzard => 70% accuracy (gen1)
-            updateMoveAccuracy(moves, 59, 70);
+            updateMoveAccuracy(moves, Moves.blizzard, 70);
             // Rock Throw => 90% accuracy (gen1)
-            updateMoveAccuracy(moves, 88, 90);
+            updateMoveAccuracy(moves, Moves.rockThrow, 90);
             // Hypnosis => 60% accuracy (gen1)
-            updateMoveAccuracy(moves, 95, 60);
+            updateMoveAccuracy(moves, Moves.hypnosis, 60);
             // SelfDestruct => 200power (gen1)
-            updateMovePower(moves, 120, 200);
+            updateMovePower(moves, Moves.selfDestruct, 200);
             // Explosion => 250 power (gen1)
-            updateMovePower(moves, 153, 250);
+            updateMovePower(moves, Moves.explosion, 250);
             // Dig => 60 power (gen1)
-            updateMovePower(moves, 91, 60);
+            updateMovePower(moves, Moves.dig, 60);
         }
 
         if (generation >= 3 && generationOfPokemon() < 3) {
             // Razor Wind => 100% accuracy (gen1/2)
-            updateMoveAccuracy(moves, 13, 100);
+            updateMoveAccuracy(moves, Moves.razorWind, 100);
             // Move 67, Low Kick, has weight-based power in gen3+
             // Low Kick => 100% accuracy (gen1)
-            updateMoveAccuracy(moves, 67, 100);
+            updateMoveAccuracy(moves, Moves.lowKick, 100);
         }
 
         if (generation >= 4 && generationOfPokemon() < 4) {
             // Fly => 90 power (gen1/2/3)
-            updateMovePower(moves, 19, 90);
+            updateMovePower(moves, Moves.fly, 90);
             // Vine Whip => 15 pp (gen1/2/3)
-            updateMovePP(moves, 22, 15);
+            updateMovePP(moves, Moves.vineWhip, 15);
             // Absorb => 25pp (gen1/2/3)
-            updateMovePP(moves, 71, 25);
+            updateMovePP(moves, Moves.absorb, 25);
             // Mega Drain => 15pp (gen1/2/3)
-            updateMovePP(moves, 72, 15);
+            updateMovePP(moves, Moves.megaDrain, 15);
             // Dig => 80 power (gen1/2/3)
-            updateMovePower(moves, 91, 80);
+            updateMovePower(moves, Moves.dig, 80);
             // Recover => 10pp (gen1/2/3)
-            updateMovePP(moves, 105, 10);
+            updateMovePP(moves, Moves.recover, 10);
             // Flash => 100% acc (gen1/2/3)
-            updateMoveAccuracy(moves, 148, 100);
+            updateMoveAccuracy(moves, Moves.flash, 100);
             // Petal Dance => 90 power (gen1/2/3)
-            updateMovePower(moves, 80, 90);
+            updateMovePower(moves, Moves.petalDance, 90);
             // Disable => 100% accuracy (gen1-4)
-            updateMoveAccuracy(moves, 50, 80);
+            updateMoveAccuracy(moves, Moves.disable, 80);
             // Jump Kick => 85 power
-            updateMovePower(moves, 26, 85);
+            updateMovePower(moves, Moves.jumpKick, 85);
             // Hi Jump Kick => 100 power
-            updateMovePower(moves, 136, 100);
+            updateMovePower(moves, Moves.highJumpKick, 100);
 
             if (generationOfPokemon() >= 2) {
                 // Zap Cannon => 120 power (gen2-3)
-                updateMovePower(moves, 192, 120);
+                updateMovePower(moves, Moves.zapCannon, 120);
                 // Outrage => 120 power (gen2-3)
-                updateMovePower(moves, 200, 120);
-                updateMovePP(moves, 200, 10);
+                updateMovePower(moves, Moves.outrage, 120);
+                updateMovePP(moves, Moves.outrage, 10);
                 // Giga Drain => 10pp (gen2-3)
-                updateMovePP(moves, 202, 10);
+                updateMovePP(moves, Moves.gigaDrain, 10);
                 // Rock Smash => 40 power (gen2-3)
-                updateMovePower(moves, 249, 40);
+                updateMovePower(moves, Moves.rockSmash, 40);
+            }
+
+            if (generationOfPokemon() == 3) {
+                // Stockpile => 20 pp
+                updateMovePP(moves, Moves.stockpile, 20);
+                // Dive => 80 power
+                updateMovePower(moves, Moves.dive, 80);
+                // Leaf Blade => 90 power
+                updateMovePower(moves, Moves.leafBlade, 90);
             }
         }
 
         if (generation >= 5 && generationOfPokemon() < 5) {
             // Bind => 85% accuracy (gen1-4)
-            updateMoveAccuracy(moves, 20, 85);
+            updateMoveAccuracy(moves, Moves.bind, 85);
             // Jump Kick => 10 pp, 100 power (gen1-4)
-            updateMovePP(moves, 26, 10);
-            updateMovePower(moves, 26, 100);
+            updateMovePP(moves, Moves.jumpKick, 10);
+            updateMovePower(moves, Moves.jumpKick, 100);
             // Tackle => 50 power, 100% accuracy , gen1-4
-            updateMovePower(moves, 33, 50);
-            updateMoveAccuracy(moves, 33, 100);
+            updateMovePower(moves, Moves.tackle, 50);
+            updateMoveAccuracy(moves, Moves.tackle, 100);
             // Wrap => 90% accuracy (gen1-4)
-            updateMoveAccuracy(moves, 35, 90);
+            updateMoveAccuracy(moves, Moves.wrap, 90);
             // Thrash => 120 power, 10pp (gen1-4)
-            updateMovePP(moves, 37, 10);
-            updateMovePower(moves, 37, 120);
+            updateMovePP(moves, Moves.thrash, 10);
+            updateMovePower(moves, Moves.thrash, 120);
             // Disable => 100% accuracy (gen1-4)
-            updateMoveAccuracy(moves, 50, 100);
+            updateMoveAccuracy(moves, Moves.disable, 100);
             // Petal Dance => 120power, 10pp (gen1-4)
-            updateMovePP(moves, 80, 10);
-            updateMovePower(moves, 80, 120);
+            updateMovePP(moves, Moves.petalDance, 10);
+            updateMovePower(moves, Moves.petalDance, 120);
             // Fire Spin => 35 power, 85% acc (gen1-4)
-            updateMoveAccuracy(moves, 83, 85);
-            updateMovePower(moves, 83, 35);
+            updateMoveAccuracy(moves, Moves.fireSpin, 85);
+            updateMovePower(moves, Moves.fireSpin, 35);
             // Toxic => 90% accuracy (gen1-4)
-            updateMoveAccuracy(moves, 92, 90);
+            updateMoveAccuracy(moves, Moves.toxic, 90);
             // Clamp => 15pp, 85% acc (gen1-4)
-            updateMoveAccuracy(moves, 128, 85);
-            updateMovePP(moves, 128, 15);
+            updateMoveAccuracy(moves, Moves.clamp, 85);
+            updateMovePP(moves, Moves.clamp, 15);
             // HJKick => 130 power, 10pp (gen1-4)
-            updateMovePP(moves, 136, 10);
-            updateMovePower(moves, 136, 130);
+            updateMovePP(moves, Moves.highJumpKick, 10);
+            updateMovePower(moves, Moves.highJumpKick, 130);
             // Glare => 90% acc (gen1-4)
-            updateMoveAccuracy(moves, 137, 90);
+            updateMoveAccuracy(moves, Moves.glare, 90);
             // Poison Gas => 80% acc (gen1-4)
-            updateMoveAccuracy(moves, 139, 80);
+            updateMoveAccuracy(moves, Moves.poisonGas, 80);
             // Crabhammer => 90% acc (gen1-4)
-            updateMoveAccuracy(moves, 152, 90);
+            updateMoveAccuracy(moves, Moves.crabhammer, 90);
 
             if (generationOfPokemon() >= 2) {
                 // Curse => GHOST (gen2-4)
-                updateMoveType(moves, 174, Type.GHOST);
+                updateMoveType(moves, Moves.curse, Type.GHOST);
                 // Cotton Spore => 100% acc (gen2-4)
-                updateMoveAccuracy(moves, 178, 100);
+                updateMoveAccuracy(moves, Moves.cottonSpore, 100);
                 // Scary Face => 100% acc (gen2-4)
-                updateMoveAccuracy(moves, 184, 100);
+                updateMoveAccuracy(moves, Moves.scaryFace, 100);
                 // Bone Rush => 90% acc (gen2-4)
-                updateMoveAccuracy(moves, 198, 90);
+                updateMoveAccuracy(moves, Moves.boneRush, 90);
                 // Giga Drain => 75 power (gen2-4)
-                updateMovePower(moves, 202, 75);
+                updateMovePower(moves, Moves.gigaDrain, 75);
                 // Fury Cutter => 20 power (gen2-4)
-                updateMovePower(moves, 210, 20);
+                updateMovePower(moves, Moves.furyCutter, 20);
                 // Future Sight => 10 pp, 100 power, 100% acc (gen2-4)
-                updateMovePP(moves, 248, 10);
-                updateMovePower(moves, 248, 100);
-                updateMoveAccuracy(moves, 248, 100);
+                updateMovePP(moves, Moves.futureSight, 10);
+                updateMovePower(moves, Moves.futureSight, 100);
+                updateMoveAccuracy(moves, Moves.futureSight, 100);
                 // Whirlpool => 35 pow, 85% acc (gen2-4)
-                updateMovePower(moves, 250, 35);
-                updateMoveAccuracy(moves, 250, 85);
+                updateMovePower(moves, Moves.whirlpool, 35);
+                updateMoveAccuracy(moves, Moves.whirlpool, 85);
             }
 
             if (generationOfPokemon() >= 3) {
                 // Uproar => 90 power (gen3-4)
-                updateMovePower(moves, 253, 90);
-                updateMovePP(moves, 254, 20);
-                updateMovePower(moves, 291, 80);
+                updateMovePower(moves, Moves.uproar, 90);
                 // Sand Tomb => 35 pow, 85% acc (gen3-4)
-                updateMovePower(moves, 328, 35);
-                updateMoveAccuracy(moves, 328, 85);
+                updateMovePower(moves, Moves.sandTomb, 35);
+                updateMoveAccuracy(moves, Moves.sandTomb, 85);
                 // Bullet Seed => 25 power (gen3-4)
-                updateMovePower(moves, 331, 25);
+                updateMovePower(moves, Moves.bulletSeed, 25);
                 // Icicle Spear => 25 power (gen3-4)
-                updateMovePower(moves, 333, 25);
+                updateMovePower(moves, Moves.icicleSpear, 25);
                 // Covet => 60 power (gen3-4)
-                updateMovePower(moves, 343, 60);
-                updateMovePower(moves, 348, 90);
+                updateMovePower(moves, Moves.covet, 60);
                 // Rock Blast => 90% acc (gen3-4)
-                updateMoveAccuracy(moves, 350, 90);
+                updateMoveAccuracy(moves, Moves.rockBlast, 90);
                 // Doom Desire => 140 pow, 100% acc, gen3-4
-                updateMovePower(moves, 353, 140);
-                updateMoveAccuracy(moves, 353, 100);
+                updateMovePower(moves, Moves.doomDesire, 140);
+                updateMoveAccuracy(moves, Moves.doomDesire, 100);
             }
 
             if (generationOfPokemon() == 4) {
                 // Feint => 30 pow
-                updateMovePower(moves, 364, 30);
+                updateMovePower(moves, Moves.feint, 30);
                 // Last Resort => 140 pow
-                updateMovePower(moves, 387, 140);
+                updateMovePower(moves, Moves.lastResort, 140);
                 // Drain Punch => 10 pp, 75 pow
-                updateMovePP(moves, 409, 10);
-                updateMovePower(moves, 409, 75);
+                updateMovePP(moves, Moves.drainPunch, 10);
+                updateMovePower(moves, Moves.drainPunch, 75);
                 // Magma Storm => 75% acc
-                updateMoveAccuracy(moves, 463, 75);
+                updateMoveAccuracy(moves, Moves.magmaStorm, 75);
             }
         }
 
         if (generation >= 6 && generationOfPokemon() < 6) {
             // gen 1
             // Swords Dance 20 PP
-            updateMovePP(moves, 14, 20);
+            updateMovePP(moves, Moves.swordsDance, 20);
             // Whirlwind can't miss
-            updateMoveAccuracy(moves, 18, perfectAccuracy);
+            updateMoveAccuracy(moves, Moves.whirlwind, perfectAccuracy);
             // Vine Whip 25 PP, 45 Power
-            updateMovePP(moves, 22, 25);
-            updateMovePower(moves, 22, 45);
+            updateMovePP(moves, Moves.vineWhip, 25);
+            updateMovePower(moves, Moves.vineWhip, 45);
             // Pin Missile 25 Power, 95% Accuracy
-            updateMovePower(moves, 42, 25);
-            updateMoveAccuracy(moves, 42, 95);
+            updateMovePower(moves, Moves.pinMissile, 25);
+            updateMoveAccuracy(moves, Moves.pinMissile, 95);
             // Flamethrower 90 Power
-            updateMovePower(moves, 53, 90);
+            updateMovePower(moves, Moves.flamethrower, 90);
             // Hydro Pump 110 Power
-            updateMovePower(moves, 56, 110);
+            updateMovePower(moves, Moves.hydroPump, 110);
             // Surf 90 Power
-            updateMovePower(moves, 57, 90);
+            updateMovePower(moves, Moves.surf, 90);
             // Ice Beam 90 Power
-            updateMovePower(moves, 58, 90);
+            updateMovePower(moves, Moves.iceBeam, 90);
             // Blizzard 110 Power
-            updateMovePower(moves, 59, 110);
+            updateMovePower(moves, Moves.blizzard, 110);
             // Growth 20 PP
-            updateMovePP(moves, 74, 20);
+            updateMovePP(moves, Moves.growth, 20);
             // Thunderbolt 90 Power
-            updateMovePower(moves, 85, 90);
+            updateMovePower(moves, Moves.thunderbolt, 90);
             // Thunder 110 Power
-            updateMovePower(moves, 87, 110);
+            updateMovePower(moves, Moves.thunder, 110);
             // Minimize 10 PP
-            updateMovePP(moves, 107, 10);
+            updateMovePP(moves, Moves.minimize, 10);
             // Barrier 20 PP
-            updateMovePP(moves, 112, 20);
+            updateMovePP(moves, Moves.barrier, 20);
             // Lick 30 Power
-            updateMovePower(moves, 122, 30);
+            updateMovePower(moves, Moves.lick, 30);
             // Smog 30 Power
-            updateMovePower(moves, 123, 30);
+            updateMovePower(moves, Moves.smog, 30);
             // Fire Blast 110 Power
-            updateMovePower(moves, 126, 110);
+            updateMovePower(moves, Moves.fireBlast, 110);
             // Skull Bash 10 PP, 130 Power
-            updateMovePP(moves, 130, 10);
-            updateMovePower(moves, 130, 130);
+            updateMovePP(moves, Moves.skullBash, 10);
+            updateMovePower(moves, Moves.skullBash, 130);
             // Glare 100% Accuracy
-            updateMoveAccuracy(moves, 137, 100);
+            updateMoveAccuracy(moves, Moves.glare, 100);
             // Poison Gas 90% Accuracy
-            updateMoveAccuracy(moves, 139, 90);
+            updateMoveAccuracy(moves, Moves.poisonGas, 90);
             // Bubble 40 Power
-            updateMovePower(moves, 145, 40);
+            updateMovePower(moves, Moves.bubble, 40);
             // Psywave 100% Accuracy
-            updateMoveAccuracy(moves, 149, 100);
+            updateMoveAccuracy(moves, Moves.psywave, 100);
             // Acid Armor 20 PP
-            updateMovePP(moves, 151, 20);
+            updateMovePP(moves, Moves.acidArmor, 20);
             // Crabhammer 100 Power
-            updateMovePower(moves, 152, 100);
+            updateMovePower(moves, Moves.crabhammer, 100);
 
             if (generationOfPokemon() >= 2) {
                 // Thief 25 PP, 60 Power
-                updateMovePP(moves, 168, 25);
-                updateMovePower(moves, 168, 60);
+                updateMovePP(moves, Moves.thief, 25);
+                updateMovePower(moves, Moves.thief, 60);
                 // Snore 50 Power
-                updateMovePower(moves, 173, 50);
+                updateMovePower(moves, Moves.snore, 50);
                 // Fury Cutter 40 Power
-                updateMovePower(moves, 210, 40);
+                updateMovePower(moves, Moves.furyCutter, 40);
                 // Future Sight 120 Power
-                updateMovePower(moves, 248, 120);
+                updateMovePower(moves, Moves.futureSight, 120);
             }
 
             if (generationOfPokemon() >= 3) {
                 // Heat Wave 95 Power
-                updateMovePower(moves, 257, 95);
+                updateMovePower(moves, Moves.heatWave, 95);
                 // Will-o-Wisp 85% Accuracy
-                updateMoveAccuracy(moves, 261, 85);
+                updateMoveAccuracy(moves, Moves.willOWisp, 85);
                 // Smellingsalt 70 Power
-                updateMovePower(moves, 265, 70);
+                updateMovePower(moves, Moves.smellingSalts, 70);
                 // Knock off 65 Power
-                updateMovePower(moves, 282, 65);
+                updateMovePower(moves, Moves.knockOff, 65);
                 // Meteor Mash 90 Power, 90% Accuracy
-                updateMovePower(moves, 309, 90);
-                updateMoveAccuracy(moves, 309, 90);
+                updateMovePower(moves, Moves.meteorMash, 90);
+                updateMoveAccuracy(moves, Moves.meteorMash, 90);
                 // Air Cutter 60 Power
-                updateMovePower(moves, 314, 60);
+                updateMovePower(moves, Moves.airCutter, 60);
                 // Overheat 130 Power
-                updateMovePower(moves, 315, 130);
+                updateMovePower(moves, Moves.overheat, 130);
                 // Rock Tomb 15 PP, 60 Power, 95% Accuracy
-                updateMovePP(moves, 317, 15);
-                updateMovePower(moves, 317, 60);
-                updateMoveAccuracy(moves, 317, 95);
+                updateMovePP(moves, Moves.rockTomb, 15);
+                updateMovePower(moves, Moves.rockTomb, 60);
+                updateMoveAccuracy(moves, Moves.rockTomb, 95);
                 // Extrasensory 20 PP
-                updateMovePP(moves, 326, 20);
+                updateMovePP(moves, Moves.extrasensory, 20);
                 // Muddy Water 90 Power
-                updateMovePower(moves, 330, 90);
+                updateMovePower(moves, Moves.muddyWater, 90);
                 // Covet 25 PP
-                updateMovePP(moves, 343, 25);
+                updateMovePP(moves, Moves.covet, 25);
             }
 
             if (generationOfPokemon() >= 4) {
                 // Wake-Up Slap 70 Power
-                updateMovePower(moves, 358, 70);
+                updateMovePower(moves, Moves.wakeUpSlap, 70);
                 // Tailwind 15 PP
-                updateMovePP(moves, 366, 15);
+                updateMovePP(moves, Moves.tailwind, 15);
                 // Assurance 60 Power
-                updateMovePower(moves, 372, 60);
+                updateMovePower(moves, Moves.assurance, 60);
                 // Psycho Shift 100% Accuracy
-                updateMoveAccuracy(moves, 375, 100);
+                updateMoveAccuracy(moves, Moves.psychoShift, 100);
                 // Aura Sphere 80 Power
-                updateMovePower(moves, 396, 80);
+                updateMovePower(moves, Moves.auraSphere, 80);
                 // Air Slash 15 PP
-                updateMovePP(moves, 403, 15);
+                updateMovePP(moves, Moves.airSlash, 15);
                 // Dragon Pulse 85 Power
-                updateMovePower(moves, 406, 85);
+                updateMovePower(moves, Moves.dragonPulse, 85);
                 // Power Gem 80 Power
-                updateMovePower(moves, 408, 80);
+                updateMovePower(moves, Moves.powerGem, 80);
                 // Energy Ball 90 Power
-                updateMovePower(moves, 412, 90);
+                updateMovePower(moves, Moves.energyBall, 90);
                 // Draco Meteor 130 Power
-                updateMovePower(moves, 434, 130);
+                updateMovePower(moves, Moves.dracoMeteor, 130);
                 // Leaf Storm 130 Power
-                updateMovePower(moves, 437, 130);
+                updateMovePower(moves, Moves.leafStorm, 130);
                 // Gunk Shot 80% Accuracy
-                updateMoveAccuracy(moves, 441, 80);
+                updateMoveAccuracy(moves, Moves.gunkShot, 80);
                 // Chatter 65 Power
-                updateMovePower(moves, 448, 65);
+                updateMovePower(moves, Moves.chatter, 65);
                 // Magma Storm 100 Power
-                updateMovePower(moves, 463, 100);
+                updateMovePower(moves, Moves.magmaStorm, 100);
             }
 
             if (generationOfPokemon() == 5) {
                 // Storm Throw 60 Power
-                updateMovePower(moves, 480, 60);
+                updateMovePower(moves, Moves.stormThrow, 60);
                 // Synchronoise 120 Power
-                updateMovePower(moves, 485, 120);
+                updateMovePower(moves, Moves.synchronoise, 120);
                 // Low Sweep 65 Power
-                updateMovePower(moves, 490, 65);
+                updateMovePower(moves, Moves.lowSweep, 65);
                 // Hex 65 Power
-                updateMovePower(moves, 506, 65);
+                updateMovePower(moves, Moves.hex, 65);
                 // Incinerate 60 Power
-                updateMovePower(moves, 510, 60);
+                updateMovePower(moves, Moves.incinerate, 60);
                 // Pledges 80 Power
-                updateMovePower(moves, 518, 80);
-                updateMovePower(moves, 519, 80);
-                updateMovePower(moves, 520, 80);
+                updateMovePower(moves, Moves.waterPledge, 80);
+                updateMovePower(moves, Moves.firePledge, 80);
+                updateMovePower(moves, Moves.grassPledge, 80);
                 // Struggle Bug 50 Power
-                updateMovePower(moves, 522, 50);
+                updateMovePower(moves, Moves.struggleBug, 50);
                 // Frost Breath 45 Power
                 // crits are 2x in these games
-                updateMovePower(moves, 524, 45);
+                updateMovePower(moves, Moves.frostBreath, 45);
                 // Sacred Sword 15 PP
-                updateMovePP(moves, 533, 15);
+                updateMovePP(moves, Moves.sacredSword, 15);
                 // Hurricane 110 Power
-                updateMovePower(moves, 542, 110);
+                updateMovePower(moves, Moves.hurricane, 110);
                 // Techno Blast 120 Power
-                updateMovePower(moves, 546, 120);
+                updateMovePower(moves, Moves.technoBlast, 120);
             }
         }
 
         if (generation >= 7 && generationOfPokemon() < 7) {
 
             // Leech Life 80 Power, 10 PP
-            updateMovePower(moves, 141, 80);
-            updateMovePP(moves, 141, 10);
+            updateMovePower(moves, Moves.leechLife, 80);
+            updateMovePP(moves, Moves.leechLife, 10);
             // Submission 20 PP
-            updateMovePP(moves, 66, 20);
+            updateMovePP(moves, Moves.submission, 20);
             // Tackle 40 Power
-            updateMovePower(moves, 33, 40);
+            updateMovePower(moves, Moves.tackle, 40);
             // Thunder Wave 90% Accuracy
-            updateMoveAccuracy(moves, 86, 90);
+            updateMoveAccuracy(moves, Moves.thunderWave, 90);
 
             if (generationOfPokemon() >= 2) {
                 // Swagger 85% Accuracy
-                updateMoveAccuracy(moves, 207, 85);
+                updateMoveAccuracy(moves, Moves.swagger, 85);
             }
 
             if (generationOfPokemon() >= 3) {
                 // Knock Off 20 PP
-                updateMovePP(moves, 282, 20);
+                updateMovePP(moves, Moves.knockOff, 20);
             }
 
             if (generationOfPokemon() >= 4) {
                 // Dark Void 50% Accuracy
-                updateMoveAccuracy(moves, 464, 50);
+                updateMoveAccuracy(moves, Moves.darkVoid, 50);
                 // Sucker Punch 70 Power
-                updateMovePower(moves, 389, 70);
+                updateMovePower(moves, Moves.suckerPunch, 70);
             }
 
             if (generationOfPokemon() == 6) {
                 // Aromatic Mist can't miss
-                updateMoveAccuracy(moves, 597, perfectAccuracy);
+                updateMoveAccuracy(moves, Moves.aromaticMist, perfectAccuracy);
                 // Fell Stinger 50 Power
-                updateMovePower(moves, 565, 50);
+                updateMovePower(moves, Moves.fellStinger, 50);
                 // Flying Press 100 Power
-                updateMovePower(moves, 560, 100);
+                updateMovePower(moves, Moves.flyingPress, 100);
                 // Mat Block 10 PP
-                updateMovePP(moves, 561, 10);
+                updateMovePP(moves, Moves.matBlock, 10);
                 // Mystical Fire 75 Power
-                updateMovePower(moves, 595, 75);
+                updateMovePower(moves, Moves.mysticalFire, 75);
                 // Parabolic Charge 65 Power
-                updateMovePower(moves, 570, 65);
+                updateMovePower(moves, Moves.parabolicCharge, 65);
                 // Topsy-Turvy can't miss
-                updateMoveAccuracy(moves, 576, perfectAccuracy);
+                updateMoveAccuracy(moves, Moves.topsyTurvy, perfectAccuracy);
                 // Water Shuriken Special
-                updateMoveCategory(moves, 594, MoveCategory.SPECIAL);
+                updateMoveCategory(moves, Moves.waterShuriken, MoveCategory.SPECIAL);
             }
         }
 
         if (generation >= 8 && generationOfPokemon() < 8) {
             if (generationOfPokemon() >= 2) {
                 // Rapid Spin 50 Power
-                updateMovePower(moves, 229, 50);
+                updateMovePower(moves, Moves.rapidSpin, 50);
             }
 
             if (generationOfPokemon() == 7) {
                 // Multi-Attack 120 Power
-                updateMovePower(moves, 718, 120);
+                updateMovePower(moves, Moves.multiAttack, 120);
             }
         }
     }
