@@ -240,7 +240,8 @@ public class Gen6Constants {
     public static final int[] boxLegendaryCodeOffsetsXY = new int[]{ 144, 300, 584 };
     public static final String rayquazaFunctionPrefixORAS = "0900A0E1F08FBDE8";
     public static final int[] rayquazaScriptOffsetsORAS = new int[]{ 3334, 14734 }, rayquazaCodeOffsetsORAS = new int[]{ 136, 292, 576 };
-    public static final String nationalDexFunctionLocator = "080094E5010000E21080BDE8170F122F", xyGetDexFlagFunctionLocator = "000055E30100A0030A00000A";
+    public static final String nationalDexFunctionLocator = "080094E5010000E21080BDE8170F122F",xyGetDexFlagFunctionLocator = "000055E30100A0030A00000A",
+            orasGetHoennDexCaughtFunctionPrefix = "170F122F1CC15800";
     public static final int megastoneTableStartingOffsetORAS = 0xABA, megastoneTableEntrySizeORAS = 0x20, megastoneTableLengthORAS = 27;
 
     // https://bulbapedia.bulbagarden.net/wiki/List_of_items_by_index_number_(Generation_VI)
