@@ -1940,6 +1940,9 @@ public abstract class AbstractRomHandler implements RomHandler {
         Map<Integer, List<MoveLearnt>> movesets = this.getMovesLearnt();
         List<Trainer> currentTrainers = this.getTrainers();
         for (Trainer t : currentTrainers) {
+            if (trainerShouldNotGetBuffs(t)) {
+                continue;
+            }
             if (!giveToRegularPokemon && (!t.isImportant() && !t.isBoss())) {
                 continue;
             }
@@ -2102,7 +2105,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         List<Trainer> currentTrainers = this.getTrainers();
         for (Trainer t: currentTrainers) {
 
-            if (t.pokemon.size() != 1 || t.couldBeMultiBattle || (t.tag != null && (t.tag.startsWith("RIVAL1-") || t.tag.startsWith("FRIEND1-") || t.tag.endsWith("NOTSTRONG")))) {
+            if (t.pokemon.size() != 1 || t.couldBeMultiBattle || this.trainerShouldNotGetBuffs(t)) {
                 continue;
             }
 
@@ -2110,6 +2113,10 @@ public abstract class AbstractRomHandler implements RomHandler {
             t.pokemon.add(t.pokemon.get(0).copy());
         }
         this.setTrainers(currentTrainers, true);
+    }
+
+    private boolean trainerShouldNotGetBuffs(Trainer t) {
+        return t.tag != null && (t.tag.startsWith("RIVAL1-") || t.tag.startsWith("FRIEND1-") || t.tag.endsWith("NOTSTRONG"));
     }
 
     public int getRandomAbilitySlot(Pokemon pokemon) {
