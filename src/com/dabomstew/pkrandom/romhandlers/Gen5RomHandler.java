@@ -1756,6 +1756,11 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
+    public boolean hasStaticMusicFix() {
+        return romEntry.tweakFiles.get("NewIndexToMusicTweak") != null;
+    }
+
+    @Override
     public List<TotemPokemon> getTotemPokemon() {
         return new ArrayList<>();
     }

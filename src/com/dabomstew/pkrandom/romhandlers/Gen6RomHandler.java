@@ -2620,6 +2620,11 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public boolean hasStaticMusicFix() {
+        return false;
+    }
+
+    @Override
     public List<TotemPokemon> getTotemPokemon() {
         return new ArrayList<>();
     }

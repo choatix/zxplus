@@ -1755,6 +1755,11 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public boolean hasStaticMusicFix() {
+        return false;
+    }
+
+    @Override
     public List<TotemPokemon> getTotemPokemon() {
         List<TotemPokemon> totems = new ArrayList<>();
         try {

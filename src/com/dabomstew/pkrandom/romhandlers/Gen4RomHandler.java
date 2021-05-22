@@ -4328,23 +4328,31 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             case Gen4Constants.Type_HGSS:
                 newIndexToMusicPrefix  = romEntry.getString("IndexToMusicPrefix");
                 newIndexToMusicPoolOffset = find(arm9, newIndexToMusicPrefix);
-                newIndexToMusicPoolOffset += newIndexToMusicPrefix.length() / 2;
 
-                for (int oldStatic: specialMusicStaticChanges.keySet()) {
-                    int i = newIndexToMusicPoolOffset;
-                    int indexEtc = readWord(arm9, i);
-                    int index = indexEtc & 0x3FF;
-                    while (index != oldStatic || replaced.contains(i)) {
-                        i += 2;
-                        indexEtc = readWord(arm9, i);
-                        index = indexEtc & 0x3FF;
+                if (newIndexToMusicPoolOffset > 0) {
+                    newIndexToMusicPoolOffset += newIndexToMusicPrefix.length() / 2;
+
+                    for (int oldStatic: specialMusicStaticChanges.keySet()) {
+                        int i = newIndexToMusicPoolOffset;
+                        int indexEtc = readWord(arm9, i);
+                        int index = indexEtc & 0x3FF;
+                        while (index != oldStatic || replaced.contains(i)) {
+                            i += 2;
+                            indexEtc = readWord(arm9, i);
+                            index = indexEtc & 0x3FF;
+                        }
+                        int newIndexEtc = specialMusicStaticChanges.get(oldStatic) | (indexEtc & 0xFC00);
+                        writeWord(arm9, i, newIndexEtc);
+                        replaced.add(i);
                     }
-                    int newIndexEtc = specialMusicStaticChanges.get(oldStatic) | (indexEtc & 0xFC00);
-                    writeWord(arm9, i, newIndexEtc);
-                    replaced.add(i);
                 }
                 break;
         }
+    }
+
+    @Override
+    public boolean hasStaticMusicFix() {
+        return romEntry.tweakFiles.get("NewIndexToMusicTweak") != null || romEntry.romType == Gen4Constants.Type_HGSS;
     }
 
     private boolean genericIPSPatch(byte[] data, String ctName) {

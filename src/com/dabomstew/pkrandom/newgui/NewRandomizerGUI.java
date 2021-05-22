@@ -2545,7 +2545,7 @@ public class NewRandomizerGUI {
                 stpPercentageLevelModifierCheckBox.setEnabled(true);
                 stpPercentageLevelModifierSlider.setVisible(true);
                 stpPercentageLevelModifierSlider.setEnabled(false);
-                stpFixMusicCheckBox.setVisible(pokemonGeneration >= 3 && pokemonGeneration <= 5);
+                stpFixMusicCheckBox.setVisible(romHandler.hasStaticMusicFix());
                 stpFixMusicCheckBox.setEnabled(false);
             } else {
                 stpSwapLegendariesSwapStandardsRadioButton.setVisible(false);

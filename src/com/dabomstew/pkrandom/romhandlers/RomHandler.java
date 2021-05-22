@@ -295,6 +295,8 @@ public interface RomHandler {
 
     void applyCorrectStaticMusic(Map<Integer,Integer> specialMusicStaticChanges);
 
+    boolean hasStaticMusicFix();
+
     // Randomizer: Totem Pokemon
 
     List<TotemPokemon> getTotemPokemon();

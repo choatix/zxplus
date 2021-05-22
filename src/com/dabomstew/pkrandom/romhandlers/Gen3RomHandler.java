@@ -2704,6 +2704,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     @Override
+    public boolean hasStaticMusicFix() {
+        return romEntry.codeTweaks.get("NewIndexToMusicTweak") != null;
+    }
+
+    @Override
     public List<TotemPokemon> getTotemPokemon() {
         return new ArrayList<>();
     }
