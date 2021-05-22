@@ -1808,6 +1808,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             statics.add(se);
         }
 
+        getRoamers(statics);
         return statics;
     }
 
@@ -1858,7 +1859,78 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             }
         }
 
+        setRoamers(staticPokemon);
         return true;
+    }
+
+    private void getRoamers(List<StaticEncounter> statics) {
+        if (romEntry.romType == Gen3Constants.RomType_Em && romEntry.arrayEntries.get("RoamerSpeciesOffsets") != null) {
+            int[] speciesOffsets = romEntry.arrayEntries.get("RoamerSpeciesOffsets");
+            int firstSpecies = readWord(rom, speciesOffsets[0]);
+            if (firstSpecies >= pokesInternal.length) {
+                // Before applying the patch, the first species offset is a pointer with a huge value.
+                // Thus, this check is a good indicator that the patch needs to be applied.
+                applyEmeraldRoamerPatch();
+            }
+            int level = rom[romEntry.arrayEntries.get("RoamerLevelOffsets")[0]];
+            int[] southernIslandOffsets = romEntry.arrayEntries.get("StaticSouthernIslandOffsets");
+            for (int i = 0; i < 2; i++) {
+                int species = readWord(rom, speciesOffsets[i]);
+                StaticEncounter se = new StaticEncounter();
+                se.pkmn = pokesInternal[species];
+                se.level = level;
+
+                // Link each roamer to their respective Southern Island static encounter so that
+                // they randomize to the same species.
+                StaticEncounter southernIslandEncounter = statics.get(southernIslandOffsets[i]);
+                southernIslandEncounter.linkedEncounters.add(se);
+            }
+        }
+    }
+
+    private void setRoamers(List<StaticEncounter> statics) {
+        if (romEntry.romType == Gen3Constants.RomType_Em && romEntry.arrayEntries.get("RoamerSpeciesOffsets") != null) {
+            int[] southernIslandOffsets = romEntry.arrayEntries.get("StaticSouthernIslandOffsets");
+            int[] speciesOffsets = romEntry.arrayEntries.get("RoamerSpeciesOffsets");
+            int[] levelOffsets = romEntry.arrayEntries.get("RoamerLevelOffsets");
+            for (int i = 0; i < 2; i++) {
+                StaticEncounter southernIslandEncounter = statics.get(southernIslandOffsets[i]);
+                StaticEncounter roamerEncounter = southernIslandEncounter.linkedEncounters.get(0);
+                writeWord(rom, speciesOffsets[i], pokedexToInternal[roamerEncounter.pkmn.number]);
+                for (int offset : levelOffsets) {
+                    rom[offset] = (byte) roamerEncounter.level;
+                }
+            }
+        }
+    }
+
+    private void applyEmeraldRoamerPatch() {
+        int offset = romEntry.getValue("RoamerFunctionStart");
+
+        // Latias's species ID is already a pc-relative loaded constant, but Latios's isn't. We need to make
+        // some room for it; the constant 0x03005D8C is actually in the function twice, so we'll replace the first
+        // instance with Latios's ID. First, change the "ldr r0, [pc, #0xC]" at the start of the function to
+        // "ldr r0, [pc, #0x104]", so it points to the second usage of 0x03005D8C
+        rom[offset + 14] = 0x41;
+
+        // In the space formerly occupied by the first 0x03005D8C, write Latios's ID
+        FileFunctions.writeFullIntLittleEndian(rom, offset + 28, pokedexToInternal[Species.latios]);
+
+        // In the original function, we "lsl r0, r0, #0x10" then compare r0 to 0. The thing is, this left
+        // shift doesn't actually matter, because 0 << 0x10 = 0, and [non-zero] << 0x10 = [non-zero].
+        // Let's move the compare up to take its place and then load Latios's ID into r3 for use in another
+        // branch later.
+        rom[offset + 8] = 0x00;
+        rom[offset + 9] = 0x28;
+        rom[offset + 10] = 0x04;
+        rom[offset + 11] = 0x4B;
+
+        // Lastly, in the branch that normally does r2 = 0xCC << 0x1 to compute Latios's ID, just mov r3
+        // into r2, since it was loaded with his ID with the above code.
+        rom[offset + 48] = 0x1A;
+        rom[offset + 49] = 0x46;
+        rom[offset + 50] = 0x00;
+        rom[offset + 51] = 0x00;
     }
 
     @Override
