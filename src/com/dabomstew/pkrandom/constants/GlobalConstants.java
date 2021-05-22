@@ -60,6 +60,7 @@ public class GlobalConstants {
         bannedForDamagingMove[Moves.synchronoise] = true; // hard to use
         bannedForDamagingMove[Moves.shellTrap] = true; // hard to use
         bannedForDamagingMove[Moves.foulPlay] = true; // doesn't depend on your own attacking stat
+        bannedForDamagingMove[Moves.spitUp] = true; // hard to use
 
         // make sure these cant roll
         bannedForDamagingMove[Moves.sonicBoom] = true;
