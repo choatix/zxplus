@@ -2427,12 +2427,12 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                             extraEntry = new Evolution(evo.from, evo.to, true,
                                     EvolutionType.LEVEL, 35);
                             extraEntry.forme = evo.forme;
-                            addEvoUpdateCondensed(easierEvolutionUpdates, evo, true);
+                            addEvoUpdateCondensed(easierEvolutionUpdates, extraEntry, true);
                         } else if (evo.type == EvolutionType.LEVEL_ELECTRIFIED_AREA) {
                             extraEntry = new Evolution(evo.from, evo.to, true,
                                     EvolutionType.LEVEL, 35);
                             extraEntry.forme = evo.forme;
-                            addEvoUpdateCondensed(easierEvolutionUpdates, evo, true);
+                            addEvoUpdateCondensed(easierEvolutionUpdates, extraEntry, true);
                         }
                     }
                 }

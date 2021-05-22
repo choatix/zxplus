@@ -216,24 +216,34 @@ public class Randomizer {
 
         // Trade evolutions removal
         if (settings.isChangeImpossibleEvolutions()) {
-            log.println("--Removing Impossible Evolutions--");
             romHandler.removeImpossibleEvolutions(settings);
-            logUpdatedEvolutions(log, romHandler.getImpossibleEvoUpdates());
         }
 
         // Easier evolutions
         if (settings.isMakeEvolutionsEasier()) {
-            log.println("--Condensed Level Evolutions--");
             romHandler.condenseLevelEvolutions(40, 30);
             romHandler.makeEvolutionsEasier(settings);
-            logUpdatedEvolutions(log, romHandler.getEasierEvoUpdates());
         }
 
         // Remove time-based evolutions
         if (settings.isRemoveTimeBasedEvolutions()) {
-            log.println("--Removing Timed-Based Evolutions--");
             romHandler.removeTimeBasedEvolutions();
-            logUpdatedEvolutions(log, romHandler.getTimeBasedEvoUpdates());
+        }
+
+        // Log everything afterwards, so that "impossible evolutions" can account for "easier evolutions"
+        if (settings.isChangeImpossibleEvolutions()) {
+            log.println("--Removing Impossible Evolutions--");
+            logUpdatedEvolutions(log, romHandler.getImpossibleEvoUpdates(), romHandler.getEasierEvoUpdates());
+        }
+
+        if (settings.isMakeEvolutionsEasier()) {
+            log.println("--Making Evolutions Easier--");
+            logUpdatedEvolutions(log, romHandler.getEasierEvoUpdates(), null);
+        }
+
+        if (settings.isRemoveTimeBasedEvolutions()) {
+            log.println("--Removing Timed-Based Evolutions--");
+            logUpdatedEvolutions(log, romHandler.getTimeBasedEvoUpdates(), null);
         }
 
         // Starter Pokemon
@@ -983,9 +993,14 @@ public class Randomizer {
         log.println("");
     }
 
-    private void logUpdatedEvolutions(final PrintStream log, Set<EvolutionUpdate> updatedEvolutions) {
+    private void logUpdatedEvolutions(final PrintStream log, Set<EvolutionUpdate> updatedEvolutions,
+                                      Set<EvolutionUpdate> otherUpdatedEvolutions) {
         for (EvolutionUpdate evo: updatedEvolutions) {
-            log.println(evo.toString());
+            if (otherUpdatedEvolutions != null && otherUpdatedEvolutions.contains(evo)) {
+                log.println(evo.toString() + " (Overwritten by \"Make Evolutions Easier\", see below)");
+            } else {
+                log.println(evo.toString());
+            }
         }
         log.println();
     }

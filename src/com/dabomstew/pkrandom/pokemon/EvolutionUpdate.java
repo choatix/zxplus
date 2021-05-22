@@ -43,11 +43,7 @@ public class EvolutionUpdate implements Comparable<EvolutionUpdate> {
             return -1;
         } else if (this.from.number > o.from.number) {
             return 1;
-        } else if (this.to.number < o.to.number) {
-            return -1;
-        } else if (this.to.number > o.to.number) {
-            return 1;
-        } else return Integer.compare(this.type.ordinal(), o.type.ordinal());
+        } else return Integer.compare(this.to.number, o.to.number);
     }
 
     @Override
@@ -55,7 +51,8 @@ public class EvolutionUpdate implements Comparable<EvolutionUpdate> {
         switch (type) {
             case LEVEL:
                 if (condensed) {
-                    return String.format("%-15s now%s evolves into %-15s at minimum level %s",
+                    String formatLength = this.additional ? "%-15s" : "%-20s";
+                    return String.format("%-15s now%s evolves into " + formatLength + " at minimum level %s",
                             fromName, additional ? " also" : "", toName, extraInfo);
                 } else {
                     return String.format("%-15s -> %-15s at level %s", fromName, toName, extraInfo);
