@@ -2670,12 +2670,37 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public List<Integer> getSpecialMusicStatics() {
-        return new ArrayList<>();
+        return Arrays.stream(romEntry.arrayEntries.get("SpecialMusicStatics")).boxed().collect(Collectors.toList());
     }
 
     @Override
     public void applyCorrectStaticMusic(Map<Integer, Integer> specialMusicStaticChanges) {
+        List<Integer> replaced = new ArrayList<>();
+        int newIndexToMusicPoolOffset;
 
+        if (romEntry.codeTweaks.get("NewIndexToMusicTweak") != null) {
+            try {
+                FileFunctions.applyPatch(rom, romEntry.codeTweaks.get("NewIndexToMusicTweak"));
+            } catch (IOException e) {
+                throw new RandomizerIOException(e);
+            }
+
+            newIndexToMusicPoolOffset  = romEntry.getValue("NewIndexToMusicPoolOffset");
+
+            if (newIndexToMusicPoolOffset > 0) {
+
+                for (int oldStatic: specialMusicStaticChanges.keySet()) {
+                    int i = newIndexToMusicPoolOffset;
+                    int index = internalToPokedex[readWord(rom, i)];
+                    while (index != oldStatic || replaced.contains(i)) {
+                        i += 4;
+                        index = internalToPokedex[readWord(rom, i)];
+                    }
+                    writeWord(rom, i, pokedexToInternal[specialMusicStaticChanges.get(oldStatic)]);
+                    replaced.add(i);
+                }
+            }
+        }
     }
 
     @Override
