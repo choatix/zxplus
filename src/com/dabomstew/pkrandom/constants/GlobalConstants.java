@@ -194,8 +194,12 @@ public class GlobalConstants {
 
     public static final List<Integer> badAbilities = Arrays.asList(
             Abilities.minus, Abilities.plus, Abilities.anticipation, Abilities.forewarn, Abilities.frisk,
-            Abilities.honeyGather, Abilities.friendGuard, Abilities.healer, Abilities.telepathy, Abilities.symbiosis,
-            Abilities.auraBreak, Abilities.battery, Abilities.receiver, Abilities.powerOfAlchemy
+            Abilities.honeyGather, Abilities.auraBreak, Abilities.receiver, Abilities.powerOfAlchemy
+    );
+
+    public static final List<Integer> doubleBattleAbilities = Arrays.asList(
+            Abilities.friendGuard, Abilities.healer, Abilities.telepathy, Abilities.symbiosis,
+            Abilities.battery
     );
 
     public static final List<Integer> duplicateAbilities = Arrays.asList(

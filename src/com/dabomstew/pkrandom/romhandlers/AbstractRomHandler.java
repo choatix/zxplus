@@ -538,6 +538,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean banBadAbilities = settings.isBanBadAbilities();
         boolean megaEvolutionSanity = settings.isAbilitiesFollowMegaEvolutions();
         boolean weighDuplicatesTogether = settings.isWeighDuplicateAbilitiesTogether();
+        boolean doubleBattleMode = settings.isDoubleBattleMode();
 
         // Abilities don't exist in some games...
         if (this.abilitiesPerPokemon() == 0) {
@@ -562,6 +563,9 @@ public abstract class AbstractRomHandler implements RomHandler {
 
         if (banBadAbilities) {
             bannedAbilities.addAll(GlobalConstants.badAbilities);
+            if (!doubleBattleMode) {
+                bannedAbilities.addAll(GlobalConstants.doubleBattleAbilities);
+            }
         }
 
         if (weighDuplicatesTogether) {
