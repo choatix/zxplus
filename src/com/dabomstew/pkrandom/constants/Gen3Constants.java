@@ -378,6 +378,16 @@ public class Gen3Constants {
         }
     }
 
+    public static int getRoamingPokemonCount(int romType) {
+        if (romType == Gen3Constants.RomType_FRLG) {
+            return 3;
+        }
+
+        // R/S roamers are not implemented, and Emerald roamers are set as
+        // linkedEncounters to their respective Southern Island statics.
+        return 0;
+    }
+
     static {
         setupAllowedItems();
     }
