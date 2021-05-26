@@ -5661,10 +5661,18 @@ public abstract class AbstractRomHandler implements RomHandler {
                     .map(mega -> mega.from)
                     .distinct()
                     .collect(Collectors.toList());
-        } else if (usePlacementHistory) {
-            pickFrom = getBelowAveragePlacements();
         } else {
             pickFrom = cachedAllList;
+        }
+        if (usePlacementHistory) {
+            double placementAverage = getPlacementAverage();
+            pickFrom = pickFrom
+                    .stream()
+                    .filter(pk -> getPlacementHistory(pk) < placementAverage * 2)
+                    .collect(Collectors.toList());
+            if (pickFrom.isEmpty()) {
+                pickFrom = cachedAllList;
+            }
         }
         if (type != null) {
             if (!cachedReplacementLists.containsKey(type)) {
@@ -5719,14 +5727,15 @@ public abstract class AbstractRomHandler implements RomHandler {
 
             Pokemon chosenPokemon = canPick.get(this.random.nextInt(canPick.size()));
             if (usePlacementHistory) {
-//                   System.out.println("Pokemon: "+ chosenPokemon.name + " placement history: " + getPlacementHistory(chosenPokemon) + " current average: " + getPlacementAverage());
-               int breaknum = 0;
-               while (getPlacementHistory(chosenPokemon) > getPlacementAverage() && breaknum < 100) {
-//                   System.out.println(">> Pokemon: "+ chosenPokemon.name + " exceed threshold, rerolling");
-                   chosenPokemon = canPick.get(this.random.nextInt(canPick.size()));
-//                   System.out.println(">> NEW Pokemon: "+ chosenPokemon.name + " placement history: " + getPlacementHistory(chosenPokemon) + " current average: " + getPlacementAverage());
-                   breaknum += 1;
-               }
+                double placementAverage = getPlacementAverage();
+                List<Pokemon> filteredPickList = canPick
+                        .stream()
+                        .filter(pk -> getPlacementHistory(pk) < placementAverage)
+                        .collect(Collectors.toList());
+                if (filteredPickList.isEmpty()) {
+                    filteredPickList = canPick;
+                }
+                chosenPokemon = filteredPickList.get(this.random.nextInt(filteredPickList.size()));
             }
             return chosenPokemon;
         } else {
@@ -6059,23 +6068,12 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     private int getPlacementHistory(Pokemon newPK) {
-        List<Pokemon> placedPK = new ArrayList<>(placementHistory.keySet());
-        if (placedPK.contains(newPK)) {
-            return placementHistory.get(newPK);
-        }
-        else {
-            return 0;
-        }
+        return placementHistory.getOrDefault(newPK, 0);
     }
 
-    private float getPlacementAverage() {
-        List<Pokemon> placedPK = new ArrayList<>(placementHistory.keySet());
-        int placedPKNum = 0;
-        for (Pokemon p : placedPK) {
-            placedPKNum += placementHistory.get(p);
-        }
-        return (float)placedPKNum / (float)placedPK.size();
-        }
+    private double getPlacementAverage() {
+        return placementHistory.values().stream().mapToInt(e -> e).average().orElse(0);
+    }
 
 
     private List<Pokemon> getBelowAveragePlacements() {
