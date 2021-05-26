@@ -214,6 +214,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                                     boolean cTT = (current.getValue("CopyTMText") == 1);
                                     if (current.copyStaticPokemon) {
                                         current.staticPokemon.addAll(otherEntry.staticPokemon);
+                                        current.roamingPokemon.addAll(otherEntry.roamingPokemon);
                                         current.entries.put("StaticPokemonSupport", 1);
                                     } else {
                                         current.entries.put("StaticPokemonSupport", 0);
@@ -1875,20 +1876,24 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     private void getRoamers(List<StaticEncounter> statics) throws IOException {
-        if (romEntry.romType == Gen3Constants.RomType_FRLG && romEntry.codeTweaks.get("RoamingPokemonTweak") != null) {
+        if (romEntry.romType == Gen3Constants.RomType_Sapp) {
+            StaticPokemon roamer = romEntry.roamingPokemon.get(0);
+            StaticEncounter se = new StaticEncounter();
+            se.pkmn = roamer.getPokemon(this);
+            se.level = roamer.getLevel(rom, 0);
+            statics.add(se);
+        } else if (romEntry.romType == Gen3Constants.RomType_FRLG && romEntry.codeTweaks.get("RoamingPokemonTweak") != null) {
             int firstSpecies = readWord(rom, romEntry.roamingPokemon.get(0).speciesOffsets[0]);
             if (firstSpecies == 0xFFFF) {
                 // This means that the IPS patch hasn't been applied yet, since the first species
                 // ID location is free space.
                 FileFunctions.applyPatch(rom, romEntry.codeTweaks.get("RoamingPokemonTweak"));
             }
-            int level = rom[romEntry.roamingPokemon.get(0).levelOffsets[0]];
             for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
                 StaticPokemon roamer = romEntry.roamingPokemon.get(i);
-                int species = readWord(rom, roamer.speciesOffsets[0]);
                 StaticEncounter se = new StaticEncounter();
-                se.pkmn = pokesInternal[species];
-                se.level = level;
+                se.pkmn = roamer.getPokemon(this);
+                se.level = roamer.getLevel(rom, 0);
                 statics.add(se);
             }
         } else if (romEntry.romType == Gen3Constants.RomType_Em) {
@@ -1898,14 +1903,12 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 // Thus, this check is a good indicator that the patch needs to be applied.
                 applyEmeraldRoamerPatch();
             }
-            int level = rom[romEntry.roamingPokemon.get(0).levelOffsets[0]];
             int[] southernIslandOffsets = romEntry.arrayEntries.get("StaticSouthernIslandOffsets");
             for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
                 StaticPokemon roamer = romEntry.roamingPokemon.get(i);
-                int species = readWord(rom, roamer.speciesOffsets[0]);
                 StaticEncounter se = new StaticEncounter();
-                se.pkmn = pokesInternal[species];
-                se.level = level;
+                se.pkmn = roamer.getPokemon(this);
+                se.level = roamer.getLevel(rom, 0);
 
                 // Link each roamer to their respective Southern Island static encounter so that
                 // they randomize to the same species.
@@ -1916,7 +1919,14 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     private void setRoamers(List<StaticEncounter> statics) {
-        if (romEntry.romType == Gen3Constants.RomType_FRLG && romEntry.codeTweaks.get("RoamingPokemonTweak") != null) {
+        if (romEntry.romType == Gen3Constants.RomType_Sapp) {
+            StaticEncounter roamerEncounter = statics.get(statics.size() - 1);
+            StaticPokemon roamer = romEntry.roamingPokemon.get(0);
+            roamer.setPokemon(this, roamerEncounter.pkmn);
+            for (int i = 0; i < roamer.levelOffsets.length; i++) {
+                roamer.setLevel(rom, roamerEncounter.level, i);
+            }
+        } else if (romEntry.romType == Gen3Constants.RomType_FRLG && romEntry.codeTweaks.get("RoamingPokemonTweak") != null) {
             for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
                 int offsetInStaticList = statics.size() - 3 + i;
                 StaticEncounter roamerEncounter = statics.get(offsetInStaticList);
