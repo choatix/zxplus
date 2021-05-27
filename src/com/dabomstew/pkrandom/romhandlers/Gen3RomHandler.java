@@ -1844,13 +1844,13 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         }
 
         if (romEntry.codeTweaks.get("StaticFirstBattleTweak") != null) {
-            StaticEncounter startingFirstBattle = staticPokemon.get(staticPokemon.size() - 1);
+            StaticEncounter startingFirstBattle = staticPokemon.get(romEntry.getValue("StaticFirstBattleOffset"));
             int startingSpeciesOffset = romEntry.getValue("StaticFirstBattleSpeciesOffset");
             writeWord(startingSpeciesOffset, pokedexToInternal[startingFirstBattle.pkmn.number]);
             int startingLevelOffset = romEntry.getValue("StaticFirstBattleLevelOffset");
             rom[startingLevelOffset] = (byte) startingFirstBattle.level;
         } else if (romEntry.codeTweaks.get("GhostMarowakTweak") != null) {
-            StaticEncounter ghostMarowak = staticPokemon.get(staticPokemon.size() - 1);
+            StaticEncounter ghostMarowak = staticPokemon.get(romEntry.getValue("GhostMarowakOffset"));
             int[] ghostMarowakSpeciesOffsets = romEntry.arrayEntries.get("GhostMarowakSpeciesOffsets");
             for (int i = 0; i < ghostMarowakSpeciesOffsets.length; i++) {
                 writeWord(ghostMarowakSpeciesOffsets[i], pokedexToInternal[ghostMarowak.pkmn.number]);
@@ -1876,7 +1876,19 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     private void getRoamers(List<StaticEncounter> statics) throws IOException {
-        if (romEntry.romType == Gen3Constants.RomType_Sapp) {
+        if (romEntry.romType == Gen3Constants.RomType_Ruby) {
+            int firstSpecies = readWord(rom, romEntry.roamingPokemon.get(0).speciesOffsets[0]);
+            if (firstSpecies == 0) {
+                // Before applying the patch, the first species offset will be pointing to
+                // the lower bytes of 0x2000000, so when it reads a word, it will be 0.
+                applyRubyRoamerPatch();
+            }
+            StaticPokemon roamer = romEntry.roamingPokemon.get(0);
+            StaticEncounter se = new StaticEncounter();
+            se.pkmn = roamer.getPokemon(this);
+            se.level = roamer.getLevel(rom, 0);
+            statics.add(se);
+        } else if (romEntry.romType == Gen3Constants.RomType_Sapp) {
             StaticPokemon roamer = romEntry.roamingPokemon.get(0);
             StaticEncounter se = new StaticEncounter();
             se.pkmn = roamer.getPokemon(this);
@@ -1919,7 +1931,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     private void setRoamers(List<StaticEncounter> statics) {
-        if (romEntry.romType == Gen3Constants.RomType_Sapp) {
+        if (romEntry.romType == Gen3Constants.RomType_Ruby || romEntry.romType == Gen3Constants.RomType_Sapp) {
             StaticEncounter roamerEncounter = statics.get(statics.size() - 1);
             StaticPokemon roamer = romEntry.roamingPokemon.get(0);
             roamer.setPokemon(this, roamerEncounter.pkmn);
@@ -1950,8 +1962,46 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         }
     }
 
+    private void applyRubyRoamerPatch() {
+        int offset = romEntry.getValue("FindMapsWithMonFunctionStartOffset");
+
+        // The constant 0x2000000 is actually in the function twice, so we'll replace the first instance
+        // with Latios's ID. First, change the "ldr r2, [pc, #0x68]" near the start of the function to
+        // "ldr r2, [pc, #0x15C]" so it points to the second usage of 0x2000000
+        rom[offset + 22] = 0x57;
+
+        // In the space formerly occupied by the first 0x2000000, write Latios's ID
+        FileFunctions.writeFullIntLittleEndian(rom, offset + 128, pokedexToInternal[Species.latios]);
+
+        // Where the original function computes Latios's ID by setting r0 to 0xCC << 1, just pc-relative
+        // load our constant. We have four bytes of space to play with, and we need to make sure the offset
+        // from the pc is 4-byte aligned; we need to nop for alignment and then perform the load.
+        rom[offset + 12] = 0x00;
+        rom[offset + 13] = 0x00;
+        rom[offset + 14] = 0x1C;
+        rom[offset + 15] = 0x48;
+
+        offset = romEntry.getValue("CreateInitialRoamerMonFunctionStartOffset");
+
+        // At the very end of the function, the game pops the lr from the stack and stores it in r0, then
+        // it does "bx r0" to jump back to the caller, and then it has two bytes of padding afterwards. For
+        // some reason, Ruby very rarely does "pop { pc }" even though that seemingly works fine. By doing
+        // that, we only need one instruction to return to the caller, giving us four bytes to write
+        // Latios's species ID.
+        rom[offset + 182] = 0x00;
+        rom[offset + 183] = (byte) 0xBD;
+        FileFunctions.writeFullIntLittleEndian(rom, offset + 184, pokedexToInternal[Species.latios]);
+
+        // Now write a pc-relative load to this new species ID constant over the original move and lsl. Similar
+        // to before, we need to write a nop first for alignment, then pc-relative load into r6.
+        rom[offset + 10] = 0x00;
+        rom[offset + 11] = 0x00;
+        rom[offset + 12] = 0x2A;
+        rom[offset + 13] = 0x4E;
+    }
+
     private void applyEmeraldRoamerPatch() {
-        int offset = romEntry.getValue("RoamerFunctionStart");
+        int offset = romEntry.getValue("CreateInitialRoamerMonFunctionStartOffset");
 
         // Latias's species ID is already a pc-relative loaded constant, but Latios's isn't. We need to make
         // some room for it; the constant 0x03005D8C is actually in the function twice, so we'll replace the first
