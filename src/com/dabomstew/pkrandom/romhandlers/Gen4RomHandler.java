@@ -69,12 +69,13 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         private String name;
         private String romCode;
         private int romType;
-        private boolean staticPokemonSupport = false, copyStaticPokemon = false, copyText = false;
+        private boolean staticPokemonSupport = false, copyStaticPokemon = false,copyRoamingPokemon = false, copyText = false;
         private Map<String, String> strings = new HashMap<>();
         private Map<String, String> tweakFiles = new HashMap<>();
         private Map<String, Integer> numbers = new HashMap<>();
         private Map<String, int[]> arrayEntries = new HashMap<>();
         private List<StaticPokemon> staticPokemon = new ArrayList<>();
+        private List<RoamingPokemon> roamingPokemon = new ArrayList<>();
         private List<ScriptEntry> marillCryScriptEntries = new ArrayList<>();
 
         private int getInt(String key) {
@@ -156,17 +157,25 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                                     } else {
                                         current.staticPokemonSupport = false;
                                     }
+                                    if (current.copyRoamingPokemon) {
+                                        current.roamingPokemon.addAll(otherEntry.roamingPokemon);
+                                    }
                                     current.marillCryScriptEntries.addAll(otherEntry.marillCryScriptEntries);
                                 }
                             }
                         } else if (r[0].equals("StaticPokemon{}")) {
                             current.staticPokemon.add(parseStaticPokemon(r[1]));
+                        } else if (r[0].equals("RoamingPokemon{}")) {
+                            current.roamingPokemon.add(parseRoamingPokemon(r[1]));
                         } else if (r[0].equals("StaticPokemonSupport")) {
                             int spsupport = parseRIInt(r[1]);
                             current.staticPokemonSupport = (spsupport > 0);
                         } else if (r[0].equals("CopyStaticPokemon")) {
                             int csp = parseRIInt(r[1]);
                             current.copyStaticPokemon = (csp > 0);
+                        } else if (r[0].equals("CopyRoamingPokemon")) {
+                            int crp = parseRIInt(r[1]);
+                            current.copyRoamingPokemon = (crp > 0);
                         } else if (r[0].equals("CopyText")) {
                             int ct = parseRIInt(r[1]);
                             current.copyText = (ct > 0);
@@ -254,6 +263,42 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             }
         }
         return sp;
+    }
+
+    private static RoamingPokemon parseRoamingPokemon(String roamingPokemonString) {
+        RoamingPokemon rp = new RoamingPokemon();
+        String pattern = "[A-z]+=\\[(0x[0-9a-fA-F]+,?\\s?)+]|[A-z]+=\\[([0-9]+:0x[0-9a-fA-F]+,?\\s?)+]";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(roamingPokemonString);
+        while (m.find()) {
+            String[] segments = m.group().split("=");
+            String[] offsets = segments[1].substring(1, segments[1].length() - 1).split(",");
+            switch (segments[0]) {
+                case "Species":
+                    int[] speciesCodeOffsets = new int[offsets.length];
+                    for (int i = 0; i < speciesCodeOffsets.length; i++) {
+                        speciesCodeOffsets[i] = parseRIInt(offsets[i]);
+                    }
+                    rp.speciesCodeOffsets = speciesCodeOffsets;
+                    break;
+                case "Level":
+                    int[] levelCodeOffsets = new int[offsets.length];
+                    for (int i = 0; i < levelCodeOffsets.length; i++) {
+                        levelCodeOffsets[i] = parseRIInt(offsets[i]);
+                    }
+                    rp.levelCodeOffsets = levelCodeOffsets;
+                    break;
+                case "Script":
+                    ScriptEntry[] entries = new ScriptEntry[offsets.length];
+                    for (int i = 0; i < entries.length; i++) {
+                        String[] parts = offsets[i].split(":");
+                        entries[i] = new ScriptEntry(parseRIInt(parts[0]), parseRIInt(parts[1]));
+                    }
+                    rp.speciesScriptOffsets = entries;
+                    break;
+            }
+        }
+        return rp;
     }
 
     // This rom
@@ -2568,6 +2613,47 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
     }
 
+    private static class RoamingPokemon {
+        private int[] speciesCodeOffsets;
+        private int[] levelCodeOffsets;
+        private ScriptEntry[] speciesScriptOffsets;
+
+        public RoamingPokemon() {
+            this.speciesCodeOffsets = new int[0];
+            this.levelCodeOffsets = new int[0];
+            this.speciesScriptOffsets = new ScriptEntry[0];
+        }
+
+        public Pokemon getPokemon(Gen4RomHandler parent) {
+            int species = parent.readWord(parent.arm9, speciesCodeOffsets[0]);
+            return parent.pokes[species];
+        }
+
+        public void setPokemon(Gen4RomHandler parent, NARCArchive scriptNARC, Pokemon pkmn) {
+            int value = pkmn.number;
+            for (int speciesCodeOffset : speciesCodeOffsets) {
+                parent.writeWord(parent.arm9, speciesCodeOffset, value);
+            }
+            for (ScriptEntry speciesScriptOffset : speciesScriptOffsets) {
+                byte[] file = scriptNARC.files.get(speciesScriptOffset.scriptFile);
+                parent.writeWord(file, speciesScriptOffset.scriptOffset, value);
+            }
+        }
+
+        public int getLevel(Gen4RomHandler parent) {
+            if (levelCodeOffsets.length == 0) {
+                return 1;
+            }
+            return parent.arm9[levelCodeOffsets[0]];
+        }
+
+        public void setLevel(Gen4RomHandler parent, int level) {
+            for (int levelCodeOffset : levelCodeOffsets) {
+                parent.arm9[levelCodeOffset] = (byte) level;
+            }
+        }
+    }
+
     @Override
     public List<StaticEncounter> getStaticPokemon() {
         List<StaticEncounter> sp = new ArrayList<>();
@@ -2633,6 +2719,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     sp.add(se);
                 }
             }
+
+            getRoamers(sp);
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
@@ -2648,7 +2736,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 .get("StaticPokemonTrades").length : 0;
         int meggsize = romEntry.getInt("MysteryEggOffset") > 0 ? 1 : 0;
         int fossilsize = romEntry.getInt("FossilTableOffset") > 0 ? 7 : 0;
-        if (staticPokemon.size() != romEntry.staticPokemon.size() + sptsize + meggsize + fossilsize) {
+        int roamerSize = Gen4Constants.getRoamingPokemonCount(romEntry.romType);
+        if (staticPokemon.size() != romEntry.staticPokemon.size() + sptsize + meggsize + fossilsize + roamerSize) {
             return false;
         }
         try {
@@ -2725,6 +2814,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     }
                 }
             }
+            setRoamers(statics);
             if (romEntry.romType == Gen4Constants.Type_Plat) {
                 patchDistortionWorldGroundCheck();
             }
@@ -2732,6 +2822,52 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             throw new RandomizerIOException(e);
         }
         return true;
+    }
+
+    private void getRoamers(List<StaticEncounter> statics) {
+        if (romEntry.romType == Gen4Constants.Type_DP && romEntry.roamingPokemon.size() > 0) {
+            int offset = romEntry.getInt("RoamingPokemonFunctionStartOffset");
+            if (readWord(arm9, offset + 44) != 0) {
+                // In the original code, the code at this offset would be performing a shift to put
+                // Cresselia's constant in r7. After applying the patch, this is now a nop, since
+                // we just pc-relative load it instead. So if a nop isn't here, apply the patch.
+                applyDiamondPearlRoamerPatch();
+            }
+            for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
+                RoamingPokemon roamer = romEntry.roamingPokemon.get(i);
+                StaticEncounter se = new StaticEncounter();
+                se.pkmn = roamer.getPokemon(this);
+                se.level = roamer.getLevel(this);
+                statics.add(se);
+            }
+        }
+    }
+
+    private void setRoamers(Iterator<StaticEncounter> statics) {
+        if (romEntry.romType == Gen4Constants.Type_DP) {
+            for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
+                RoamingPokemon roamer = romEntry.roamingPokemon.get(i);
+                StaticEncounter roamerEncounter = statics.next();
+                roamer.setPokemon(this, scriptNarc, roamerEncounter.pkmn);
+                roamer.setLevel(this, roamerEncounter.level);
+            }
+        }
+    }
+
+    private void applyDiamondPearlRoamerPatch() {
+        int offset = romEntry.getInt("RoamingPokemonFunctionStartOffset");
+
+        // The original code had an entry for Darkrai; its species ID is pc-relative loaded. Since this
+        // entry is clearly unused, just replace Darkrai's species ID constant with Cresselia's, since
+        // in the original code, her ID is computed as 0x7A << 0x2
+        FileFunctions.writeFullIntLittleEndian(arm9, offset + 244, Species.cresselia);
+
+        // Now write a pc-relative load to our new constant over where Cresselia's ID is normally mov'd
+        // into r7 and shifted.
+        arm9[offset + 42] = 0x32;
+        arm9[offset + 43] = 0x4F;
+        arm9[offset + 44] = 0x00;
+        arm9[offset + 45] = 0x00;
     }
 
     private void patchDistortionWorldGroundCheck() throws IOException {

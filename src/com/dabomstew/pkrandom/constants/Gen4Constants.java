@@ -918,6 +918,15 @@ public class Gen4Constants {
         }
     }
 
+    public static int getRoamingPokemonCount(int romType) {
+        if (romType == Gen4Constants.Type_DP) {
+            return 2;
+        }
+
+        // No other game is implemented yet.
+        return 0;
+    }
+
     public static final Map<Integer,Integer> balancedItemPrices = Stream.of(new Integer[][] {
             // Skip item index 0. All prices divided by 10
             {1, 300}, // Master Ball
