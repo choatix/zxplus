@@ -921,9 +921,11 @@ public class Gen4Constants {
     public static int getRoamingPokemonCount(int romType) {
         if (romType == Gen4Constants.Type_DP) {
             return 2;
+        } else if (romType == Gen4Constants.Type_HGSS) {
+            return 4;
         }
 
-        // No other game is implemented yet.
+        // Platinum is not implemented yet.
         return 0;
     }
 

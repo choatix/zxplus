@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.dabomstew.pkrandom.*;
 import com.dabomstew.pkrandom.constants.*;
@@ -316,6 +317,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     private boolean loadedWildMapNames;
     private Map<Integer, String> wildMapNames, headbuttMapNames;
     private ItemList allowedItems, nonBadItems;
+    private boolean roamerRandomizationEnabled;
 
     private RomEntry romEntry;
 
@@ -371,12 +373,16 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         allowedItems = Gen4Constants.allowedItems.copy();
         nonBadItems = Gen4Constants.nonBadItems.copy();
 
+        roamerRandomizationEnabled =
+                (romEntry.romType == Gen4Constants.Type_DP && romEntry.roamingPokemon.size() > 0) ||
+                (romEntry.romType == Gen4Constants.Type_HGSS && romEntry.tweakFiles.containsKey("NewRoamerSubroutineTweak"));
+
         // We want to guarantee that the catching tutorial in HGSS has Ethan/Lyra's new Pokemon. We also
         // want to allow the option of randomizing the enemy Pokemon too. Unfortunately, the latter can
         // occur *before* the former, but there's no guarantee that it will even happen. Since we *know*
         // we'll need to do this patch eventually, just expand the arm9 here to make things easy.
         if (romEntry.romType == Gen4Constants.Type_HGSS && romEntry.tweakFiles.containsKey("NewCatchingTutorialSubroutineTweak")) {
-            int extendBy = romEntry.getInt("NewCatchingTutorialSubroutineSize");
+            int extendBy = romEntry.getInt("Arm9ExtensionSize");
             arm9 = extendARM9(arm9, extendBy, romEntry.getString("TCMCopyingPrefix"), Gen4Constants.arm9Offset);
             genericIPSPatch(arm9, "NewCatchingTutorialSubroutineTweak");
         }
@@ -2720,7 +2726,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 }
             }
 
-            getRoamers(sp);
+            if (roamerRandomizationEnabled) {
+                getRoamers(sp);
+            }
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
@@ -2814,7 +2822,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     }
                 }
             }
-            setRoamers(statics);
+            if (roamerRandomizationEnabled) {
+                setRoamers(statics);
+            }
             if (romEntry.romType == Gen4Constants.Type_Plat) {
                 patchDistortionWorldGroundCheck();
             }
@@ -2825,7 +2835,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     private void getRoamers(List<StaticEncounter> statics) {
-        if (romEntry.romType == Gen4Constants.Type_DP && romEntry.roamingPokemon.size() > 0) {
+        if (romEntry.romType == Gen4Constants.Type_DP) {
             int offset = romEntry.getInt("RoamingPokemonFunctionStartOffset");
             if (readWord(arm9, offset + 44) != 0) {
                 // In the original code, the code at this offset would be performing a shift to put
@@ -2833,24 +2843,30 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 // we just pc-relative load it instead. So if a nop isn't here, apply the patch.
                 applyDiamondPearlRoamerPatch();
             }
-            for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
-                RoamingPokemon roamer = romEntry.roamingPokemon.get(i);
-                StaticEncounter se = new StaticEncounter();
-                se.pkmn = roamer.getPokemon(this);
-                se.level = roamer.getLevel(this);
-                statics.add(se);
+        } else if (romEntry.romType == Gen4Constants.Type_HGSS) {
+            int firstSpeciesOffset = romEntry.roamingPokemon.get(0).speciesCodeOffsets[0];
+            if (arm9.length < firstSpeciesOffset || readWord(arm9, firstSpeciesOffset) == 0) {
+                // Either the arm9 hasn't been extended, or the patch hasn't been written
+                int extendBy = romEntry.getInt("Arm9ExtensionSize");
+                arm9 = extendARM9(arm9, extendBy, romEntry.getString("TCMCopyingPrefix"), Gen4Constants.arm9Offset);
+                genericIPSPatch(arm9, "NewRoamerSubroutineTweak");
             }
+        }
+        for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
+            RoamingPokemon roamer = romEntry.roamingPokemon.get(i);
+            StaticEncounter se = new StaticEncounter();
+            se.pkmn = roamer.getPokemon(this);
+            se.level = roamer.getLevel(this);
+            statics.add(se);
         }
     }
 
     private void setRoamers(Iterator<StaticEncounter> statics) {
-        if (romEntry.romType == Gen4Constants.Type_DP) {
-            for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
-                RoamingPokemon roamer = romEntry.roamingPokemon.get(i);
-                StaticEncounter roamerEncounter = statics.next();
-                roamer.setPokemon(this, scriptNarc, roamerEncounter.pkmn);
-                roamer.setLevel(this, roamerEncounter.level);
-            }
+        for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
+            RoamingPokemon roamer = romEntry.roamingPokemon.get(i);
+            StaticEncounter roamerEncounter = statics.next();
+            roamer.setPokemon(this, scriptNarc, roamerEncounter.pkmn);
+            roamer.setLevel(this, roamerEncounter.level);
         }
     }
 
