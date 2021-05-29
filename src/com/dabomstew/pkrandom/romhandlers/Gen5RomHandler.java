@@ -1208,6 +1208,18 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             List<String> tclasses = this.getTrainerClassNames();
             List<String> tnames = this.getTrainerNames();
             for (int i = 1; i < trainernum; i++) {
+                // Trainer entries are 20 bytes
+                // Team flags; 1 byte; 0x01 = custom moves, 0x02 = held item
+                // Class; 1 byte
+                // Battle Mode; 1 byte; 0=single, 1=double, 2=triple, 3=rotation
+                // Number of pokemon in team; 1 byte
+                // Items; 2 bytes each, 4 item slots
+                // AI Flags; 2 byte
+                // 2 bytes not used
+                // Healer; 1 byte; 0x01 means they will heal player's pokes after defeat.
+                // Victory Money; 1 byte; The money given out after defeat =
+                //         4 * this value * highest level poke in party
+                // Victory Item; 2 bytes; The item given out after defeat (e.g. berries)
                 byte[] trainer = trainers.files.get(i);
                 byte[] trpoke = trpokes.files.get(i);
                 Trainer tr = new Trainer();
@@ -1222,25 +1234,28 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 }
                 for (int poke = 0; poke < numPokes; poke++) {
                     // Structure is
-                    // AI SB LV LV SP SP FRM FRM
+                    // IV SB LV LV SP SP FRM FRM
                     // (HI HI)
                     // (M1 M1 M2 M2 M3 M3 M4 M4)
                     // where SB = 0 0 Ab Ab 0 0 Fm Ml
+                    // IV is a "difficulty" level between 0 and 255 to represent 0 to 31 IVs.
+                    //     These IVs affect all attributes. For the vanilla games, the
+                    //     vast majority of trainers have 0 IVs; Elite Four members will
+                    //     have 30 IVs.
                     // Ab Ab = ability number, 0 for random
                     // Fm = 1 for forced female
                     // Ml = 1 for forced male
                     // There's also a trainer flag to force gender, but
                     // this allows fixed teams with mixed genders.
 
-                    int ailevel = trpoke[pokeOffs] & 0xFF;
-                    // int secondbyte = trpoke[pokeOffs + 1] & 0xFF;
+                    int difficulty = trpoke[pokeOffs] & 0xFF;
                     int level = readWord(trpoke, pokeOffs + 2);
                     int species = readWord(trpoke, pokeOffs + 4);
                     int formnum = readWord(trpoke, pokeOffs + 6);
                     TrainerPokemon tpk = new TrainerPokemon();
                     tpk.level = level;
                     tpk.pokemon = pokes[species];
-                    tpk.AILevel = ailevel;
+                    tpk.IVs = (difficulty) * 31 / 255;
                     int abilityAndFlag = trpoke[pokeOffs + 1];
                     tpk.abilitySlot = (abilityAndFlag >>> 4) & 0xF;
                     tpk.forcedGenderFlag = (abilityAndFlag & 0xF);
@@ -1288,7 +1303,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                             TrainerPokemon tpk = new TrainerPokemon();
                             tpk.level = 25;
                             tpk.pokemon = pokes[species];
-                            tpk.AILevel = 255;
+                            tpk.IVs = 31;
                             tpk.heldItem = readWord(pkmndata, 12);
                             tpk.move1 = readWord(pkmndata, 2);
                             tpk.move2 = readWord(pkmndata, 4);
@@ -1369,9 +1384,10 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 Iterator<TrainerPokemon> tpokes = tr.pokemon.iterator();
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon tp = tpokes.next();
+                    // Add 1 to offset integer division truncation
+                    int difficulty = Math.min(255, 1 + (tp.IVs * 255) / 31);
                     byte abilityAndFlag = (byte)((tp.abilitySlot << 4) | tp.forcedGenderFlag);
-                    trpoke[pokeOffs] = (byte) tp.AILevel;
-                    trpoke[pokeOffs + 1] = abilityAndFlag;
+                    writeWord(trpoke, pokeOffs, difficulty | abilityAndFlag << 8);
                     writeWord(trpoke, pokeOffs + 2, tp.level);
                     writeWord(trpoke, pokeOffs + 4, tp.pokemon.number);
                     writeWord(trpoke, pokeOffs + 6, tp.forme);

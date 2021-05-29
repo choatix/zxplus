@@ -1378,6 +1378,21 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         List<Trainer> theTrainers = new ArrayList<>();
         List<String> tcnames = this.getTrainerClassNames();
         for (int i = 1; i < amount; i++) {
+            // Trainer entries are 40 bytes
+            // Team flags; 1 byte; 0x01 = custom moves, 0x02 = held item
+            // Class; 1 byte
+            // Encounter Music and gender; 1 byte
+            // Battle Sprite; 1 byte
+            // Name; 12 bytes; 0xff terminated
+            // Items; 2 bytes each, 4 item slots
+            // Battle Mode; 1 byte; 0 means single, 1 means double.
+            // 3 bytes not used
+            // AI Flags; 1 byte
+            // 3 bytes not used
+            // Number of pokemon in team; 1 byte
+            // 3 bytes not used
+            // Pointer to pokemon; 4 bytes
+            // https://github.com/pret/pokefirered/blob/3dce3407d5f9bca69d61b1cf1b314fb1e921d572/include/battle.h#L111
             int trOffset = baseOffset + i * entryLen;
             Trainer tr = new Trainer();
             tr.offset = trOffset;
@@ -1391,12 +1406,19 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             tr.poketype = pokeDataType;
             tr.name = this.readVariableLengthString(trOffset + 4);
             tr.fullDisplayName = tcnames.get(trainerclass) + " " + tr.name;
-            // Pokemon data!
+            // Pokemon structure data is like
+            // IV IV LV SP SP
+            // (HI HI)
+            // (M1 M1 M2 M2 M3 M3 M4 M4)
+            // IV is a "difficulty" level between 0 and 255 to represent 0 to 31 IVs.
+            //     These IVs affect all attributes. For the vanilla games, the majority
+            //     of trainers have 0 IVs; Elite Four members will have 31 IVs.
+            // https://github.com/pret/pokeemerald/blob/6c38837b266c0dd36ccdd04559199282daa7a8a0/include/data.h#L22
             if (pokeDataType == 0) {
                 // blocks of 8 bytes
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon thisPoke = new TrainerPokemon();
-                    thisPoke.AILevel = readWord(pointerToPokes + poke * 8);
+                    thisPoke.IVs = ((readWord(pointerToPokes + poke * 8) & 0xFF) * 31) / 255;
                     thisPoke.level = readWord(pointerToPokes + poke * 8 + 2);
                     thisPoke.pokemon = pokesInternal[readWord(pointerToPokes + poke * 8 + 4)];
                     tr.pokemon.add(thisPoke);
@@ -1405,7 +1427,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 // blocks of 8 bytes
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon thisPoke = new TrainerPokemon();
-                    thisPoke.AILevel = readWord(pointerToPokes + poke * 8);
+                    thisPoke.IVs = ((readWord(pointerToPokes + poke * 8) & 0xFF) * 31) / 255;
                     thisPoke.level = readWord(pointerToPokes + poke * 8 + 2);
                     thisPoke.pokemon = pokesInternal[readWord(pointerToPokes + poke * 8 + 4)];
                     thisPoke.heldItem = readWord(pointerToPokes + poke * 8 + 6);
@@ -1415,7 +1437,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 // blocks of 16 bytes
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon thisPoke = new TrainerPokemon();
-                    thisPoke.AILevel = readWord(pointerToPokes + poke * 16);
+                    thisPoke.IVs = ((readWord(pointerToPokes + poke * 16) & 0xFF) * 31) / 255;
                     thisPoke.level = readWord(pointerToPokes + poke * 16 + 2);
                     thisPoke.pokemon = pokesInternal[readWord(pointerToPokes + poke * 16 + 4)];
                     thisPoke.move1 = readWord(pointerToPokes + poke * 16 + 6);
@@ -1428,7 +1450,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 // blocks of 16 bytes
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon thisPoke = new TrainerPokemon();
-                    thisPoke.AILevel = readWord(pointerToPokes + poke * 16);
+                    thisPoke.IVs = ((readWord(pointerToPokes + poke * 16) & 0xFF) * 31) / 255;
                     thisPoke.level = readWord(pointerToPokes + poke * 16 + 2);
                     thisPoke.pokemon = pokesInternal[readWord(pointerToPokes + poke * 16 + 4)];
                     thisPoke.heldItem = readWord(pointerToPokes + poke * 16 + 6);
@@ -1517,7 +1539,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 // custom moves, blocks of 16 bytes
                 for (int poke = 0; poke < newPokeCount; poke++) {
                     TrainerPokemon tp = pokes.next();
-                    writeWord(pointerToPokes + poke * 16, tp.AILevel);
+                    // Add 1 to offset integer division truncation
+                    writeWord(pointerToPokes + poke * 16, Math.min(255, 1 + (tp.IVs * 255) / 31));
                     writeWord(pointerToPokes + poke * 16 + 2, tp.level);
                     writeWord(pointerToPokes + poke * 16 + 4, pokedexToInternal[tp.pokemon.number]);
                     int movesStart;
@@ -1544,7 +1567,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 // no moves, blocks of 8 bytes
                 for (int poke = 0; poke < newPokeCount; poke++) {
                     TrainerPokemon tp = pokes.next();
-                    writeWord(pointerToPokes + poke * 8, tp.AILevel);
+                    writeWord(pointerToPokes + poke * 8, Math.min(255, 1 + (tp.IVs * 255) / 31));
                     writeWord(pointerToPokes + poke * 8 + 2, tp.level);
                     writeWord(pointerToPokes + poke * 8 + 4, pokedexToInternal[tp.pokemon.number]);
                     if (tr.pokemonHaveItems()) {

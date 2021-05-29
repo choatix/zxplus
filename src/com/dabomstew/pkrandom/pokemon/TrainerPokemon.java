@@ -34,7 +34,6 @@ public class TrainerPokemon {
     public int move3;
     public int move4;
 
-    public int AILevel;
     public int heldItem = 0;
     public boolean hasMegaStone;
     public boolean hasZCrystal;
@@ -52,6 +51,13 @@ public class TrainerPokemon {
     public byte spdefEVs;
     public byte speedEVs;
     public int IVs;
+    // In gens 3-5, there is a byte or word that corresponds
+    // to the IVs a trainer's pokemon has. In X/Y, this byte
+    // also encodes some other information, possibly related
+    // to EV spread. Because of the unknown part in X/Y,
+    // we store the whole "strength byte" so we can
+    // write it unchanged when randomizing trainer pokemon.
+    public int strength;
     
     public boolean resetMoves = false;
 
@@ -86,7 +92,7 @@ public class TrainerPokemon {
         tpk.move3 = move3;
         tpk.move4 = move4;
 
-        tpk.AILevel = AILevel;
+        tpk.strength = strength;
         tpk.heldItem = heldItem;
         tpk.abilitySlot = abilitySlot;
         tpk.forme = forme;

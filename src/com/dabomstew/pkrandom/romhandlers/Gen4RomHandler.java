@@ -2220,6 +2220,16 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             List<String> tnames = this.getTrainerNames();
             int trainernum = trainers.files.size();
             for (int i = 1; i < trainernum; i++) {
+                // Trainer entries are 20 bytes
+                // Team flags; 1 byte; 0x01 = custom moves, 0x02 = held item
+                // Class; 1 byte
+                // 1 byte not used
+                // Number of pokemon in team; 1 byte
+                // Items; 2 bytes each, 4 item slots
+                // AI Flags; 2 byte
+                // 2 bytes not used
+                // Battle Mode; 1 byte; 0 means single, 1 means double.
+                // 3 bytes not used
                 byte[] trainer = trainers.files.get(i);
                 byte[] trpoke = trpokes.files.get(i);
                 Trainer tr = new Trainer();
@@ -2229,16 +2239,27 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 int numPokes = trainer[3] & 0xFF;
                 int pokeOffs = 0;
                 tr.fullDisplayName = tclasses.get(tr.trainerclass) + " " + tnames.get(i - 1);
-                // printBA(trpoke);
                 for (int poke = 0; poke < numPokes; poke++) {
-                    int ailevel = trpoke[pokeOffs] & 0xFF;
+                    // Structure is
+                    // IV SB LV LV SP SP FRM FRM
+                    // (HI HI)
+                    // (M1 M1 M2 M2 M3 M3 M4 M4)
+                    // where SB = 0 0 Ab Ab 0 0 G G
+                    // IV is a "difficulty" level between 0 and 255 to represent 0 to 31 IVs.
+                    //     These IVs affect all attributes. For the vanilla games, the
+                    //     vast majority of trainers have 0 IVs; Elite Four members will
+                    //     have 30 IVs.
+                    // Ab Ab = ability number, 0 for first ability, 2 for second [HGSS only]
+                    // G G affect the gender somehow. 0 appears to mean "most common
+                    //     gender for the species".
+                    int difficulty = trpoke[pokeOffs] & 0xFF;
                     int level = trpoke[pokeOffs + 2] & 0xFF;
                     int species = (trpoke[pokeOffs + 4] & 0xFF) + ((trpoke[pokeOffs + 5] & 0x01) << 8);
                     int formnum = (trpoke[pokeOffs + 5] >> 2);
                     TrainerPokemon tpk = new TrainerPokemon();
                     tpk.level = level;
                     tpk.pokemon = pokes[species];
-                    tpk.AILevel = ailevel;
+                    tpk.IVs = (difficulty * 31) / 255;
                     int abilitySlot = (trpoke[pokeOffs + 1] >>> 4) & 0xF;
                     if (abilitySlot == 0) {
                         // All Gen 4 games represent the first ability as ability 0.
@@ -2353,8 +2374,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                         // All Gen 4 games represent the first ability as ability 0.
                         ability = 0;
                     }
-                    writeWord(trpoke, pokeOffs, tp.AILevel);
-                    writeWord(trpoke, pokeOffs + 1, ability);
+                    // Add 1 to offset integer division truncation
+                    int difficulty = Math.min(255, 1 + (tp.IVs * 255) / 31);
+                    writeWord(trpoke, pokeOffs, difficulty | ability << 8);
                     writeWord(trpoke, pokeOffs + 2, tp.level);
                     writeWord(trpoke, pokeOffs + 4, tp.pokemon.number);
                     trpoke[pokeOffs + 5] |= (tp.forme << 2);

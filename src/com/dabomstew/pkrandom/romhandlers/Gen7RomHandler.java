@@ -1489,7 +1489,6 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                         }
                     }
                     tpk.pokemon = pokes[species];
-                    tpk.AILevel = trainerAILevel;
                     tpk.forme = formnum;
                     tpk.formeSuffix = Gen7Constants.getFormeSuffixByBaseForme(species,formnum);
                     tpk.absolutePokeNumber = absolutePokeNumByBaseForme

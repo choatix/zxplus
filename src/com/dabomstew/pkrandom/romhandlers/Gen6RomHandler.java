@@ -1690,6 +1690,22 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 tnamesMap.put(i,tnames.get(i));
             }
             for (int i = 1; i < trainernum; i++) {
+                // Trainer entries are 20 bytes in X/Y, 24 bytes in ORAS
+                // Team flags; 1 byte; 0x01 = custom moves, 0x02 = held item
+                // [ORAS only] 1 byte unused
+                // Class; 1 byte
+                // [ORAS only] 1 byte unknown
+                // [ORAS only] 2 bytes unused
+                // Battle Mode; 1 byte; 0=single, 1=double, 2=triple, 3=rotation, 4=???
+                // Number of pokemon in team; 1 byte
+                // Items; 2 bytes each, 4 item slots
+                // AI Flags; 2 byte
+                // 3 bytes not used
+                // Victory Money; 1 byte; The money given out after defeat =
+                //         4 * this value * highest level poke in party
+                // Victory Item; 2 bytes; The item given out after defeat.
+                //         In X/Y, these are berries, nuggets, pearls (e.g. Battle Chateau)
+                //         In ORAS, none of these are set.
                 byte[] trainer = trainers.files.get(i).get(0);
                 byte[] trpoke = trpokes.files.get(i).get(0);
                 Trainer tr = new Trainer();
@@ -1699,7 +1715,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 int offset = isORAS ? 6 : 2;
                 int battleType = trainer[offset] & 0xFF;
                 int numPokes = trainer[offset+1] & 0xFF;
-                int trainerAILevel = trainer[offset+9] & 0xFF;
                 boolean healer = trainer[offset+13] != 0;
                 int pokeOffs = 0;
                 String trainerClass = tclasses.get(tr.trainerclass);
@@ -1708,13 +1723,19 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
 
                 for (int poke = 0; poke < numPokes; poke++) {
                     // Structure is
-                    // IV SB LV LV SP SP FRM FRM
+                    // ST SB LV LV SP SP FRM FRM
                     // (HI HI)
                     // (M1 M1 M2 M2 M3 M3 M4 M4)
-                    // where SB = 0 0 Ab Ab 0 0 Fm Ml
-                    // Ab Ab = ability number, 0 for random
-                    // Fm = 1 for forced female
-                    // Ml = 1 for forced male
+                    // ST (strength) corresponds to the IVs of a trainer's pokemon.
+                    //   In ORAS, this value is like previous gens, a number 0-255
+                    //   to represent 0 to 31 IVs. In the vanilla games, the top
+                    //   leaders/champions have 29.
+                    //   In X/Y, the bottom 5 bits are the IVs. It is unknown what
+                    //   the top 3 bits correspond to, perhaps EV spread?
+                    // The second byte, SB = 0 0 Ab Ab 0 0 Fm Ml
+                    //   Ab Ab = ability number, 0 for random
+                    //   Fm = 1 for forced female
+                    //   Ml = 1 for forced male
                     // There's also a trainer flag to force gender, but
                     // this allows fixed teams with mixed genders.
 
@@ -1724,7 +1745,12 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     TrainerPokemon tpk = new TrainerPokemon();
                     tpk.level = level;
                     tpk.pokemon = pokes[species];
-                    tpk.AILevel = trainerAILevel;
+                    tpk.strength = trpoke[pokeOffs];
+                    if (isORAS) {
+                        tpk.IVs = (tpk.strength * 31 / 255);
+                    } else {
+                        tpk.IVs = tpk.strength & 0x1F;
+                    }
                     int abilityAndFlag = trpoke[pokeOffs + 1];
                     tpk.abilitySlot = (abilityAndFlag >>> 4) & 0xF;
                     tpk.forcedGenderFlag = (abilityAndFlag & 0xF);
@@ -1824,7 +1850,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 for (int poke = 0; poke < numPokes; poke++) {
                     TrainerPokemon tp = tpokes.next();
                     byte abilityAndFlag = (byte)((tp.abilitySlot << 4) | tp.forcedGenderFlag);
-                    trpoke[pokeOffs] = (byte) tp.AILevel;
+                    trpoke[pokeOffs] = (byte) tp.strength;
                     trpoke[pokeOffs + 1] = abilityAndFlag;
                     writeWord(trpoke, pokeOffs + 2, tp.level);
                     writeWord(trpoke, pokeOffs + 4, tp.pokemon.number);
