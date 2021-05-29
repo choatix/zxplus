@@ -375,6 +375,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
         roamerRandomizationEnabled =
                 (romEntry.romType == Gen4Constants.Type_DP && romEntry.roamingPokemon.size() > 0) ||
+                (romEntry.romType == Gen4Constants.Type_Plat && romEntry.tweakFiles.containsKey("NewRoamerSubroutineTweak")) ||
                 (romEntry.romType == Gen4Constants.Type_HGSS && romEntry.tweakFiles.containsKey("NewRoamerSubroutineTweak"));
 
         // We want to guarantee that the catching tutorial in HGSS has Ethan/Lyra's new Pokemon. We also
@@ -2744,8 +2745,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 .get("StaticPokemonTrades").length : 0;
         int meggsize = romEntry.getInt("MysteryEggOffset") > 0 ? 1 : 0;
         int fossilsize = romEntry.getInt("FossilTableOffset") > 0 ? 7 : 0;
-        int roamerSize = Gen4Constants.getRoamingPokemonCount(romEntry.romType);
-        if (staticPokemon.size() != romEntry.staticPokemon.size() + sptsize + meggsize + fossilsize + roamerSize) {
+        if (staticPokemon.size() != romEntry.staticPokemon.size() + sptsize + meggsize + fossilsize + romEntry.roamingPokemon.size()) {
             return false;
         }
         try {
@@ -2843,7 +2843,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 // we just pc-relative load it instead. So if a nop isn't here, apply the patch.
                 applyDiamondPearlRoamerPatch();
             }
-        } else if (romEntry.romType == Gen4Constants.Type_HGSS) {
+        } else if (romEntry.romType == Gen4Constants.Type_Plat || romEntry.romType == Gen4Constants.Type_HGSS) {
             int firstSpeciesOffset = romEntry.roamingPokemon.get(0).speciesCodeOffsets[0];
             if (arm9.length < firstSpeciesOffset || readWord(arm9, firstSpeciesOffset) == 0) {
                 // Either the arm9 hasn't been extended, or the patch hasn't been written
@@ -4458,7 +4458,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         switch(romEntry.romType) {
             case Gen4Constants.Type_DP:
             case Gen4Constants.Type_Plat:
-                int extendBy = romEntry.getInt("NewIndexToMusicSize");
+                int extendBy = romEntry.getInt("Arm9ExtensionSize");
                 arm9 = extendARM9(arm9, extendBy, romEntry.getString("TCMCopyingPrefix"), Gen4Constants.arm9Offset);
                 genericIPSPatch(arm9, "NewIndexToMusicTweak");
 

@@ -58,7 +58,7 @@
     mov     r5, 0x23     ; Level 35
     b       @@end
 @@end:
-    pop { pc }
+    pop     { pc }
     .pool
     .endarea
 
