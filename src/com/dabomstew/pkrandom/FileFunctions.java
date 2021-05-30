@@ -28,6 +28,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -36,7 +37,7 @@ import java.util.zip.CRC32;
 public class FileFunctions {
 
     public static File fixFilename(File original, String defaultExtension) {
-        return fixFilename(original, defaultExtension, null);
+        return fixFilename(original, defaultExtension, new ArrayList<>());
     }
 
     // Behavior:
