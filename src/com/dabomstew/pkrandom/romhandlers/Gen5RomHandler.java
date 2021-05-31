@@ -1492,6 +1492,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                     // Change a branch destination in order to only check the relevant trainer instead of checking
                     // every trainer in the game (will result in incorrect text boxes when being spotted by doubles
                     // pairs, but this is better than the game freezing for half a second and getting a blank text box)
+                    offset += textBoxChoicePrefix.length() / 2;
                     arm9[offset-4] = 2;
                 } else {
                     throw new RandomizationException("Double Battle Mode not supported for this game");
