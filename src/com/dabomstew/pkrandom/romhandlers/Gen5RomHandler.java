@@ -1735,6 +1735,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         newIndexToMusicPoolOffset += newIndexToMusicPrefix.length() / 2;
 
         List<Integer> replaced = new ArrayList<>();
+        int iMax = -1;
 
         switch(romEntry.romType) {
             case Gen5Constants.Type_BW:
@@ -1747,6 +1748,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                     }
                     writeWord(arm9, i, specialMusicStaticChanges.get(oldStatic));
                     replaced.add(i);
+                    if (i > iMax) iMax = i;
                 }
                 break;
             case Gen5Constants.Type_BW2:
@@ -1766,8 +1768,14 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                     }
                     writeWord(arm9, i, specialMusicStaticChanges.get(oldStatic));
                     replaced.add(i);
+                    if (i > iMax) iMax = i;
                 }
                 break;
+        }
+        for (int i = newIndexToMusicPoolOffset; i <= iMax; i+= 4) {
+            if (!replaced.contains(i)) {
+                writeWord(arm9, i, 0);
+            }
         }
 
     }
