@@ -2757,7 +2757,8 @@ public abstract class AbstractRomHandler implements RomHandler {
             double avgPowerForType = avgTypePowers.get(type);
             List<Move> typeMoves = validTypeMoves.get(type);
             List<Move> alreadyPicked = new ArrayList<>();
-            while (avgPowerForType < minAvg) {
+            int iterLoops = 0;
+            while (avgPowerForType < minAvg && iterLoops < 10000) {
                 final double finalAvgPowerForType = avgPowerForType;
                 List<Move> strongerThanAvgTypeMoves = typeMoves
                         .stream()
@@ -2774,8 +2775,10 @@ public abstract class AbstractRomHandler implements RomHandler {
                         / (typeMoves.size() + 1);
                 typeMoves.add(extraMove);
                 alreadyPicked.add(extraMove);
+                iterLoops++;
             }
-            while (avgPowerForType > maxAvg) {
+            iterLoops = 0;
+            while (avgPowerForType > maxAvg && iterLoops < 10000) {
                 final double finalAvgPowerForType = avgPowerForType;
                 List<Move> weakerThanAvgTypeMoves = typeMoves
                         .stream()
@@ -2792,6 +2795,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                         / (typeMoves.size() + 1);
                 typeMoves.add(extraMove);
                 alreadyPicked.add(extraMove);
+                iterLoops++;
             }
         }
 
