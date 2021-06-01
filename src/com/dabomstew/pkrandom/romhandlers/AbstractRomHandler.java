@@ -2124,6 +2124,9 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     public int getRandomAbilitySlot(Pokemon pokemon) {
+        if (abilitiesPerPokemon() == 0) {
+            return 0;
+        }
         List<Integer> abilitiesList = Arrays.asList(pokemon.ability1, pokemon.ability2, pokemon.ability3);
         int slot = random.nextInt(this.abilitiesPerPokemon());
         while (abilitiesList.get(slot) == 0) {
