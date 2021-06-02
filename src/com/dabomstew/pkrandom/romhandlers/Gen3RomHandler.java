@@ -1468,7 +1468,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             Gen3Constants.trainerTagsRS(theTrainers, romEntry.romType);
         } else if (romEntry.romType == Gen3Constants.RomType_Em) {
             Gen3Constants.trainerTagsE(theTrainers);
-            Gen3Constants.setCouldBeMultiBattleEm(theTrainers);
+            Gen3Constants.setMultiBattleStatusEm(theTrainers);
         } else {
             Gen3Constants.trainerTagsFRLG(theTrainers);
         }

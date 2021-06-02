@@ -1941,7 +1941,19 @@ public class Gen4Constants {
 
     }
 
-    public static void setCouldBeMultiBattleDP(List<Trainer> trs) {
+    public static void setMultiBattleStatusDP(List<Trainer> trs) {
+        // 407 + 528: Commander Mars and Commander Jupiter Multi Battle on Spear Pillar
+        // 414 + 415: Galactic Grunts in Jubilife City
+        // 419 + 426: Galactic Grunts in Lake Verity
+        // 420 + 427: Galactic Grunts in Lake Verity
+        // 521 + 527: Galactic Grunts on Spear Pillar
+        // 561 + 590: Double Battle with Dragon Tamer Drake and Black Belt Jarrett
+        // 835 + 836: Galactic Grunts in Iron Island
+        // 848 + 849: Galactic Grunts in Veilstone City
+        setMultiBattleStatus(trs, Trainer.MultiBattleStatus.ALWAYS, 414, 415, 419, 420, 426, 427, 521, 527,
+                528, 561, 590, 835, 836, 848, 849
+        );
+
         // 34 + 35: Potential Double Battle with Camper Anthony and Picnicker Lauren
         // 82 + 83: Potential Double Battle with Rich Boy Jason and Lady Melissa
         // 84 + 85: Potential Double Battle with Gentleman Jeremy and Socialite Reina
@@ -1965,17 +1977,12 @@ public class Gen4Constants {
         // 395 + 398: Potential Double Battle with Psychic Kody and Psychic Rachael
         // 396 + 399: Potential Double Battle with Psychic Landon and Psychic Desiree
         // 397 + 400: Potential Double Battle with Psychic Deandre and Psychic Kendra
-        // 407 + 528: Commander Mars and Commander Jupiter Multi Battle on Spear Pillar
-        // 414 + 415: Galactic Grunts in Jubilife City
-        // 419 + 426: Galactic Grunts in Lake Verity
-        // 420 + 427: Galactic Grunts in Lake Verity
         // 446 + 499: Potential Double Battle with Black Belt Eddie and Veteran Terrell
         // 447 + 500: Potential Double Battle with Black Belt Willie and Veteran Brenden
         // 450 + 496: Potential Double Battle with Lass Cassidy and Youngster Wayne
         // 452 + 453: Potential Double Battle with Hiker Damon and Hiker Maurice
         // 454 + 455: Potential Double Battle with Hiker Reginald and Hiker Lorenzo
         // 505 + 506: Potential Double Battle with Worker Brendon and Worker Quentin
-        // 521 + 527: Galactic Grunts on Spear Pillar
         // 555 + 560: Potential Double Battle with Bird Keeper Geneva and Dragon Tamer Stanley
         // 556 + 589: Potential Double Battle with Bird Keeper Krystal and Black Belt Ray
         // 562 + 606: Potential Double Battle with Dragon Tamer Kenny and Veteran Harlan
@@ -1985,51 +1992,52 @@ public class Gen4Constants {
         // 571 + 581: Potential Double Battle with Ace Trainer Skylar and Ace Trainer Natasha
         // 572 + 582: Potential Double Battle with Ace Trainer Abel and Ace Trainer Monique
         // 584 + 586: Potential Double Battle with Psychic Sterling and Psychic Chelsey
-        // 561 + 590: Potential Double Battle with Dragon Tamer Drake and Black Belt Jarrett
         // 591 + 596: Potential Double Battle with PKMN Ranger Kyler and PKMN Ranger Krista
         // 594 + 554/585: Potential Double Battle with PKMN Ranger Ashlee and either Bird Keeper Audrey or Psychic Daisy
         // 599 + 602: Potential Double Battle with Swimmer Sam and Swimmer Sophia
-        // 835 + 836: Galactic Grunts in Iron Island
-        // 848 + 849: Galactic Grunts in Veilstone City
-        setCouldBeMultiBattle(trs, 34, 35, 82, 83, 84, 85, 95, 96, 104, 106, 160, 186, 191, 201, 202, 203,
-                204, 205, 206, 278, 287, 337, 358, 359, 360, 372, 373, 379, 383, 386, 388, 389, 390, 392, 393, 394,
-                395, 396, 397, 398, 399, 400, 407, 414, 415, 419, 420, 426, 427, 443, 445, 446, 447, 450, 452, 453,
-                454, 455, 459, 494, 496, 499, 500, 505, 506, 521, 527, 528, 554, 555, 556, 560, 561, 562, 566, 569,
-                570, 571, 572, 575, 579, 580, 581, 582, 584, 585, 586, 589, 590, 591, 594, 596, 599, 602, 606, 835,
-                836, 848, 849);
+        setMultiBattleStatus(trs, Trainer.MultiBattleStatus.POTENTIAL, 34, 35, 82, 83, 84, 85, 95, 96, 104,
+                106, 160, 186, 191, 201, 202, 203, 204, 205, 206, 278, 287, 337, 358, 359, 360, 372, 373, 379, 383, 386,
+                388, 389, 390, 392, 393, 394, 395, 396, 397, 398, 399, 400, 443, 445, 446, 447, 450, 452, 453, 454, 455,
+                459, 494, 496, 499, 500, 505, 506, 554, 555, 556, 560, 562, 566, 569, 570, 571, 572, 575, 579, 580, 581,
+                582, 584, 585, 586, 589, 591, 594, 596, 599, 602, 606
+        );
     }
 
-    public static void setCouldBeMultiBattlePt(List<Trainer> trs) {
+    public static void setMultiBattleStatusPt(List<Trainer> trs) {
         // In addition to every single trainer listed in setCouldBeMultiBattleDP...
         // 921 + 922: Elite Four Flint and Leader Volkner Multi Battle in the Fight Area
-        setCouldBeMultiBattle(trs, 34, 35, 82, 83, 84, 85, 95, 96, 104, 106, 160, 186, 191, 201, 202, 203,
-                204, 205, 206, 278, 287, 337, 358, 359, 360, 372, 373, 379, 383, 386, 388, 389, 390, 392, 393, 394,
-                395, 396, 397, 398, 399, 400, 407, 414, 415, 419, 420, 426, 427, 443, 445, 446, 447, 450, 452, 453,
-                454, 455, 459, 494, 496, 499, 500, 505, 506, 521, 527, 528, 554, 555, 556, 560, 561, 562, 566, 569,
-                570, 571, 572, 575, 579, 580, 581, 582, 584, 585, 586, 589, 590, 591, 594, 596, 599, 602, 606, 835,
-                836, 848, 849, 921, 922);
+        setMultiBattleStatus(trs, Trainer.MultiBattleStatus.ALWAYS, 414, 415, 419, 420, 426, 427, 521, 527,
+                528, 561, 590, 835, 836, 848, 849, 921, 922
+        );
+        setMultiBattleStatus(trs, Trainer.MultiBattleStatus.POTENTIAL, 34, 35, 82, 83, 84, 85, 95, 96, 104,
+                106, 160, 186, 191, 201, 202, 203, 204, 205, 206, 278, 287, 337, 358, 359, 360, 372, 373, 379, 383, 386,
+                388, 389, 390, 392, 393, 394, 395, 396, 397, 398, 399, 400, 443, 445, 446, 447, 450, 452, 453, 454, 455,
+                459, 494, 496, 499, 500, 505, 506, 554, 555, 556, 560, 562, 566, 569, 570, 571, 572, 575, 579, 580, 581,
+                582, 584, 585, 586, 589, 591, 594, 596, 599, 602, 606
+        );
     }
 
-    public static void setCouldBeMultiBattleHGSS(List<Trainer> trs) {
+    public static void setMultiBattleStatusHGSS(List<Trainer> trs) {
         // 120 + 417: Double Battle with Ace Trainer Irene and Ace Trainer Jenn
+        // 354 + 355: Double Battle with Lass Laura and Lass Shannon
+        // 479 + 499: Multi Battle with Executive Ariana and Team Rocket Grunt in Team Rocket HQ
+        // 679 + 680: Double Battle with Beauty Callie and Beauty Kassandra
+        // 733 + 734: Multi Battle with Champion Lance and Leader Clair in the Dragon's Den
+        setMultiBattleStatus(trs, Trainer.MultiBattleStatus.ALWAYS, 120, 354, 355, 417, 479, 499, 679, 680, 733, 734);
+
         // 147 + 151: Potential Double Battle with Camper Ted and Picnicker Erin
-        // 354 + 355: Potential Double Battle with Lass Laura and Lass Shannon
         // 423: Potential Double Battle with Pokéfan Jeremy. His potential teammate (Pokéfan Georgia) has more than
         // three Pokemon in the vanilla game, so we leave her be.
-        // 479 + 499: Multi Battle with Executive Ariana and Team Rocket Grunt in Team Rocket HQ
         // 564 + 567: Potential Double Battle with Teacher Clarice and School Kid Torin
         // 575 + 576: Potential Double Battle with Biker Dan and Biker Theron
         // 577 + 579: Potential Double Battle with Biker Markey and Biker Teddy
-        // 679 + 680: Double Battle with Beauty Callie and Beauty Kassandra
-        // 733 + 734: Multi Battle with Champion Lance and Leader Clair in the Dragon's Den
-        setCouldBeMultiBattle(trs, 120, 147, 151, 354, 355, 417, 423, 479, 499, 564, 567, 575, 576, 577,
-                579, 679, 680, 733, 734);
+        setMultiBattleStatus(trs, Trainer.MultiBattleStatus.POTENTIAL, 147, 151, 423, 564, 567, 575, 576, 577, 579);
     }
 
-    private static void setCouldBeMultiBattle(List<Trainer> allTrainers, int... numbers) {
+    private static void setMultiBattleStatus(List<Trainer> allTrainers, Trainer.MultiBattleStatus status, int... numbers) {
         for (int num : numbers) {
             if (allTrainers.size() > (num - 1)) {
-                allTrainers.get(num - 1).couldBeMultiBattle = true;
+                allTrainers.get(num - 1).multiBattleStatus = status;
             }
         }
     }

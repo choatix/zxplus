@@ -1514,10 +1514,10 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             }
             if (romEntry.romType == Gen7Constants.Type_SM) {
                 Gen7Constants.tagTrainersSM(allTrainers);
-                Gen7Constants.setCouldBeMultiBattleSM(allTrainers);
+                Gen7Constants.setMultiBattleStatusSM(allTrainers);
             } else {
                 Gen7Constants.tagTrainersUSUM(allTrainers);
-                Gen7Constants.setCouldBeMultiBattleUSUM(allTrainers);
+                Gen7Constants.setMultiBattleStatusUSUM(allTrainers);
                 Gen7Constants.setForcedRivalStarterPositionsUSUM(allTrainers);
             }
         } catch (IOException ex) {

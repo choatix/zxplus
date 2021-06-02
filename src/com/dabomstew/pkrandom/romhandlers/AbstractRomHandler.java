@@ -2085,7 +2085,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             // If a trainer can appear in a Multi Battle (i.e., a Double Battle where the enemy consists
             // of two independent trainers), we want to be aware of that so we don't give them a team of
             // six Pokemon and have a 6v12 battle
-            int maxPokemon = t.couldBeMultiBattle ? 3 : 6;
+            int maxPokemon = t.multiBattleStatus != Trainer.MultiBattleStatus.NEVER ? 3 : 6;
             for (int i = 0; i < additional; i++) {
                 if (t.pokemon.size() >= maxPokemon) break;
 
@@ -2105,15 +2105,11 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void doubleBattleMode() {
-
         List<Trainer> currentTrainers = this.getTrainers();
         for (Trainer t: currentTrainers) {
-
-            if (t.pokemon.size() != 1 || t.couldBeMultiBattle || this.trainerShouldNotGetBuffs(t)) {
+            if (t.pokemon.size() != 1 || t.multiBattleStatus == Trainer.MultiBattleStatus.ALWAYS || this.trainerShouldNotGetBuffs(t)) {
                 continue;
             }
-
-
             t.pokemon.add(t.pokemon.get(0).copy());
         }
         this.setTrainers(currentTrainers, true);

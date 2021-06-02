@@ -1782,10 +1782,10 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             }
             if (romEntry.romType == Gen6Constants.Type_XY) {
                 Gen6Constants.tagTrainersXY(allTrainers);
-                Gen6Constants.setCouldBeMultiBattleXY(allTrainers);
+                Gen6Constants.setMultiBattleStatusXY(allTrainers);
             } else {
                 Gen6Constants.tagTrainersORAS(allTrainers);
-                Gen6Constants.setCouldBeMultiBattleORAS(allTrainers);
+                Gen6Constants.setMultiBattleStatusORAS(allTrainers);
             }
         } catch (IOException ex) {
             throw new RandomizerIOException(ex);

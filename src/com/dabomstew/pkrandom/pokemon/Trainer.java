@@ -37,7 +37,7 @@ public class Trainer implements Comparable<Trainer> {
     public String name;
     public int trainerclass;
     public String fullDisplayName;
-    public boolean couldBeMultiBattle;
+    public MultiBattleStatus multiBattleStatus = MultiBattleStatus.NEVER;
     public int forceStarterPosition = -1;
 
     public String toString() {
@@ -122,5 +122,9 @@ public class Trainer implements Comparable<Trainer> {
     public boolean pokemonHaveCustomMoves() {
         // This flag seems consistent for all gens
         return (this.poketype & 1) == 1;
+    }
+
+    public enum MultiBattleStatus {
+        NEVER, POTENTIAL, ALWAYS
     }
 }

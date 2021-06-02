@@ -679,7 +679,20 @@ public class Gen3Constants {
         }
     }
 
-    public static void setCouldBeMultiBattleEm(List<Trainer> trs) {
+    public static void setMultiBattleStatusEm(List<Trainer> trs) {
+        // 25 + 569: Double Battle with Team Aqua Grunts on Mt. Pyre
+        // 105 + 237: Double Battle with Hex Maniac Patricia and Psychic Joshua
+        // 397 + 508: Double Battle with Dragon Tamer Aaron and Cooltrainer Marley
+        // 404 + 654: Double Battle with Bird Keeper Edwardo and Camper Flint
+        // 504 + 505: Double Battle with Ninja Boy Jonas and Parasol Lady Kayley
+        // 514 + 734: Double Battle with Tabitha and Maxie in Mossdeep Space Center
+        // 572 + 573: Double Battle with Sailor Brenden and Battle Girl Lilith
+        // 721 + 730: Double Battle with Team Magma Grunts in Team Magma Hideout
+        // 848 + 850: Double Battle with Psychic Mariela and Gentleman Everett
+        setMultiBattleStatus(trs, Trainer.MultiBattleStatus.ALWAYS, 25, 105, 237, 397, 404, 504, 505, 508, 514,
+                569, 572, 573, 654, 721, 730, 734, 848, 850
+        );
+
         // 1 + 124: Potential Double Battle with Hiker Sawyer and Beauty Melissa
         // 3 + 192: Potential Double Battle with Team Aqua Grunts in Team Aqua Hideout
         // 8 + 14: Potential Double Battle with Team Aqua Grunts in Seafloor Cavern
@@ -689,7 +702,6 @@ public class Gen3Constants {
         // 13 + 106: Potential Double Battle with Collector Ed and Hex Maniac Kindra
         // 15 + 450: Potential Double Battle with Swimmer Declan and Swimmer Grace
         // 18 + 596: Potential Double Battle with Team Aqua Grunts in Weather Institute
-        // 25 + 569: Double Battle with Team Aqua Grunts on Mt. Pyre
         // 28 + 193: Potential Double Battle with Team Aqua Grunts in Team Aqua Hideout
         // 29 + 249: Potential Double Battle with Expert Fredrick and Psychic Jacki
         // 31 + 35 + 145: Potential Double Battles with Black Belt Zander, Hex Maniac Leah, and PokéManiac Mark
@@ -698,7 +710,6 @@ public class Gen3Constants {
         // 38 + 417: Potential Double Battle with Cooltrainer Felix and Cooltrainer Dianne
         // 57 + 698: Potential Double Battle with Tuber Lola and Tuber Chandler
         // 64 + 491 + 697: Potential Double Battles with Tuber Ricky, Sailor Edmond, and Tuber Hailey
-        // 105 + 237: Double Battle with Hex Maniac Patricia and Psychic Joshua
         // 107 + 764: Potential Double Battle with Hex Maniac Tammy and Bug Maniac Cale
         // 108 + 475: Potential Double Battle with Hex Maniac Valerie and Psychic Cedric
         // 115 + 502: Potential Double Battle with Lady Daphne and Pokéfan Annika
@@ -731,11 +742,9 @@ public class Gen3Constants {
         // 345 + 742: Potential Double Battle with Fisherman Carter and Bird Keeper Elijah
         // 377 + 459: Potential Double Battle with Triathlete Pablo and Swimmer Sienna
         // 383 + 576: Potential Double Battle with Triathlete Isobel and Swimmer Leonardo
-        // 397 + 508: Double Battle with Dragon Tamer Aaron and Cooltrainer Marley
         // 400 + 761: Potential Double Battle with Bird Keeper Phil and Parasol Lady Rachel
         // 401 + 655: Potential Double Battle with Bird Keeper Jared and Picnicker Ashley
         // 403 + 506: Potential Double Battle with Bird Keeper Presley and Expert Auron
-        // 404 + 654: Double Battle with Bird Keeper Edwardo and Camper Flint
         // 413 + 507: Potential Double Battle with Bird Keeper Alex and Sailor Kelvin
         // 415 + 759: Potential Double Battle with Ninja Boy Yasu and Guitarist Fabian
         // 416 + 760: Potential Double Battle with Ninja Boy Takashi and Kindler Dayton
@@ -746,12 +755,9 @@ public class Gen3Constants {
         // 464 + 578: Potential Double Battle with Swimmer Carlee and Swimmer Harrison
         // 494 + 495: Potential Double Battle with Sailor Phillip and Sailor Leonard (S.S. Tidal)
         // 503 + 539: Potential Double Battle with Cooltrainer Jazmyn and Bug Catcher Davis
-        // 504 + 505: Double Battle with Ninja Boy Jonas and Parasol Lady Kayley
         // 512 + 700: Potential Double Battle with Collector Edwin and Guitarist Joseph
         // 513 + 752: Potential Double Battle with Collector Hector and Psychic Marlene
-        // 514 + 734: Double Battle with Tabitha and Maxie in Mossdeep Space Center
         // 540 + 546: Potential Double Battle with Cooltrainer Mitchell and Cooltrainer Halle
-        // 572 + 573: Double Battle with Sailor Brenden and Battle Girl Lilith
         // 577 + 674: Potential Double Battle with Cooltrainer Athena and Bird Keeper Aidan
         // 580 + 676: Potential Double Battle with Swimmer Clarence and Swimmer Tisha
         // 583 + 584 + 585 + 591: Potential Double Battles with Hex Maniac Kathleen, Gentleman Clifford, Psychic Nicholas, and Psychic Macey
@@ -767,7 +773,6 @@ public class Gen3Constants {
         // 708 + 709: Potential Double Battle with Picnicker Sophie and Bird Keeper Coby
         // 713 + 714: Potential Double Battle with Fisherman Kai and Picnicker Charlotte
         // 719 + 720: Potential Double Battle with Team Magma Grunts in Team Magma Hideout
-        // 721 + 730: Double Battle with Team Magma Grunts in Team Magma Hideout
         // 727 + 728: Potential Double Battle with Team Magma Grunts in Team Magma Hideout
         // 735 + 736: Potential Double Battle with Swimmer Pete and Swimmer Isabelle
         // 737 + 738: Potential Double Battle with Ruin Maniac Andres and Bird Keeper Josue
@@ -777,24 +782,23 @@ public class Gen3Constants {
         // 750 + 751: Potential Double Battle with Psychic Alix and Battle Girl Helene
         // 755 + 756 + 757: Potential Double Battles with Triathlete Melina, Psychic Brandi, and Battle Girl Aisha
         // 765 + 766: Potential Double Battle with Pokémon Breeder Myles and Pokémon Breeder Pat
-        // 848 + 850: Double Battle with Psychic Mariela and Gentleman Everett
-        setCouldBeMultiBattle(trs, 1, 3, 8, 9, 11, 12, 13, 14, 15, 18, 25, 28, 29, 31, 33, 35, 37, 38, 57, 64,
-                105, 106, 107, 108, 115, 118, 124, 129, 130, 131, 137, 144, 145, 146, 160, 168, 170, 171, 180, 182, 191,
-                192, 193, 194, 195, 201, 204, 217, 232, 233, 234, 235, 236, 237, 244, 245, 246, 247, 248, 249, 273, 301,
-                302, 307, 321, 324, 325, 345, 375, 377, 383, 385, 397, 400, 401, 403, 404, 413, 415, 416, 417, 418, 420,
-                436, 445, 450, 455, 459, 460, 464, 475, 491, 494, 495, 501, 502, 503, 504, 505, 506, 507, 508, 509, 511,
-                512, 513, 514, 539, 540, 546, 547, 566, 567, 569, 571, 572, 573, 575, 576, 577, 578, 579, 580, 582, 583,
-                584, 585, 591, 594, 595, 596, 598, 605, 614, 629, 631, 648, 649, 653, 654, 655, 674, 676, 694, 695, 697,
-                698, 699, 700, 701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715, 719, 720, 721,
-                727, 728, 730, 733, 734, 735, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 746, 747, 748, 749, 750,
-                751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 762, 763, 764, 765, 766, 767, 802, 848, 849, 850
+        setMultiBattleStatus(trs, Trainer.MultiBattleStatus.POTENTIAL, 1, 3, 8, 9, 11, 12, 13, 14, 15, 18, 28,
+                29, 31, 33, 35, 37, 38, 57, 64, 106, 107, 108, 115, 118, 124, 129, 130, 131, 137, 144, 145, 146, 160,
+                168, 170, 171, 180, 182, 191, 192, 193, 194, 195, 201, 204, 217, 232, 233, 234, 235, 236, 244, 245, 246,
+                247, 248, 249, 273, 301, 302, 307, 321, 324, 325, 345, 375, 377, 383, 385, 400, 401, 403, 413, 415, 416,
+                417, 418, 420, 436, 445, 450, 455, 459, 460, 464, 475, 491, 494, 495, 501, 502, 503, 506, 507, 509, 511,
+                512, 513, 539, 540, 546, 547, 566, 567, 571, 575, 576, 577, 578, 579, 580, 582, 583, 584, 585, 591, 594,
+                595, 596, 598, 605, 614, 629, 631, 648, 649, 653, 655, 674, 676, 694, 695, 697, 698, 699, 700, 701, 702,
+                703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715, 719, 720, 727, 728, 733, 735, 736, 737,
+                738, 739, 740, 741, 742, 743, 744, 745, 746, 747, 748, 749, 750, 751, 752, 753, 754, 755, 756, 757, 758,
+                759, 760, 761, 762, 763, 764, 765, 766, 767, 802, 849
         );
     }
 
-    private static void setCouldBeMultiBattle(List<Trainer> allTrainers, int... numbers) {
+    private static void setMultiBattleStatus(List<Trainer> allTrainers, Trainer.MultiBattleStatus status, int... numbers) {
         for (int num : numbers) {
             if (allTrainers.size() > (num - 1)) {
-                allTrainers.get(num - 1).couldBeMultiBattle = true;
+                allTrainers.get(num - 1).multiBattleStatus = status;
             }
         }
     }
