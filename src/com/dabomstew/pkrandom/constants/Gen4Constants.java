@@ -839,7 +839,7 @@ public class Gen4Constants {
     public static final int pokedexAreaDataSize = 495;
     public static final int dpptMtCoronetDexIndex = 3, dpptGreatMarshDexIndex = 4, dpptTrophyGardenDexIndex = 14, dpptFloaromaMeadowDexIndex = 21;
     public static final List<Integer> dpptOverworldHoneyTreeDexIndicies = Arrays.asList(6, 7, 17, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 34, 36, 37, 50);
-    public static final int hgssNationalParkDexIndex = 6;
+    public static final List<Integer> partnerTrainerIndices = Arrays.asList(608, 609, 610, 611, 612);
 
     static {
         setupAllowedItems();

@@ -2348,7 +2348,11 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
                 if (doubleBattleMode) {
                     if (!tr.skipImportant()) {
-                        if (trainer[16] == 0) {
+                        // If we set this flag for partner trainers (e.g., Cheryl), then the double wild battles
+                        // will turn into trainer battles with glitchy trainers.
+                        boolean excludedPartnerTrainer = romEntry.romType != Gen4Constants.Type_HGSS &&
+                                Gen4Constants.partnerTrainerIndices.contains(tr.offset);
+                        if (trainer[16] == 0 && !excludedPartnerTrainer) {
                             trainer[16] |= 3;
                         }
                     }
