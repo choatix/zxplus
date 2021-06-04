@@ -1773,9 +1773,18 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 }
                 break;
         }
+
+        List<Integer> specialMusicStatics = getSpecialMusicStatics();
+
         for (int i = newIndexToMusicPoolOffset; i <= iMax; i+= 4) {
             if (!replaced.contains(i)) {
-                writeWord(arm9, i, 0);
+                int pkID = readWord(arm9, i);
+
+                // If a Pokemon is a "special music static" but the music hasn't been replaced, leave as is
+                // Otherwise zero it out, because the original static encounter doesn't exist
+                if (!specialMusicStatics.contains(pkID)) {
+                    writeWord(arm9, i, 0);
+                }
             }
         }
 
