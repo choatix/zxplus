@@ -109,6 +109,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         private Map<String, int[]> arrayEntries = new HashMap<>();
         private Map<String, OffsetWithinEntry[]> offsetArrayEntries = new HashMap<>();
         private List<StaticPokemon> staticPokemon = new ArrayList<>();
+        private List<RoamingPokemon> roamingPokemon = new ArrayList<>();
         private List<TradeScript> tradeScripts = new ArrayList<>();
         
 
@@ -177,6 +178,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                                     current.offsetArrayEntries.putAll(otherEntry.offsetArrayEntries);
                                     if (current.copyStaticPokemon) {
                                         current.staticPokemon.addAll(otherEntry.staticPokemon);
+                                        current.roamingPokemon.addAll(otherEntry.roamingPokemon);
                                         current.staticPokemonSupport = true;
                                     } else {
                                         current.staticPokemonSupport = false;
@@ -188,6 +190,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                             }
                         } else if (r[0].equals("StaticPokemon{}")) {
                             current.staticPokemon.add(parseStaticPokemon(r[1]));
+                        }  else if (r[0].equals("RoamingPokemon{}")) {
+                            current.roamingPokemon.add(parseRoamingPokemon(r[1]));
                         } else if (r[0].equals("TradeScript[]")) {
                             String[] offsets = r[1].substring(1, r[1].length() - 1).split(",");
                             int[] reqOffs = new int[offsets.length];
@@ -302,6 +306,42 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             }
         }
         return sp;
+    }
+
+    private static RoamingPokemon parseRoamingPokemon(String roamingPokemonString) {
+        RoamingPokemon rp = new RoamingPokemon();
+        String pattern = "[A-z]+=\\[(0x[0-9a-fA-F]+,?\\s?)+]|[A-z]+=\\[([0-9]+:0x[0-9a-fA-F]+,?\\s?)+]";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(roamingPokemonString);
+        while (m.find()) {
+            String[] segments = m.group().split("=");
+            String[] offsets = segments[1].substring(1, segments[1].length() - 1).split(",");
+            switch (segments[0]) {
+                case "Species":
+                    int[] speciesOverlayOffsets = new int[offsets.length];
+                    for (int i = 0; i < speciesOverlayOffsets.length; i++) {
+                        speciesOverlayOffsets[i] = parseRIInt(offsets[i]);
+                    }
+                    rp.speciesOverlayOffsets = speciesOverlayOffsets;
+                    break;
+                case "Level":
+                    int[] levelOverlayOffsets = new int[offsets.length];
+                    for (int i = 0; i < levelOverlayOffsets.length; i++) {
+                        levelOverlayOffsets[i] = parseRIInt(offsets[i]);
+                    }
+                    rp.levelOverlayOffsets = levelOverlayOffsets;
+                    break;
+                case "Script":
+                    ScriptEntry[] entries = new ScriptEntry[offsets.length];
+                    for (int i = 0; i < entries.length; i++) {
+                        String[] parts = offsets[i].split(":");
+                        entries[i] = new ScriptEntry(parseRIInt(parts[0]), parseRIInt(parts[1]));
+                    }
+                    rp.speciesScriptOffsets = entries;
+                    break;
+            }
+        }
+        return rp;
     }
 
     // This ROM
@@ -1675,6 +1715,53 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         }
     }
 
+    private static class RoamingPokemon {
+        private int[] speciesOverlayOffsets;
+        private int[] levelOverlayOffsets;
+        private ScriptEntry[] speciesScriptOffsets;
+
+        public RoamingPokemon() {
+            this.speciesOverlayOffsets = new int[0];
+            this.levelOverlayOffsets = new int[0];
+            this.speciesScriptOffsets = new ScriptEntry[0];
+        }
+
+        public Pokemon getPokemon(Gen5RomHandler parent) throws IOException {
+            byte[] overlay = parent.readOverlay(parent.romEntry.getInt("RoamerOvlNumber"));
+            int species = parent.readWord(overlay, speciesOverlayOffsets[0]);
+            return parent.pokes[species];
+        }
+
+        public void setPokemon(Gen5RomHandler parent, NARCArchive scriptNARC, Pokemon pkmn) throws IOException {
+            int value = pkmn.number;
+            byte[] overlay = parent.readOverlay(parent.romEntry.getInt("RoamerOvlNumber"));
+            for (int speciesOverlayOffset : speciesOverlayOffsets) {
+                parent.writeWord(overlay, speciesOverlayOffset, value);
+            }
+            parent.writeOverlay(parent.romEntry.getInt("RoamerOvlNumber"), overlay);
+            for (ScriptEntry speciesScriptOffset : speciesScriptOffsets) {
+                byte[] file = scriptNARC.files.get(speciesScriptOffset.scriptFile);
+                parent.writeWord(file, speciesScriptOffset.scriptOffset, value);
+            }
+        }
+
+        public int getLevel(Gen5RomHandler parent) throws IOException {
+            if (levelOverlayOffsets.length == 0) {
+                return 1;
+            }
+            byte[] overlay = parent.readOverlay(parent.romEntry.getInt("RoamerOvlNumber"));
+            return overlay[levelOverlayOffsets[0]];
+        }
+
+        public void setLevel(Gen5RomHandler parent, int level) throws IOException {
+            byte[] overlay = parent.readOverlay(parent.romEntry.getInt("RoamerOvlNumber"));
+            for (int levelOverlayOffset : levelOverlayOffsets) {
+                overlay[levelOverlayOffset] = (byte) level;
+            }
+            parent.writeOverlay(parent.romEntry.getInt("RoamerOvlNumber"), overlay);
+        }
+    }
+
     private static class TradeScript {
         private int fileNum;
         private int[] requestedOffsets;
@@ -1834,7 +1921,6 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             sp.add(se);
         }
         if (romEntry.romType == Gen5Constants.Type_BW2) {
-
             List<Pokemon> allowedHiddenHollowPokemon = new ArrayList<>();
             allowedHiddenHollowPokemon.addAll(Arrays.asList(Arrays.copyOfRange(pokes,1,494)));
             allowedHiddenHollowPokemon.addAll(
@@ -1881,6 +1967,28 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             }
         }
         hiddenHollowCounted = true;
+
+        if (romEntry.roamingPokemon.size() > 0) {
+            try {
+                int firstSpeciesOffset = romEntry.roamingPokemon.get(0).speciesOverlayOffsets[0];
+                byte[] overlay = readOverlay(romEntry.getInt("RoamerOvlNumber"));
+                if (readWord(overlay, firstSpeciesOffset) > pokes.length) {
+                    // In the original code, this is "mov r0, #0x2", which read as a word is
+                    // 0x2002, much larger than the number of species in the game.
+                    applyBlackWhiteRoamerPatch();
+                }
+                for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
+                    RoamingPokemon roamer = romEntry.roamingPokemon.get(i);
+                    StaticEncounter se = new StaticEncounter();
+                    se.pkmn = roamer.getPokemon(this);
+                    se.level = roamer.getLevel(this);
+                    sp.add(se);
+                }
+            } catch (Exception e) {
+                throw new RandomizerIOException(e);
+            }
+        }
+
         return sp;
     }
 
@@ -1889,7 +1997,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         if (!romEntry.staticPokemonSupport) {
             return false;
         }
-        if (staticPokemon.size() != (romEntry.staticPokemon.size() + hiddenHollowCount)) {
+        if (staticPokemon.size() != (romEntry.staticPokemon.size() + hiddenHollowCount + romEntry.roamingPokemon.size())) {
             return false;
         }
         Iterator<StaticEncounter> statics = staticPokemon.iterator();
@@ -1951,6 +2059,17 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             } catch (IOException e) {
                 throw new RandomizerIOException(e);
             }
+        }
+
+        try {
+            for (int i = 0; i < romEntry.roamingPokemon.size(); i++) {
+                RoamingPokemon roamer = romEntry.roamingPokemon.get(i);
+                StaticEncounter roamerEncounter = statics.next();
+                roamer.setPokemon(this, scriptNarc, roamerEncounter.pkmn);
+                roamer.setLevel(this, roamerEncounter.level);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
         }
 
         return true;
@@ -2028,6 +2147,27 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             }
         }
         writeOverlay(romEntry.getInt("FieldOvlNumber"), boxLegendaryOverlay);
+    }
+
+    private void applyBlackWhiteRoamerPatch() throws IOException {
+        int offset = romEntry.getInt("GetRoamerFlagOffsetStartOffset");
+        byte[] overlay = readOverlay(romEntry.getInt("RoamerOvlNumber"));
+
+        // This function returns 0 for Thundurus, 1 for Tornadus, and 2 for any other species.
+        // In testing, this 2 case is never used, so we can use the space for it to pc-relative
+        // load Thundurus's ID. The original code compares to Tornadus and Thundurus then does
+        // "bne #0xA" to the default case. Change it to "bne #0x4", which will just make this
+        // case immediately return.
+        overlay[offset + 10] = 0x00;
+
+        // Now in the space that used to do "mov r0, #0x2" and return, write Thundurus's ID
+        FileFunctions.writeFullIntLittleEndian(overlay, offset + 20, Species.thundurus);
+
+        // Lastly, instead of computing Thundurus's ID as TornadusID + 1, pc-relative load it
+        // from what we wrote earlier.
+        overlay[offset + 6] = 0x03;
+        overlay[offset + 7] = 0x49;
+        writeOverlay(romEntry.getInt("RoamerOvlNumber"), overlay);
     }
 
     @Override
