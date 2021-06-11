@@ -378,19 +378,6 @@ public class Gen3Constants {
         }
     }
 
-    public static int getRoamingPokemonCount(int romType) {
-        if (romType == Gen3Constants.RomType_FRLG) {
-            return 3;
-        } else if (romType == Gen3Constants.RomType_Ruby || romType == Gen3Constants.RomType_Sapp) {
-            return 1;
-        } else if (romType == Gen3Constants.RomType_Em) {
-            // Emerald roamers are set as linkedEncounters to their
-            // respective Southern Island statics.
-            return 0;
-        }
-        return 0;
-    }
-
     static {
         setupAllowedItems();
     }

@@ -1851,7 +1851,12 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         attemptObedienceEvolutionPatches();
 
         List<StaticPokemon> staticsHere = romEntry.staticPokemon;
-        int roamerSize = Gen3Constants.getRoamingPokemonCount(romEntry.romType);
+        int roamerSize = romEntry.roamingPokemon.size();
+        if (romEntry.romType == Gen3Constants.RomType_Em) {
+            // Emerald roamers are set as linkedEncounters to their respective
+            // Southern Island statics and thus don't count.
+            roamerSize = 0;
+        }
         int hardcodedStaticSize = 0;
         if (romEntry.codeTweaks.get("StaticFirstBattleTweak") != null || romEntry.codeTweaks.get("GhostMarowakTweak") != null) {
             hardcodedStaticSize = 1;
