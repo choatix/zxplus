@@ -2608,7 +2608,6 @@ public class NewRandomizerGUI {
             tpPercentageLevelModifierCheckBox.setEnabled(true);
             tpSwapMegaEvosCheckBox.setVisible(romHandler.hasMegaEvolutions());
             tpDoubleBattleModeCheckBox.setVisible(pokemonGeneration >= 3);
-            tpDoubleBattleModeCheckBox.setEnabled(pokemonGeneration >= 3);
 
             boolean additionalPokemonAvailable = pokemonGeneration >= 3;
 
@@ -3004,6 +3003,8 @@ public class NewRandomizerGUI {
             tpSwapMegaEvosCheckBox.setSelected(false);
             tpRandomShinyTrainerPokemonCheckBox.setEnabled(false);
             tpRandomShinyTrainerPokemonCheckBox.setSelected(false);
+            tpDoubleBattleModeCheckBox.setEnabled(false);
+            tpDoubleBattleModeCheckBox.setSelected(false);
             tpBossTrainersCheckBox.setEnabled(false);
             tpBossTrainersCheckBox.setSelected(false);
             tpImportantTrainersCheckBox.setEnabled(false);
@@ -3034,6 +3035,7 @@ public class NewRandomizerGUI {
                 tpSwapMegaEvosCheckBox.setSelected(false);
             }
             tpRandomShinyTrainerPokemonCheckBox.setEnabled(true);
+            tpDoubleBattleModeCheckBox.setEnabled(tpDoubleBattleModeCheckBox.isVisible());
             tpBossTrainersCheckBox.setEnabled(tpBossTrainersCheckBox.isVisible());
             tpImportantTrainersCheckBox.setEnabled(tpImportantTrainersCheckBox.isVisible());
             tpRegularTrainersCheckBox.setEnabled(tpRegularTrainersCheckBox.isVisible());
