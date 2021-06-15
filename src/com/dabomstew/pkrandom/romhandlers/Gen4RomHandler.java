@@ -290,12 +290,20 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     rp.levelCodeOffsets = levelCodeOffsets;
                     break;
                 case "Script":
-                    ScriptEntry[] entries = new ScriptEntry[offsets.length];
-                    for (int i = 0; i < entries.length; i++) {
+                    ScriptEntry[] scriptEntries = new ScriptEntry[offsets.length];
+                    for (int i = 0; i < scriptEntries.length; i++) {
                         String[] parts = offsets[i].split(":");
-                        entries[i] = new ScriptEntry(parseRIInt(parts[0]), parseRIInt(parts[1]));
+                        scriptEntries[i] = new ScriptEntry(parseRIInt(parts[0]), parseRIInt(parts[1]));
                     }
-                    rp.speciesScriptOffsets = entries;
+                    rp.speciesScriptOffsets = scriptEntries;
+                    break;
+                case "Gender":
+                    ScriptEntry[] genderEntries = new ScriptEntry[offsets.length];
+                    for (int i = 0; i < genderEntries.length; i++) {
+                        String[] parts = offsets[i].split(":");
+                        genderEntries[i] = new ScriptEntry(parseRIInt(parts[0]), parseRIInt(parts[1]));
+                    }
+                    rp.genderOffsets = genderEntries;
                     break;
             }
         }
@@ -499,6 +507,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             pkmn.rareHeldItem = item2;
         }
         pkmn.darkGrassHeldItem = -1;
+
+        pkmn.genderRatio = stats[Gen4Constants.bsGenderRatioOffset] & 0xFF;
 
         int cosmeticForms = Gen4Constants.cosmeticForms.getOrDefault(pkmn.number,0);
         if (cosmeticForms > 0 && romEntry.romType != Gen4Constants.Type_DP) {
@@ -2650,11 +2660,13 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         private int[] speciesCodeOffsets;
         private int[] levelCodeOffsets;
         private ScriptEntry[] speciesScriptOffsets;
+        private ScriptEntry[] genderOffsets;
 
         public RoamingPokemon() {
             this.speciesCodeOffsets = new int[0];
             this.levelCodeOffsets = new int[0];
             this.speciesScriptOffsets = new ScriptEntry[0];
+            this.genderOffsets = new ScriptEntry[0];
         }
 
         public Pokemon getPokemon(Gen4RomHandler parent) {
@@ -2670,6 +2682,14 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             for (ScriptEntry speciesScriptOffset : speciesScriptOffsets) {
                 byte[] file = scriptNARC.files.get(speciesScriptOffset.scriptFile);
                 parent.writeWord(file, speciesScriptOffset.scriptOffset, value);
+            }
+            int gender = 0; // male (works for genderless Pokemon too)
+            if (pkmn.genderRatio == 0xFE) {
+                gender = 1; // female
+            }
+            for (ScriptEntry genderOffset : genderOffsets) {
+                byte[] file = scriptNARC.files.get(genderOffset.scriptFile);
+                parent.writeWord(file, genderOffset.scriptOffset, gender);
             }
         }
 
