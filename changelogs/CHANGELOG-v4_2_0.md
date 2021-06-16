@@ -121,13 +121,16 @@
 
 - CHANGED: Random (preferring same type)
     - This setting now attempts to do some power balancing when picking moves of the same type as the Pokemon; types that have very many non-damaging/low-damage moves gain a slightly boosted chance of getting higher-damage moves, and vice versa for types that have very many high-damage moves.
+
 - CHANGED: Banned Levelup Moves
     - Transform is no longer banned from appearing as a levelup move in Generation 3 and up.
+
 - CHANGED: Good Damaging Moves
     - The following moves are no longer considered "Good Damaging Moves":
         - Spit Up, Synchronoise, Foul Play, Shell Trap
     - When picking "Good Damaging Moves", the randomizer also considers the Pokemon's Attack/Special Attack distribution (a Pokemon with higher Attack will have a higher probability of getting a physical move, and vice versa).
     - The percentage specified by "Guarantee Good Damaging Moves" is now actually the guaranteed percentage of "Good Damaging Moves", rather than just being a probability.
+
 - FIX: Good Damaging Moves
     - Fixed an issue where perfect accuracy moves would not be considered "Good Damaging Moves" in Generation 1-4.
 
