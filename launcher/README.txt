@@ -13,11 +13,6 @@ The launcher is necessary for being able to randomize 3DS games.
 
 2. TROUBLESHOOTING
 
-If you get the following error:
+Please go here if you run into problems with the launcher and need help:
 
-"Invalid maximum heap size: -Xmx4096M"
-
-it means you do not have 64-bit Java installed.
-
-Please go to this page for more information about how to fix this:
-https://github.com/Ajarmar/universal-pokemon-randomizer-zx/wiki/About-Java
+https://github.com/Ajarmar/universal-pokemon-randomizer-zx/issues/221
