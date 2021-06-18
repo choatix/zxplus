@@ -562,6 +562,7 @@ public interface RomHandler {
 
     List<Pokemon> getAbilityDependentFormes();
 
-    List<Pokemon> getBannedFormes();
+    List<Pokemon> getBannedFormesForPlayerPokemon();
 
+    List<Pokemon> getBannedFormesForTrainerPokemon();
 }

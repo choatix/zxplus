@@ -732,7 +732,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         Collections.shuffle(scrambledEncounters, this.random);
 
         List<Pokemon> banned = this.bannedForWildEncounters();
-        banned.addAll(this.getBannedFormes());
+        banned.addAll(this.getBannedFormesForPlayerPokemon());
         if (!abilitiesAreRandomized) {
             List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
             banned.addAll(abilityDependentFormes);
@@ -929,7 +929,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
         checkPokemonRestrictions();
         List<Pokemon> banned = this.bannedForWildEncounters();
-        banned.addAll(this.getBannedFormes());
+        banned.addAll(this.getBannedFormesForPlayerPokemon());
         if (!abilitiesAreRandomized) {
             List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
             banned.addAll(abilityDependentFormes);
@@ -1151,7 +1151,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     : new ArrayList<>(mainPokemonList);
         }
         List<Pokemon> banned = this.bannedForWildEncounters();
-        banned.addAll(this.getBannedFormes());
+        banned.addAll(this.getBannedFormesForPlayerPokemon());
         if (!abilitiesAreRandomized) {
             List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
             banned.addAll(abilityDependentFormes);
@@ -1593,7 +1593,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                         .collect(Collectors.toList());
         List<Integer> mainPlaythroughTrainers = getMainPlaythroughTrainers();
 
-        List<Pokemon> banned = new ArrayList<>();
+        List<Pokemon> banned = this.getBannedFormesForTrainerPokemon();
         if (!abilitiesAreRandomized) {
             List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
             banned.addAll(abilityDependentFormes);
@@ -1758,7 +1758,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         typeWeightings = new TreeMap<>();
         totalTypeWeighting = 0;
 
-        List<Pokemon> banned = new ArrayList<>();
+        List<Pokemon> banned = this.getBannedFormesForTrainerPokemon();
         if (!abilitiesAreRandomized) {
             List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
             banned.addAll(abilityDependentFormes);
@@ -3106,7 +3106,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
         int starterCount = starterCount();
         pickedStarters = new ArrayList<>();
-        List<Pokemon> banned = getBannedFormes();
+        List<Pokemon> banned = getBannedFormesForPlayerPokemon();
         if (abilitiesUnchanged) {
             List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
             banned.addAll(abilityDependentFormes);
@@ -3128,7 +3128,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
         int starterCount = starterCount();
         pickedStarters = new ArrayList<>();
-        List<Pokemon> banned = getBannedFormes();
+        List<Pokemon> banned = getBannedFormesForPlayerPokemon();
         if (abilitiesUnchanged) {
             List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
             banned.addAll(abilityDependentFormes);
@@ -3166,7 +3166,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         List<StaticEncounter> currentStaticPokemon = this.getStaticPokemon();
         List<StaticEncounter> replacements = new ArrayList<>();
         List<Pokemon> banned = this.bannedForStaticPokemon();
-        banned.addAll(this.getBannedFormes());
+        banned.addAll(this.getBannedFormesForPlayerPokemon());
         if (!abilitiesAreRandomized) {
             List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
             banned.addAll(abilityDependentFormes);
@@ -4560,7 +4560,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         List<Pokemon> actuallyCosmeticPokemonPool = new ArrayList<>();
         int stageLimit = limitToThreeStages ? 3 : 10;
 
-        List<Pokemon> banned = this.getBannedFormes();
+        List<Pokemon> banned = this.getBannedFormesForPlayerPokemon();
         if (!abilitiesAreRandomized) {
             List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
             banned.addAll(abilityDependentFormes);
@@ -5682,7 +5682,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 //                System.out.println(current.name + " using cachedReplacementLists");
                 List<Pokemon> pokemonOfType = allowAltFormes ? pokemonOfTypeInclFormes(type, noLegendaries) :
                         pokemonOfType(type, noLegendaries);
-                pokemonOfType.removeAll(this.getBannedFormes());
+                pokemonOfType.removeAll(this.getBannedFormesForPlayerPokemon());
                 if (!abilitiesAreRandomized) {
                     List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
                     pokemonOfType.removeAll(abilityDependentFormes);
@@ -5881,7 +5881,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     @Override
-    public List<Pokemon> getBannedFormes() {
+    public List<Pokemon> getBannedFormesForPlayerPokemon() {
         List<Pokemon> bannedFormes = new ArrayList<>();
         for (int i = 0; i < mainPokemonListInclFormes.size(); i++) {
             Pokemon pokemon = mainPokemonListInclFormes.get(i);
@@ -6129,10 +6129,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         for (Pokemon p : placedPK) {
             System.out.println(p.name+": "+ placementHistory.get(p));
         }
-
-
     }
-
 
     ///// Item functions
     private void setItemPlacementHistory(int newItem) {
@@ -6172,9 +6169,6 @@ public abstract class AbstractRomHandler implements RomHandler {
             System.out.println(itemNames[p]+": "+ itemPlacementHistory.get(p));
         }
     }
-
-
-
 
     protected void log(String log) {
         if (logStream != null) {
@@ -6342,5 +6336,10 @@ public abstract class AbstractRomHandler implements RomHandler {
     @Override
     public List<Integer> getAllHeldItems() {
         return Arrays.asList(0);
+    }
+
+    @Override
+    public List<Pokemon> getBannedFormesForTrainerPokemon() {
+        return new ArrayList<>();
     }
 }

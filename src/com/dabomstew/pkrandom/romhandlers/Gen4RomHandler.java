@@ -2501,7 +2501,20 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         } catch (IOException ex) {
             throw new RandomizerIOException(ex);
         }
+    }
 
+    @Override
+    public List<Pokemon> getBannedFormesForTrainerPokemon() {
+        List<Pokemon> banned = new ArrayList<>();
+        if (romEntry.romType != Gen4Constants.Type_DP) {
+            Pokemon giratinaOrigin = this.getAltFormeOfPokemon(pokes[Species.giratina], 1);
+            if (giratinaOrigin != null) {
+                // Ban Giratina-O for trainers in Gen 4, since he just instantly transforms
+                // back to Altered Forme if he's not holding the Griseous Orb.
+                banned.add(giratinaOrigin);
+            }
+        }
+        return banned;
     }
 
     @Override
