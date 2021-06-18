@@ -3142,13 +3142,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
         List<String> ilexForestStrings = getStrings(Gen4Constants.ilexForestStringsFile);
 
-        // For longer moves, the original string used when the Pokemon cannot learn
-        // the tutor's move can scroll past the end of the text box. To fix this, we
-        // simply relocate the newline character so the row containing the move name
-        // has more room
-        String longText = "Sorry...That Pokémon\\ncannot learn Headbutt.\\p";
-        ilexForestStrings.set(Gen4Constants.headbuttTutorLongTextIndex, longText);
-
         String replacementName = moves[headbuttReplacement].name;
         for (int index : Gen4Constants.headbuttTutorTextIndices) {
             String text = ilexForestStrings.get(index).replace("Headbutt", replacementName);
