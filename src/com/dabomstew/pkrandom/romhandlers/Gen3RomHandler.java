@@ -1010,10 +1010,6 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         return len - 1;
     }
 
-    private byte[] traduire(String str) {
-        return translateString(str);
-    }
-
     private static boolean romName(byte[] rom, String name) {
         try {
             int sigOffset = Gen3Constants.romNameOffset;
@@ -1203,7 +1199,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     private void writeFRLGStarterText(String findName, Pokemon pkmn, String oakText) {
-        List<Integer> foundTexts = RomFunctions.search(rom, traduire(findName));
+        List<Integer> foundTexts = RomFunctions.search(rom, translateString(findName));
         if (foundTexts.size() > 0) {
             int offset = foundTexts.get(0);
             String pokeName = pkmn.name;
