@@ -1110,10 +1110,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             writeWord(baseOffset + Gen3Constants.rseStarter3Offset, starter2);
 
         } else {
-
             // frlg:
-
-            // US
             // order: 0, 1, 2
             writeWord(baseOffset, starter0);
             writeWord(baseOffset + Gen3Constants.frlgStarterRepeatOffset, starter1);
@@ -1127,12 +1124,12 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             if (romEntry.romCode.charAt(3) != 'J' && romEntry.romCode.charAt(3) != 'B') {
                 // Update PROF. Oak's descriptions for each starter
                 // First result for each STARTERNAME is the text we need
-                writeFRLGStarterText(pokes[Gen3Constants.frlgBaseStarter1].name, newStarters.get(0),
-                        "you want to go with\\nthe ");
-                writeFRLGStarterText(pokes[Gen3Constants.frlgBaseStarter2].name, newStarters.get(1),
-                        "you’re claiming the\\n");
-                writeFRLGStarterText(pokes[Gen3Constants.frlgBaseStarter3].name, newStarters.get(2),
-                        "you’ve decided on the\\n");
+                List<Integer> bulbasaurFoundTexts = RomFunctions.search(rom, translateString(pokes[Gen3Constants.frlgBaseStarter1].name));
+                List<Integer> charmanderFoundTexts = RomFunctions.search(rom, translateString(pokes[Gen3Constants.frlgBaseStarter2].name));
+                List<Integer> squirtleFoundTexts = RomFunctions.search(rom, translateString(pokes[Gen3Constants.frlgBaseStarter3].name));
+                writeFRLGStarterText(bulbasaurFoundTexts, newStarters.get(0), "you want to go with\\nthe ");
+                writeFRLGStarterText(charmanderFoundTexts, newStarters.get(1), "you’re claiming the\\n");
+                writeFRLGStarterText(squirtleFoundTexts, newStarters.get(2), "you’ve decided on the\\n");
             }
         }
         return true;
@@ -1198,8 +1195,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         }
     }
 
-    private void writeFRLGStarterText(String findName, Pokemon pkmn, String oakText) {
-        List<Integer> foundTexts = RomFunctions.search(rom, translateString(findName));
+    private void writeFRLGStarterText(List<Integer> foundTexts, Pokemon pkmn, String oakText) {
         if (foundTexts.size() > 0) {
             int offset = foundTexts.get(0);
             String pokeName = pkmn.name;
