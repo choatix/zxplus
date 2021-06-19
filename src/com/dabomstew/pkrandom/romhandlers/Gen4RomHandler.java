@@ -70,7 +70,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         private String name;
         private String romCode;
         private int romType;
-        private boolean staticPokemonSupport = false, copyStaticPokemon = false,copyRoamingPokemon = false, copyText = false;
+        private boolean staticPokemonSupport = false, copyStaticPokemon = false,copyRoamingPokemon = false, ignoreGameCornerStatics = false;
         private Map<String, String> strings = new HashMap<>();
         private Map<String, String> tweakFiles = new HashMap<>();
         private Map<String, Integer> numbers = new HashMap<>();
@@ -92,12 +92,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             }
             return strings.get(key);
         }
-    }
-
-    private static class TextEntry {
-        private int textFile;
-        private int stringNumber;
-        private String template;
     }
 
     private static List<RomEntry> roms;
@@ -154,6 +148,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                                     current.strings.putAll(otherEntry.strings);
                                     if (current.copyStaticPokemon) {
                                         current.staticPokemon.addAll(otherEntry.staticPokemon);
+                                        if (current.ignoreGameCornerStatics) {
+                                            current.staticPokemon.removeIf(staticPokemon -> staticPokemon instanceof StaticPokemonGameCorner);
+                                        }
                                         current.staticPokemonSupport = true;
                                     } else {
                                         current.staticPokemonSupport = false;
@@ -168,6 +165,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                             current.staticPokemon.add(parseStaticPokemon(r[1]));
                         } else if (r[0].equals("RoamingPokemon{}")) {
                             current.roamingPokemon.add(parseRoamingPokemon(r[1]));
+                        } else if (r[0].equals("StaticPokemonGameCorner{}")) {
+                            current.staticPokemon.add(parseStaticPokemonGameCorner(r[1]));
                         } else if (r[0].equals("StaticPokemonSupport")) {
                             int spsupport = parseRIInt(r[1]);
                             current.staticPokemonSupport = (spsupport > 0);
@@ -177,9 +176,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                         } else if (r[0].equals("CopyRoamingPokemon")) {
                             int crp = parseRIInt(r[1]);
                             current.copyRoamingPokemon = (crp > 0);
-                        } else if (r[0].equals("CopyText")) {
+                        } else if (r[0].equals("IgnoreGameCornerStatics")) {
                             int ct = parseRIInt(r[1]);
-                            current.copyText = (ct > 0);
+                            current.ignoreGameCornerStatics = (ct > 0);
                         } else if (r[0].endsWith("Tweak")) {
                             current.tweakFiles.put(r[0], r[1]);
                         } else if (r[0].endsWith("MarillCryScripts")) {
@@ -260,6 +259,44 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     break;
                 case "Forme":
                     sp.formeEntries = entries;
+                    break;
+            }
+        }
+        return sp;
+    }
+
+    private static StaticPokemonGameCorner parseStaticPokemonGameCorner(String staticPokemonString) {
+        StaticPokemonGameCorner sp = new StaticPokemonGameCorner();
+        String pattern = "[A-z]+=\\[([0-9]+:0x[0-9a-fA-F]+,?\\s?)+]";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(staticPokemonString);
+        while (m.find()) {
+            String[] segments = m.group().split("=");
+            String[] offsets = segments[1].substring(1, segments[1].length() - 1).split(",");
+            switch (segments[0]) {
+                case "Species":
+                    ScriptEntry[] speciesEntries = new ScriptEntry[offsets.length];
+                    for (int i = 0; i < speciesEntries.length; i++) {
+                        String[] parts = offsets[i].split(":");
+                        speciesEntries[i] = new ScriptEntry(parseRIInt(parts[0]), parseRIInt(parts[1]));
+                    }
+                    sp.speciesEntries = speciesEntries;
+                    break;
+                case "Level":
+                    ScriptEntry[] levelEntries = new ScriptEntry[offsets.length];
+                    for (int i = 0; i < levelEntries.length; i++) {
+                        String[] parts = offsets[i].split(":");
+                        levelEntries[i] = new ScriptEntry(parseRIInt(parts[0]), parseRIInt(parts[1]));
+                    }
+                    sp.levelEntries = levelEntries;
+                    break;
+                case "Text":
+                    TextEntry[] textEntries = new TextEntry[offsets.length];
+                    for (int i = 0; i < textEntries.length; i++) {
+                        String[] parts = offsets[i].split(":");
+                        textEntries[i] = new TextEntry(parseRIInt(parts[0]), parseRIInt(parts[1]));
+                    }
+                    sp.textEntries = textEntries;
                     break;
             }
         }
@@ -2611,10 +2648,20 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
     }
 
+    private static class TextEntry {
+        private int textIndex;
+        private int stringNumber;
+
+        public TextEntry(int textIndex, int stringNumber) {
+            this.textIndex = textIndex;
+            this.stringNumber = stringNumber;
+        }
+    }
+
     private static class StaticPokemon {
-        private ScriptEntry[] speciesEntries;
-        private ScriptEntry[] formeEntries;
-        private ScriptEntry[] levelEntries;
+        protected ScriptEntry[] speciesEntries;
+        protected ScriptEntry[] formeEntries;
+        protected ScriptEntry[] levelEntries;
 
         public StaticPokemon() {
             this.speciesEntries = new ScriptEntry[0];
@@ -2665,6 +2712,29 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             if (levelEntries.length > i) { // Might not have a level entry e.g., it's an egg
                 byte[] file = scriptNARC.files.get(levelEntries[i].scriptFile);
                 file[levelEntries[i].scriptOffset] = (byte) level;
+            }
+        }
+    }
+
+    private static class StaticPokemonGameCorner extends StaticPokemon {
+        private TextEntry[] textEntries;
+
+        public StaticPokemonGameCorner() {
+            super();
+            this.textEntries = new TextEntry[0];
+        }
+
+        @Override
+        public void setPokemon(Gen4RomHandler parent, NARCArchive scriptNARC, Pokemon pkmn) {
+            super.setPokemon(parent, scriptNARC, pkmn);
+            for (TextEntry textEntry : textEntries) {
+                List<String> strings = parent.getStrings(textEntry.textIndex);
+                String originalString = strings.get(textEntry.stringNumber);
+                // For JP, the first thing after the name is "\x0001". For non-JP, it's "\v0203"
+                int postNameIndex = originalString.indexOf("\\");
+                String newString = pkmn.name.toUpperCase() + originalString.substring(postNameIndex);
+                strings.set(textEntry.stringNumber, newString);
+                parent.setStrings(textEntry.textIndex, strings);
             }
         }
     }
