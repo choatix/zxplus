@@ -84,7 +84,7 @@ public class Gen4Constants {
 
     public static final int tmItemOffset = 328;
 
-    public static final int textCharsPerLine = 40;
+    private static final int dpptTextCharsPerLine = 40, hgssTextCharsPerLine = 36;
 
     public static final String dpItemPalettesPrefix = "8D018E01210132018D018F0122013301",
             pthgssItemPalettesPrefix = "8D018E01210133018D018F0122013401";
@@ -914,6 +914,14 @@ public class Gen4Constants {
             return marshGrassEncounterIndicesDP;
         } else {
             return marshGrassEncounterIndicesPt;
+        }
+    }
+
+    public static int getTextCharsPerLine(int romType) {
+        if (romType == Gen4Constants.Type_HGSS) {
+            return hgssTextCharsPerLine;
+        } else {
+            return dpptTextCharsPerLine;
         }
     }
 

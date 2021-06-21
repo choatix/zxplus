@@ -3115,11 +3115,12 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             // Update TM item descriptions
             List<String> itemDescriptions = getStrings(romEntry.getInt("ItemDescriptionsTextOffset"));
             List<String> moveDescriptions = getStrings(romEntry.getInt("MoveDescriptionsTextOffset"));
+            int textCharsPerLine = Gen4Constants.getTextCharsPerLine(romEntry.romType);
             // TM01 is item 328 and so on
             for (int i = 0; i < Gen4Constants.tmCount; i++) {
                 // Rewrite 5-line move descs into 3-line item descs
                 itemDescriptions.set(i + Gen4Constants.tmItemOffset, RomFunctions.rewriteDescriptionForNewLineSize(
-                        moveDescriptions.get(moveIndexes.get(i)), "\\n", Gen4Constants.textCharsPerLine, ssd));
+                        moveDescriptions.get(moveIndexes.get(i)), "\\n", textCharsPerLine, ssd));
             }
             // Save the new item descriptions
             setStrings(romEntry.getInt("ItemDescriptionsTextOffset"), itemDescriptions);
@@ -3274,7 +3275,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         String replacementName = moves[headbuttReplacement].name;
         Map<String, String> replacements = new TreeMap<>();
         replacements.put("Headbutt", replacementName);
-        replaceAllStringsInEntry(Gen4Constants.ilexForestStringsFile, replacements, Gen4Constants.textCharsPerLine);
+        replaceAllStringsInEntry(Gen4Constants.ilexForestStringsFile, replacements);
     }
 
     @Override
@@ -4022,7 +4023,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 Map<String, String> replacements = new TreeMap<>();
                 replacements.put(originalSpeciesString, newSpeciesString);
                 for (int i = 0; i < textOffsets.length; i++) {
-                    replaceAllStringsInEntry(textOffsets[i], replacements, Gen4Constants.textCharsPerLine);
+                    replaceAllStringsInEntry(textOffsets[i], replacements);
                 }
 
                 // Lastly, modify the catching tutorial to use the new Pokemon if we're capable of doing so
@@ -4362,11 +4363,10 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                         if (oldTrade.requestedPokemon != newTrade.requestedPokemon) {
                             replacements.put(oldTrade.requestedPokemon.name.toUpperCase(), newTrade.requestedPokemon.name);
                         }
-                        replaceAllStringsInEntry(textOffsets[trade], replacements, Gen4Constants.textCharsPerLine);
+                        replaceAllStringsInEntry(textOffsets[trade], replacements);
                         // hgss override for one set of strings that appears 2x
                         if (romEntry.romType == Gen4Constants.Type_HGSS && trade == 6) {
-                            replaceAllStringsInEntry(textOffsets[trade] + 1, replacements,
-                                    Gen4Constants.textCharsPerLine);
+                            replaceAllStringsInEntry(textOffsets[trade] + 1, replacements);
                         }
                     }
                 }
@@ -4376,7 +4376,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
     }
 
-    private void replaceAllStringsInEntry(int entry, Map<String, String> replacements, int lineLength) {
+    private void replaceAllStringsInEntry(int entry, Map<String, String> replacements) {
+        int lineLength = Gen4Constants.getTextCharsPerLine(romEntry.romType);
         List<String> strings = this.getStrings(entry);
         for (int strNum = 0; strNum < strings.size(); strNum++) {
             String oldString = strings.get(strNum);
