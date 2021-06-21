@@ -3270,14 +3270,11 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         for (int offset : Gen4Constants.headbuttTutorScriptOffsets) {
             writeWord(ilexForestScripts, offset, headbuttReplacement);
         }
-        List<String> ilexForestStrings = getStrings(Gen4Constants.ilexForestStringsFile);
 
         String replacementName = moves[headbuttReplacement].name;
-        for (int index : Gen4Constants.headbuttTutorTextIndices) {
-            String text = ilexForestStrings.get(index).replace("Headbutt", replacementName);
-            ilexForestStrings.set(index, text);
-        }
-        setStrings(Gen4Constants.ilexForestStringsFile, ilexForestStrings);
+        Map<String, String> replacements = new TreeMap<>();
+        replacements.put("Headbutt", replacementName);
+        replaceAllStringsInEntry(Gen4Constants.ilexForestStringsFile, replacements, Gen4Constants.textCharsPerLine);
     }
 
     @Override
@@ -4383,9 +4380,18 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         List<String> strings = this.getStrings(entry);
         for (int strNum = 0; strNum < strings.size(); strNum++) {
             String oldString = strings.get(strNum);
-            String newString = RomFunctions.formatTextWithReplacements(oldString, replacements, "\\n", "\\l", "\\p",
-                    lineLength, ssd);
-            strings.set(strNum, newString);
+            boolean needsReplacement = false;
+            for (Map.Entry<String, String> replacement : replacements.entrySet()) {
+                if (oldString.contains(replacement.getKey())) {
+                    needsReplacement = true;
+                    break;
+                }
+            }
+            if (needsReplacement) {
+                String newString = RomFunctions.formatTextWithReplacements(oldString, replacements, "\\n", "\\l", "\\p",
+                        lineLength, ssd);
+                strings.set(strNum, newString);
+            }
         }
         this.setStrings(entry, strings);
     }
