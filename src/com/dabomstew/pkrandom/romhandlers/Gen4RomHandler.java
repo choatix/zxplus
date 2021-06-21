@@ -32,7 +32,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import com.dabomstew.pkrandom.*;
 import com.dabomstew.pkrandom.constants.*;
@@ -70,7 +69,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         private String name;
         private String romCode;
         private int romType;
-        private boolean staticPokemonSupport = false, copyStaticPokemon = false,copyRoamingPokemon = false, ignoreGameCornerStatics = false;
+        private boolean staticPokemonSupport = false, copyStaticPokemon = false,copyRoamingPokemon = false,
+                ignoreGameCornerStatics = false, copyText = false;
         private Map<String, String> strings = new HashMap<>();
         private Map<String, String> tweakFiles = new HashMap<>();
         private Map<String, Integer> numbers = new HashMap<>();
@@ -78,6 +78,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         private List<StaticPokemon> staticPokemon = new ArrayList<>();
         private List<RoamingPokemon> roamingPokemon = new ArrayList<>();
         private List<ScriptEntry> marillCryScriptEntries = new ArrayList<>();
+        private Map<Integer, TextEntry> tmTextsGameCorner = new HashMap<>();
 
         private int getInt(String key) {
             if (!numbers.containsKey(key)) {
@@ -158,6 +159,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                                     if (current.copyRoamingPokemon) {
                                         current.roamingPokemon.addAll(otherEntry.roamingPokemon);
                                     }
+                                    if (current.copyText) {
+                                        current.tmTextsGameCorner.putAll(otherEntry.tmTextsGameCorner);
+                                    }
                                     current.marillCryScriptEntries.addAll(otherEntry.marillCryScriptEntries);
                                 }
                             }
@@ -167,6 +171,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                             current.roamingPokemon.add(parseRoamingPokemon(r[1]));
                         } else if (r[0].equals("StaticPokemonGameCorner{}")) {
                             current.staticPokemon.add(parseStaticPokemonGameCorner(r[1]));
+                        } else if (r[0].equals("TMTextGameCorner{}")) {
+                            parseTMTextGameCorner(r[1], current.tmTextsGameCorner);
                         } else if (r[0].equals("StaticPokemonSupport")) {
                             int spsupport = parseRIInt(r[1]);
                             current.staticPokemonSupport = (spsupport > 0);
@@ -176,6 +182,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                         } else if (r[0].equals("CopyRoamingPokemon")) {
                             int crp = parseRIInt(r[1]);
                             current.copyRoamingPokemon = (crp > 0);
+                        } else if (r[0].equals("CopyText")) {
+                            int ct = parseRIInt(r[1]);
+                            current.copyText = (ct > 0);
                         } else if (r[0].equals("IgnoreGameCornerStatics")) {
                             int ct = parseRIInt(r[1]);
                             current.ignoreGameCornerStatics = (ct > 0);
@@ -345,6 +354,18 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             }
         }
         return rp;
+    }
+
+    private static void parseTMTextGameCorner(String tmTextGameCornerString, Map<Integer, TextEntry> tmTextGameCorner) {
+        String[] tmTextGameCornerEntries = tmTextGameCornerString.substring(1, tmTextGameCornerString.length() - 1).split(",");
+        for (String tmTextGameCornerEntry : tmTextGameCornerEntries) {
+            String[] segments = tmTextGameCornerEntry.trim().split("=");
+            int tmNum = parseRIInt(segments[0]);
+            String textEntry = segments[1].substring(1, segments[1].length() - 1);
+            String[] textSegments = textEntry.split(":");
+            TextEntry entry = new TextEntry(parseRIInt(textSegments[0]), parseRIInt(textSegments[1]));
+            tmTextGameCorner.put(tmNum, entry);
+        }
     }
 
     // This rom
@@ -3116,7 +3137,33 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     writeWord(arm9, offsPals + i * 8 + 2, pal);
                 }
             }
-            // if we can't update the palettes its not a big deal...
+            // if we can't update the palettes, it's not a big deal...
+
+            // Update TM Text
+            for (int i = 0; i < Gen4Constants.tmCount; i++) {
+                int moveIndex = moveIndexes.get(i);
+                int tmNumber = i + 1;
+                if (romEntry.tmTextsGameCorner.containsKey(tmNumber)) {
+                    TextEntry textEntry = romEntry.tmTextsGameCorner.get(tmNumber);
+                    List<String> strings = getStrings(textEntry.textIndex);
+                    String originalString = strings.get(textEntry.stringNumber);
+
+                    // The first thing after the name is "\n".
+                    int postNameIndex = originalString.indexOf("\\");
+                    String originalName = originalString.substring(0, postNameIndex);
+
+                    // Some languages (like English) write the name in ALL CAPS, others don't.
+                    // Check if the original is ALL CAPS and then match it for consistency.
+                    boolean isAllCaps = originalName.equals(originalName.toUpperCase());
+                    String newName = moves[moveIndex].name;
+                    if (isAllCaps) {
+                        newName = newName.toUpperCase();
+                    }
+                    String newString = newName + originalString.substring(postNameIndex);
+                    strings.set(textEntry.stringNumber, newString);
+                    setStrings(textEntry.textIndex, strings);
+                }
+            }
         }
     }
 
