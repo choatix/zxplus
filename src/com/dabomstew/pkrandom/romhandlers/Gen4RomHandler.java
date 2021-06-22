@@ -2416,6 +2416,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
     @Override
     public void setTrainers(List<Trainer> trainerData, boolean doubleBattleMode) {
+        if (romEntry.romType == Gen4Constants.Type_HGSS) {
+            fixAbilitySlotValuesForHGSS(trainerData);
+        }
         Iterator<Trainer> allTrainers = trainerData.iterator();
         try {
             NARCArchive trainers = this.readNARC(romEntry.getString("TrainerData"));
@@ -2580,6 +2583,30 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             }
         } catch (IOException ex) {
             throw new RandomizerIOException(ex);
+        }
+    }
+
+    // Note: This method is here to avoid bloating AbstractRomHandler with special-case logic.
+    // It only works here because nothing in AbstractRomHandler cares about the abilitySlot at
+    // the moment; if that changes, then this should be moved there instead.
+    private void fixAbilitySlotValuesForHGSS(List<Trainer> trainers) {
+        for (Trainer tr : trainers) {
+            if (tr.pokemon.size() > 0) {
+                TrainerPokemon lastPokemon = tr.pokemon.get(tr.pokemon.size() - 1);
+                int lastAbilitySlot = lastPokemon.abilitySlot;
+                for (int i = 0; i < tr.pokemon.size(); i++) {
+                    // HGSS has a nasty bug where if a single Pokemon with an abilitySlot of 2
+                    // appears on the trainer's team, then all Pokemon that appear after it in
+                    // the trpoke data will *also* use their second ability in-game, regardless
+                    // of what their abilitySlot is set to. This can mess with the rival's
+                    // starter carrying forward their ability, and can also cause sensible items
+                    // to behave incorrectly. To fix this, we just make sure everything on a
+                    // Trainer's team uses the same abilitySlot. The choice to copy the last
+                    // Pokemon's abilitySlot is arbitrary, but allows us to avoid any special-
+                    // casing involving the rival's starter, since it always appears last.
+                    tr.pokemon.get(i).abilitySlot = lastAbilitySlot;
+                }
+            }
         }
     }
 
