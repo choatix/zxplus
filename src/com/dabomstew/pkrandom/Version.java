@@ -68,19 +68,24 @@ public class Version {
             return false;
         }
         // Chop off leading "v" from release version
-        String releaseVersionTrimmed = releaseVersion.substring(1);
-        String[] thisVersionPieces = VERSION_STRING.split("\\.");
-        String[] releaseVersionPieces = releaseVersionTrimmed.split("\\.");
-        int smallestLength = Math.min(thisVersionPieces.length, releaseVersionPieces.length);
-        for (int i = 0; i < smallestLength; i++) {
-            int thisVersionPiece = Integer.parseInt(thisVersionPieces[i]);
-            int releaseVersionPiece = Integer.parseInt(releaseVersionPieces[i]);
-            if (thisVersionPiece < releaseVersionPiece) {
-                return true;
-            } else if (thisVersionPiece > releaseVersionPiece) {
-                return false;
+        try {
+            String releaseVersionTrimmed = releaseVersion.substring(1);
+            String[] thisVersionPieces = VERSION_STRING.split("\\.");
+            String[] releaseVersionPieces = releaseVersionTrimmed.split("\\.");
+            int smallestLength = Math.min(thisVersionPieces.length, releaseVersionPieces.length);
+            for (int i = 0; i < smallestLength; i++) {
+                int thisVersionPiece = Integer.parseInt(thisVersionPieces[i]);
+                int releaseVersionPiece = Integer.parseInt(releaseVersionPieces[i]);
+                if (thisVersionPiece < releaseVersionPiece) {
+                    return true;
+                } else if (thisVersionPiece > releaseVersionPiece) {
+                    return false;
+                }
             }
+            return false;
+        } catch (Exception e) {
+            // Really not a big deal if we fail at this, probably because we can't connect to Github.
+            return false;
         }
-        return false;
     }
 }
