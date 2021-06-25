@@ -663,6 +663,8 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 Pokemon pk = pokes[i];
                 if (pk.number == Species.nincada) {
                     writeShedinjaEvolution();
+                } else if (pk.number == Species.feebas && romEntry.romType == Gen6Constants.Type_ORAS) {
+                    recreateFeebasBeautyEvolution();
                 }
                 int evosWritten = 0;
                 for (Evolution evo : pk.evolutionsFrom) {
@@ -757,6 +759,25 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         nincada.evolutionsFrom.remove(1);
         extraEvolution.evolutionsTo.remove(0);
         writeFile(romEntry.getString("Evolution"), evolutionCRO);
+    }
+
+    private void recreateFeebasBeautyEvolution() {
+        Pokemon feebas = pokes[Species.feebas];
+
+        // When the "Limit Pokemon" setting is enabled, we clear out the evolutions of
+        // everything *not* in the pool, which could include Feebas. In that case,
+        // there's no point in even worrying about its evolutions, so just return.
+        if (feebas.evolutionsFrom.size() == 0) {
+            return;
+        }
+
+        Evolution prismScaleEvo = feebas.evolutionsFrom.get(0);
+        Pokemon feebasEvolution = prismScaleEvo.to;
+        int beautyNeededToEvolve = 170;
+        Evolution beautyEvolution = new Evolution(feebas, feebasEvolution, true,
+                EvolutionType.LEVEL_HIGH_BEAUTY, beautyNeededToEvolve);
+        feebas.evolutionsFrom.add(beautyEvolution);
+        feebasEvolution.evolutionsTo.add(beautyEvolution);
     }
 
     private void saveMoves() {
