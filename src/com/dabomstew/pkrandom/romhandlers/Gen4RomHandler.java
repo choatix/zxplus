@@ -78,6 +78,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         private List<StaticPokemon> staticPokemon = new ArrayList<>();
         private List<RoamingPokemon> roamingPokemon = new ArrayList<>();
         private List<ScriptEntry> marillCryScriptEntries = new ArrayList<>();
+        private Map<Integer, List<TextEntry>> tmTexts = new HashMap<>();
         private Map<Integer, TextEntry> tmTextsGameCorner = new HashMap<>();
 
         private int getInt(String key) {
@@ -160,6 +161,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                                         current.roamingPokemon.addAll(otherEntry.roamingPokemon);
                                     }
                                     if (current.copyText) {
+                                        current.tmTexts.putAll(otherEntry.tmTexts);
                                         current.tmTextsGameCorner.putAll(otherEntry.tmTextsGameCorner);
                                     }
                                     current.marillCryScriptEntries.addAll(otherEntry.marillCryScriptEntries);
@@ -171,6 +173,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                             current.roamingPokemon.add(parseRoamingPokemon(r[1]));
                         } else if (r[0].equals("StaticPokemonGameCorner{}")) {
                             current.staticPokemon.add(parseStaticPokemonGameCorner(r[1]));
+                        } else if (r[0].equals("TMText{}")) {
+                            parseTMText(r[1], current.tmTexts);
                         } else if (r[0].equals("TMTextGameCorner{}")) {
                             parseTMTextGameCorner(r[1], current.tmTextsGameCorner);
                         } else if (r[0].equals("StaticPokemonSupport")) {
@@ -354,6 +358,24 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             }
         }
         return rp;
+    }
+
+    private static void parseTMText(String tmTextString, Map<Integer, List<TextEntry>> tmTexts) {
+        String pattern = "[0-9]+=\\[([0-9]+:[0-9]+,?\\s?)+]";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(tmTextString);
+        while (m.find()) {
+            String[] segments = m.group().split("=");
+            int tmNum = parseRIInt(segments[0]);
+            String[] entries = segments[1].substring(1, segments[1].length() - 1).split(",");
+            List<TextEntry> textEntries = new ArrayList<>();
+            for (String entry : entries) {
+                String[] textSegments = entry.split(":");
+                TextEntry textEntry = new TextEntry(parseRIInt(textSegments[0]), parseRIInt(textSegments[1]));
+                textEntries.add(textEntry);
+            }
+            tmTexts.put(tmNum, textEntries);
+        }
     }
 
     private static void parseTMTextGameCorner(String tmTextGameCornerString, Map<Integer, TextEntry> tmTextGameCorner) {
@@ -3099,6 +3121,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
     @Override
     public void setTMMoves(List<Integer> moveIndexes) {
+        List<Integer> oldMoveIndexes = this.getTMMoves();
         String tmDataPrefix;
         if (romEntry.romType == Gen4Constants.Type_DP || romEntry.romType == Gen4Constants.Type_Plat) {
             tmDataPrefix = Gen4Constants.dpptTMDataPrefix;
@@ -3142,8 +3165,30 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
             // Update TM Text
             for (int i = 0; i < Gen4Constants.tmCount; i++) {
-                int moveIndex = moveIndexes.get(i);
+                int oldMoveIndex = oldMoveIndexes.get(i);
+                int newMoveIndex = moveIndexes.get(i);
                 int tmNumber = i + 1;
+
+                if (romEntry.tmTexts.containsKey(tmNumber)) {
+                    List<TextEntry> textEntries = romEntry.tmTexts.get(tmNumber);
+                    Set<Integer> textFiles = new HashSet<>();
+                    for (TextEntry textEntry : textEntries) {
+                        textFiles.add(textEntry.textIndex);
+                    }
+                    String oldMoveName = moves[oldMoveIndex].name;
+                    String newMoveName = moves[newMoveIndex].name;
+                    if (romEntry.romType == Gen4Constants.Type_HGSS && oldMoveIndex == Moves.roar) {
+                        // It's somewhat dumb to even be bothering with this, but it's too silly not to do
+                        oldMoveName = oldMoveName.toUpperCase();
+                        newMoveName = newMoveName.toUpperCase();
+                    }
+                    Map<String, String> replacements = new TreeMap<>();
+                    replacements.put(oldMoveName, newMoveName);
+                    for (int textFile : textFiles) {
+                        replaceAllStringsInEntry(textFile, replacements);
+                    }
+                }
+
                 if (romEntry.tmTextsGameCorner.containsKey(tmNumber)) {
                     TextEntry textEntry = romEntry.tmTextsGameCorner.get(tmNumber);
                     List<String> strings = getStrings(textEntry.textIndex);
@@ -3156,7 +3201,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     // Some languages (like English) write the name in ALL CAPS, others don't.
                     // Check if the original is ALL CAPS and then match it for consistency.
                     boolean isAllCaps = originalName.equals(originalName.toUpperCase());
-                    String newName = moves[moveIndex].name;
+                    String newName = moves[newMoveIndex].name;
                     if (isAllCaps) {
                         newName = newName.toUpperCase();
                     }
@@ -3274,7 +3319,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
         String replacementName = moves[headbuttReplacement].name;
         Map<String, String> replacements = new TreeMap<>();
-        replacements.put("Headbutt", replacementName);
+        replacements.put(moves[Moves.headbutt].name, replacementName);
         replaceAllStringsInEntry(Gen4Constants.ilexForestStringsFile, replacements);
     }
 
@@ -4377,6 +4422,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     private void replaceAllStringsInEntry(int entry, Map<String, String> replacements) {
+        // This function currently only replaces move and Pokemon names, and we don't want them
+        // split across multiple lines if there is a space.
+        replacements.replaceAll((key, oldValue) -> oldValue.replace(' ', '_'));
         int lineLength = Gen4Constants.getTextCharsPerLine(romEntry.romType);
         List<String> strings = this.getStrings(entry);
         for (int strNum = 0; strNum < strings.size(); strNum++) {
@@ -4391,6 +4439,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             if (needsReplacement) {
                 String newString = RomFunctions.formatTextWithReplacements(oldString, replacements, "\\n", "\\l", "\\p",
                         lineLength, ssd);
+                newString = newString.replace('_', ' ');
                 strings.set(strNum, newString);
             }
         }
