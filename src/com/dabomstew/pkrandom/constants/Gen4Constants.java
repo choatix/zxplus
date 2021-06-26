@@ -84,7 +84,7 @@ public class Gen4Constants {
 
     public static final int tmItemOffset = 328;
 
-    private static final int dpptTextCharsPerLine = 40, hgssTextCharsPerLine = 36;
+    private static final int dpptTextCharsPerLine = 38, hgssTextCharsPerLine = 36;
 
     public static final String dpItemPalettesPrefix = "8D018E01210132018D018F0122013301",
             pthgssItemPalettesPrefix = "8D018E01210133018D018F0122013401";
