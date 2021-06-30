@@ -158,6 +158,9 @@ public class PokeTextData {
                     string.append("\\v").append(String.format("%04X", chars.get(i)));
                     i++;
                     int total = chars.get(i);
+                    if (total == 0) {
+                        string.append("\\x").append(String.format("%04X", 0));
+                    }
                     for (int z = 0; z < total; z++) {
                         i++;
                         string.append("\\z").append(String.format("%04X", chars.get(i)));

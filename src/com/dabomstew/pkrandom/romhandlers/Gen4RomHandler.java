@@ -80,6 +80,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         private List<ScriptEntry> marillCryScriptEntries = new ArrayList<>();
         private Map<Integer, List<TextEntry>> tmTexts = new HashMap<>();
         private Map<Integer, TextEntry> tmTextsGameCorner = new HashMap<>();
+        private Map<Integer, Integer> tmScriptOffsetsFrontier = new HashMap<>();
+        private Map<Integer, Integer> tmTextsFrontier = new HashMap<>();
 
         private int getInt(String key) {
             if (!numbers.containsKey(key)) {
@@ -163,6 +165,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                                     if (current.copyText) {
                                         current.tmTexts.putAll(otherEntry.tmTexts);
                                         current.tmTextsGameCorner.putAll(otherEntry.tmTextsGameCorner);
+                                        current.tmScriptOffsetsFrontier.putAll(otherEntry.tmScriptOffsetsFrontier);
+                                        current.tmTextsFrontier.putAll(otherEntry.tmTextsFrontier);
                                     }
                                     current.marillCryScriptEntries.addAll(otherEntry.marillCryScriptEntries);
                                 }
@@ -177,6 +181,22 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                             parseTMText(r[1], current.tmTexts);
                         } else if (r[0].equals("TMTextGameCorner{}")) {
                             parseTMTextGameCorner(r[1], current.tmTextsGameCorner);
+                        } else if (r[0].equals("FrontierScriptTMOffsets{}")) {
+                            String[] offsets = r[1].substring(1, r[1].length() - 1).split(",");
+                            for (String off : offsets) {
+                                String[] parts = off.split("=");
+                                int tmNum = parseRIInt(parts[0]);
+                                int offset = parseRIInt(parts[1]);
+                                current.tmScriptOffsetsFrontier.put(tmNum, offset);
+                            }
+                        } else if (r[0].equals("FrontierTMText{}")) {
+                            String[] offsets = r[1].substring(1, r[1].length() - 1).split(",");
+                            for (String off : offsets) {
+                                String[] parts = off.split("=");
+                                int tmNum = parseRIInt(parts[0]);
+                                int stringNumber = parseRIInt(parts[1]);
+                                current.tmTextsFrontier.put(tmNum, stringNumber);
+                            }
                         } else if (r[0].equals("StaticPokemonSupport")) {
                             int spsupport = parseRIInt(r[1]);
                             current.staticPokemonSupport = (spsupport > 0);
@@ -3218,26 +3238,44 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
                 if (romEntry.tmTextsGameCorner.containsKey(tmNumber)) {
                     TextEntry textEntry = romEntry.tmTextsGameCorner.get(tmNumber);
-                    List<String> strings = getStrings(textEntry.textIndex);
-                    String originalString = strings.get(textEntry.stringNumber);
+                    setBottomScreenTMText(textEntry.textIndex, textEntry.stringNumber, newMoveIndex);
+                }
 
-                    // The first thing after the name is "\n".
-                    int postNameIndex = originalString.indexOf("\\");
-                    String originalName = originalString.substring(0, postNameIndex);
+                if (romEntry.tmScriptOffsetsFrontier.containsKey(tmNumber)) {
+                    int scriptFile = romEntry.getInt("FrontierScriptNumber");
+                    byte[] frontierScript = scriptNarc.files.get(scriptFile);
+                    int scriptOffset = romEntry.tmScriptOffsetsFrontier.get(tmNumber);
+                    writeWord(frontierScript, scriptOffset, newMoveIndex);
+                    scriptNarc.files.set(scriptFile, frontierScript);
+                }
 
-                    // Some languages (like English) write the name in ALL CAPS, others don't.
-                    // Check if the original is ALL CAPS and then match it for consistency.
-                    boolean isAllCaps = originalName.equals(originalName.toUpperCase());
-                    String newName = moves[newMoveIndex].name;
-                    if (isAllCaps) {
-                        newName = newName.toUpperCase();
-                    }
-                    String newString = newName + originalString.substring(postNameIndex);
-                    strings.set(textEntry.stringNumber, newString);
-                    setStrings(textEntry.textIndex, strings);
+                if (romEntry.tmTextsFrontier.containsKey(tmNumber)) {
+                    int textOffset = romEntry.getInt("MiscUITextOffset");
+                    int stringNumber = romEntry.tmTextsFrontier.get(tmNumber);
+                    setBottomScreenTMText(textOffset, stringNumber, newMoveIndex);
                 }
             }
         }
+    }
+
+    private void setBottomScreenTMText(int textOffset, int stringNumber, int newMoveIndex) {
+        List<String> strings = getStrings(textOffset);
+        String originalString = strings.get(stringNumber);
+
+        // The first thing after the name is "\n".
+        int postNameIndex = originalString.indexOf("\\");
+        String originalName = originalString.substring(0, postNameIndex);
+
+        // Some languages (like English) write the name in ALL CAPS, others don't.
+        // Check if the original is ALL CAPS and then match it for consistency.
+        boolean isAllCaps = originalName.equals(originalName.toUpperCase());
+        String newName = moves[newMoveIndex].name;
+        if (isAllCaps) {
+            newName = newName.toUpperCase();
+        }
+        String newString = newName + originalString.substring(postNameIndex);
+        strings.set(stringNumber, newString);
+        setStrings(textOffset, strings);
     }
 
     private static RomFunctions.StringSizeDeterminer ssd = new RomFunctions.StringLengthSD();
