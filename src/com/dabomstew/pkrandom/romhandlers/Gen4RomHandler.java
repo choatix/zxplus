@@ -2997,13 +2997,22 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     if (thisTrade.ability3 > 0) {
                         possibleAbilities.add(thisTrade.ability3);
                     }
+
                     // Write species and ability
                     writeLong(tradeNARC.files.get(tradeNum), 0, thisTrade.number);
                     writeLong(tradeNARC.files.get(tradeNum), 0x1C,
                             possibleAbilities.get(this.random.nextInt(possibleAbilities.size())));
+
                     // Write level to script file
                     byte[] scriptFile = scriptNARC.files.get(scripts[i]);
                     scriptFile[scriptOffsets[i]] = (byte) se.level;
+
+                    // If it's Kenya, write new species name to text file
+                    if (i == 1) {
+                        Map<String, String> replacements = new TreeMap<>();
+                        replacements.put(pokes[Species.spearow].name.toUpperCase(), se.pkmn.name);
+                        replaceAllStringsInEntry(romEntry.getInt("KenyaTextOffset"), replacements);
+                    }
                 }
                 writeNARC(romEntry.getString("InGameTrades"), tradeNARC);
             }
