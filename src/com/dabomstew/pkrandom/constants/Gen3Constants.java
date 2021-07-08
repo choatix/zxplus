@@ -151,6 +151,8 @@ public class Gen3Constants {
 
     public static final String frlgOakOutsideHouseFix = "1604800100";
 
+    public static final String frlgOakAideCheckPrefix = "00B5064800880028";
+
     public static final String ePokedexScriptIdentifier = "3229610825F00129E40816CD40010003";
 
     public static final String eNatDexScriptPart1 = "31720167";

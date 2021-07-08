@@ -2515,6 +2515,15 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 // fix him to use ndex count
                 writeHexString(Gen3Constants.frlgOakOutsideHouseFix, oakHouseCheckOffs);
             }
+
+            // Fix Oak's aides so they look for your National Dex seen/caught,
+            // not your Kanto Dex seen/caught
+            int oakAideCheckOffs = find(Gen3Constants.frlgOakAideCheckPrefix);
+            if (oakAideCheckOffs > 0) {
+                oakAideCheckOffs += Gen3Constants.frlgOakAideCheckPrefix.length() / 2; // because it was a prefix
+                // Change the bne instruction to an unconditional branch to always use National Dex
+                rom[oakAideCheckOffs + 1] = (byte) 0xE0;
+            }
         } else {
             // Find the original pokedex script
             int pkDexOffset = find(Gen3Constants.ePokedexScriptIdentifier);
