@@ -1170,22 +1170,90 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     }
 
     private void fixTypeEffectiveness() {
-        // TODO rewrite to use table properly
-        int base = romEntry.getValue("TypeEffectivenessOffset");
+        List<TypeRelationship> typeEffectivenessTable = readTypeEffectivenessTable();
         log("--Fixing Type Effectiveness--");
-        // Change Poison SE to bug (should be neutral)
-        // to Ice NE to Fire (is currently neutral)
-        log("Replaced: Poison super effective vs Bug => Ice not very effective vs Fire");
-        rom[base + 135] = typeToByte(Type.ICE);
-        rom[base + 136] = typeToByte(Type.FIRE);
-        rom[base + 137] = 5; // Not very effective
-        // Change BUG SE to Poison to Bug NE to Poison
-        log("Changed: Bug super effective vs Poison => Bug not very effective vs Poison");
-        rom[base + 203] = 5; // Not very effective
-        // Change Ghost 0E to Psychic to Ghost SE to Psychic
-        log("Changed: Psychic immune to Ghost => Ghost super effective vs Psychic");
-        rom[base + 227] = 20; // Super effective
+        for (TypeRelationship relationship : typeEffectivenessTable) {
+            // Change Poison SE to bug (should be neutral) to Ice NE to Fire (is currently neutral)
+            if (relationship.attacker == Type.POISON && relationship.defender == Type.BUG) {
+                relationship.attacker = Type.ICE;
+                relationship.defender = Type.FIRE;
+                relationship.effectiveness = Effectiveness.HALF;
+                log("Replaced: Poison super effective vs Bug => Ice not very effective vs Fire");
+            }
+
+            // Change Bug SE to Poison to Bug NE to Poison
+            else if (relationship.attacker == Type.BUG && relationship.defender == Type.POISON) {
+                relationship.effectiveness = Effectiveness.HALF;
+                log("Changed: Bug super effective vs Poison => Bug not very effective vs Poison");
+            }
+
+            // Change Ghost 0E to Psychic to Ghost SE to Psychic
+            else if (relationship.attacker == Type.GHOST && relationship.defender == Type.PSYCHIC) {
+                relationship.effectiveness = Effectiveness.DOUBLE;
+                log("Changed: Psychic immune to Ghost => Ghost super effective vs Psychic");
+            }
+        }
         logBlankLine();
+        writeTypeEffectivenessTable(typeEffectivenessTable);
+    }
+
+    private List<TypeRelationship> readTypeEffectivenessTable() {
+        List<TypeRelationship> typeEffectivenessTable = new ArrayList<>();
+        int currentOffset = romEntry.getValue("TypeEffectivenessOffset");
+        int attackingType = rom[currentOffset];
+        while (attackingType != (byte) 0xFF) {
+            int defendingType = rom[currentOffset + 1];
+            int effectivenessInternal = rom[currentOffset + 2];
+            Type attacking = Gen1Constants.typeTable[attackingType];
+            Type defending = Gen1Constants.typeTable[defendingType];
+            Effectiveness effectiveness = null;
+            switch (effectivenessInternal) {
+                case 20:
+                    effectiveness = Effectiveness.DOUBLE;
+                    break;
+                case 10:
+                    effectiveness = Effectiveness.NEUTRAL;
+                    break;
+                case 5:
+                    effectiveness = Effectiveness.HALF;
+                    break;
+                case 0:
+                    effectiveness = Effectiveness.ZERO;
+                    break;
+            }
+            if (effectiveness != null) {
+                TypeRelationship relationship = new TypeRelationship(attacking, defending, effectiveness);
+                typeEffectivenessTable.add(relationship);
+            }
+            currentOffset += 3;
+            attackingType = rom[currentOffset];
+        }
+        return typeEffectivenessTable;
+    }
+
+    private void writeTypeEffectivenessTable(List<TypeRelationship> typeEffectivenessTable) {
+        int currentOffset = romEntry.getValue("TypeEffectivenessOffset");
+        for (TypeRelationship relationship : typeEffectivenessTable) {
+            rom[currentOffset] = Gen1Constants.typeToByte(relationship.attacker);
+            rom[currentOffset + 1] = Gen1Constants.typeToByte(relationship.defender);
+            byte effectivenessInternal = 0;
+            switch (relationship.effectiveness) {
+                case DOUBLE:
+                    effectivenessInternal = 20;
+                    break;
+                case NEUTRAL:
+                    effectivenessInternal = 10;
+                    break;
+                case HALF:
+                    effectivenessInternal = 5;
+                    break;
+                case ZERO:
+                    effectivenessInternal = 0;
+                    break;
+            }
+            rom[currentOffset + 2] = effectivenessInternal;
+            currentOffset += 3;
+        }
     }
 
     @Override
