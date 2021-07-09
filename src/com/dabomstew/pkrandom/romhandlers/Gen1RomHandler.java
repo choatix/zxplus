@@ -1169,11 +1169,11 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         return Gen1Constants.bannedLevelupMoves;
     }
 
-    private void fixTypeEffectiveness() {
+    private void updateTypeEffectiveness() {
         List<TypeRelationship> typeEffectivenessTable = readTypeEffectivenessTable();
-        log("--Fixing Type Effectiveness--");
+        log("--Updating Type Effectiveness--");
         for (TypeRelationship relationship : typeEffectivenessTable) {
-            // Change Poison SE to bug (should be neutral) to Ice NE to Fire (is currently neutral)
+            // Change Poison 2x against bug (should be neutral) to Ice 0.5x against Fire (is currently neutral)
             if (relationship.attacker == Type.POISON && relationship.defender == Type.BUG) {
                 relationship.attacker = Type.ICE;
                 relationship.defender = Type.FIRE;
@@ -1181,13 +1181,13 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
                 log("Replaced: Poison super effective vs Bug => Ice not very effective vs Fire");
             }
 
-            // Change Bug SE to Poison to Bug NE to Poison
+            // Change Bug 2x against Poison to Bug 0.5x against Poison
             else if (relationship.attacker == Type.BUG && relationship.defender == Type.POISON) {
                 relationship.effectiveness = Effectiveness.HALF;
                 log("Changed: Bug super effective vs Poison => Bug not very effective vs Poison");
             }
 
-            // Change Ghost 0E to Psychic to Ghost SE to Psychic
+            // Change Ghost 0x against Psychic to Ghost 2x against Psychic
             else if (relationship.attacker == Type.GHOST && relationship.defender == Type.PSYCHIC) {
                 relationship.effectiveness = Effectiveness.DOUBLE;
                 log("Changed: Psychic immune to Ghost => Ghost super effective vs Psychic");
@@ -1847,7 +1847,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         } else if (tweak == MiscTweak.LOWER_CASE_POKEMON_NAMES) {
             applyCamelCaseNames();
         } else if (tweak == MiscTweak.UPDATE_TYPE_EFFECTIVENESS) {
-            fixTypeEffectiveness();
+            updateTypeEffectiveness();
         } else if (tweak == MiscTweak.RANDOMIZE_CATCHING_TUTORIAL) {
             randomizeCatchingTutorial();
         }
