@@ -3645,6 +3645,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         List<TypeRelationship> typeEffectivenessTable = new ArrayList<>();
         int currentOffset = romEntry.getValue("TypeEffectivenessOffset");
         int attackingType = rom[currentOffset];
+        // 0xFE marks the end of the table *not* affected by Foresight, while 0xFF marks
+        // the actual end of the table. Since we don't care about Ghost immunities at all,
+        // just stop once we reach the Foresight section.
         while (attackingType != (byte) 0xFE) {
             int defendingType = rom[currentOffset + 1];
             int effectivenessInternal = rom[currentOffset + 2];

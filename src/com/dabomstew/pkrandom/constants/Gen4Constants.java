@@ -733,6 +733,8 @@ public class Gen4Constants {
 
     public static final String hpBarSpeedPrefix = "0CD106200090", expBarSpeedPrefix = "011C00D101212E6C", bothBarsSpeedPrefix = "70BD90421DDA";
 
+    public static final String typeEffectivenessTableLocator = "000505000805";
+
     private static final int trophyGardenGrassEncounterIndexDP = 304, trophyGardenGrassEncounterIndexPt = 308;
     private static final List<Integer> marshGrassEncounterIndicesDP = Arrays.asList(76, 82, 88, 94, 100, 102),
             marshGrassEncounterIndicesPt = Arrays.asList(76, 82, 88, 94, 100, 106);

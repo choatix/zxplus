@@ -32,11 +32,19 @@ import java.util.Map;
 public enum Effectiveness {
     ZERO, HALF, NEUTRAL, DOUBLE, QUARTER, QUADRUPLE;
 
+    public static Map<Type, Effectiveness> against(Type primaryType, Type secondaryType, int gen) {
+        return against(primaryType, secondaryType, gen, false);
+    }
+
     // Returns a map where the key is a type and the value is the effectiveness against
     // a pokemon with the two types in a given gen. It does not account for abilities.
-    public static Map<Type, Effectiveness> against(Type primaryType, Type secondaryType, int gen) {
+    public static Map<Type, Effectiveness> against(Type primaryType, Type secondaryType, int gen, boolean effectivenessUpdated) {
         if (gen >= 2 && gen <= 5) {
-            return against(primaryType, secondaryType, gen2Through5Table, Type.GEN2THROUGH5);
+            if (effectivenessUpdated) {
+                return against(primaryType, secondaryType, gen6PlusTable, Type.GEN2THROUGH5);
+            } else {
+                return against(primaryType, secondaryType, gen2Through5Table, Type.GEN2THROUGH5);
+            }
         }
         if (gen >= 6) {
             return against(primaryType, secondaryType, gen6PlusTable, Type.GEN6PLUS);
