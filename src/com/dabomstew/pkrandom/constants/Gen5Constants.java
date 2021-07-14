@@ -342,6 +342,8 @@ public class Gen5Constants {
 
     public static final String introGraphicPrefix = "5A0000010000001700000001000000", bw1IntroCryPrefix = "0021009101910291", bw2IntroCryLocator = "3D020000F8B51C1C";
 
+    public static final String typeEffectivenessTableLocator = "0404040404020400";
+
     // https://bulbapedia.bulbagarden.net/wiki/List_of_items_by_index_number_(Generation_V)
     // Held items we randomize from Gen 5 are a superset of the held items from Gen 4. Thus, we list only the
     // new ones here.
