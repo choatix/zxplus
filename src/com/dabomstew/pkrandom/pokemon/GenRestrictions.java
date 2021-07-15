@@ -24,6 +24,10 @@ package com.dabomstew.pkrandom.pokemon;
 /*--  along with this program. If not, see <http://www.gnu.org/licenses/>.  --*/
 /*----------------------------------------------------------------------------*/
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class GenRestrictions {
 
     public boolean allow_gen1, allow_gen2, allow_gen3, allow_gen4, allow_gen5, allow_gen6, allow_gen7;
@@ -105,6 +109,49 @@ public class GenRestrictions {
         if (generation < 7) {
             allow_gen7 = false;
         }
+    }
+
+    public boolean allowTrainerSwapMegaEvolvables(boolean isXY, boolean isTypeThemedTrainers) {
+        if (isTypeThemedTrainers) {
+            return megaEvolutionsOfEveryTypeAreInPool(isXY);
+        } else {
+            return megaEvolutionsAreInPool(isXY);
+        }
+    }
+
+    public boolean megaEvolutionsOfEveryTypeAreInPool(boolean isXY) {
+        Set<Type> typePool = new HashSet<>();
+        if (allow_gen1) {
+            typePool.addAll(Arrays.asList(Type.GRASS, Type.POISON, Type.FIRE, Type.FLYING, Type.WATER, Type.PSYCHIC,
+                    Type.GHOST, Type.NORMAL, Type.BUG, Type.ROCK));
+        }
+        if (allow_gen2) {
+            typePool.addAll(Arrays.asList(Type.ELECTRIC, Type.BUG, Type.STEEL, Type.FIGHTING, Type.DARK,
+                    Type.FIRE, Type.ROCK));
+            if (!isXY) {
+                typePool.add(Type.GROUND);
+            }
+        }
+        if (allow_gen3) {
+            typePool.addAll(Arrays.asList(Type.FIRE, Type.FIGHTING, Type.PSYCHIC, Type.FAIRY, Type.STEEL, Type.ROCK,
+                    Type.ELECTRIC, Type.GHOST, Type.DARK, Type.DRAGON));
+            if (!isXY) {
+                typePool.addAll(Arrays.asList(Type.GRASS, Type.WATER, Type.GROUND, Type.FLYING, Type.ICE));
+            }
+        }
+        if (allow_gen4) {
+            typePool.addAll(Arrays.asList(Type.DRAGON, Type.GROUND, Type.FIGHTING, Type.STEEL, Type.GRASS, Type.ICE));
+            if (!isXY) {
+                typePool.addAll(Arrays.asList(Type.NORMAL, Type.PSYCHIC));
+            }
+        }
+        if (allow_gen5 && !isXY) {
+            typePool.add(Type.NORMAL);
+        }
+        if (allow_gen6 && !isXY) {
+            typePool.addAll(Arrays.asList(Type.ROCK, Type.FAIRY));
+        }
+        return typePool.size() == 18;
     }
 
     public boolean megaEvolutionsAreInPool(boolean isXY) {

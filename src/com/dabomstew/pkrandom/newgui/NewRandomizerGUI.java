@@ -486,7 +486,8 @@ public class NewRandomizerGUI {
                     romHandler.generationOfPokemon(), romHandler.forceSwapStaticMegaEvos());
             if (gld.pressedOK()) {
                 currentRestrictions = gld.getChoice();
-                if (currentRestrictions != null && !currentRestrictions.megaEvolutionsAreInPool(romHandler.forceSwapStaticMegaEvos())) {
+                if (currentRestrictions != null && !currentRestrictions.allowTrainerSwapMegaEvolvables(
+                        romHandler.forceSwapStaticMegaEvos(), tpTypeThemedRadioButton.isSelected())) {
                     tpSwapMegaEvosCheckBox.setEnabled(false);
                     tpSwapMegaEvosCheckBox.setSelected(false);
                 }
@@ -3028,7 +3029,8 @@ public class NewRandomizerGUI {
             tpDontUseLegendariesCheckBox.setEnabled(true);
             tpNoEarlyWonderGuardCheckBox.setEnabled(true);
             tpAllowAlternateFormesCheckBox.setEnabled(true);
-            if (currentRestrictions == null || currentRestrictions.megaEvolutionsAreInPool(romHandler.forceSwapStaticMegaEvos())) {
+            if (currentRestrictions == null || currentRestrictions.allowTrainerSwapMegaEvolvables(
+                    romHandler.forceSwapStaticMegaEvos(), tpTypeThemedRadioButton.isSelected())) {
                 tpSwapMegaEvosCheckBox.setEnabled(true);
             } else {
                 tpSwapMegaEvosCheckBox.setEnabled(false);
