@@ -1100,6 +1100,11 @@ public class NewRandomizerGUI {
             // On the 3DS, the update has the same title ID as the base game, save for the 8th character,
             // which is 'E' instead of '0'. We can use this to detect if the update matches the game.
             String actualUpdateTitleId = Abstract3DSRomHandler.getTitleIdFromFile(fh.getAbsolutePath());
+            if (actualUpdateTitleId == null) {
+                // Error: couldn't find a title ID in the update
+                JOptionPane.showMessageDialog(frame, String.format(bundle.getString("GUI.invalidGameUpdate"), fh.getName()));
+                return;
+            }
             Abstract3DSRomHandler ctrRomHandler = (Abstract3DSRomHandler) romHandler;
             String baseGameTitleId = ctrRomHandler.getTitleIdFromLoadedROM();
             char[] baseGameTitleIdChars = baseGameTitleId.toCharArray();
