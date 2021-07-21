@@ -103,7 +103,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         private String name;
         private String romCode;
         private int romType;
-        private boolean staticPokemonSupport = false, copyStaticPokemon = false, copyTradeScripts = false, isBlack = false;
+        private boolean staticPokemonSupport = false, copyStaticPokemon = false, copyRoamingPokemon = false,
+                copyTradeScripts = false, isBlack = false;
         private Map<String, String> strings = new HashMap<>();
         private Map<String, Integer> numbers = new HashMap<>();
         private Map<String, String> tweakFiles = new HashMap<>();
@@ -179,13 +180,15 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                                     current.offsetArrayEntries.putAll(otherEntry.offsetArrayEntries);
                                     if (current.copyStaticPokemon) {
                                         current.staticPokemon.addAll(otherEntry.staticPokemon);
-                                        current.roamingPokemon.addAll(otherEntry.roamingPokemon);
                                         current.staticPokemonSupport = true;
                                     } else {
                                         current.staticPokemonSupport = false;
                                     }
                                     if (current.copyTradeScripts) {
                                         current.tradeScripts.addAll(otherEntry.tradeScripts);
+                                    }
+                                    if (current.copyRoamingPokemon) {
+                                        current.roamingPokemon.addAll(otherEntry.roamingPokemon);
                                     }
                                 }
                             }
@@ -216,6 +219,9 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                         } else if (r[0].equals("CopyStaticPokemon")) {
                             int csp = parseRIInt(r[1]);
                             current.copyStaticPokemon = (csp > 0);
+                        } else if (r[0].equals("CopyRoamingPokemon")) {
+                            int crp = parseRIInt(r[1]);
+                            current.copyRoamingPokemon = (crp > 0);
                         } else if (r[0].equals("CopyTradeScripts")) {
                             int cts = parseRIInt(r[1]);
                             current.copyTradeScripts = (cts > 0);
