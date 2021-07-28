@@ -877,7 +877,7 @@ public class Settings {
         }
 
         // starters
-        List<Pokemon> romPokemon = rh.getPokemon();
+        List<Pokemon> romPokemon = rh.getPokemonInclFormes();
         List<Pokemon> romStarters = rh.getStarters();
         for (int starter = 0; starter < 3; starter++) {
             if (this.customStarters[starter] < 0 || this.customStarters[starter] >= romPokemon.size()) {
