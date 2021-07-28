@@ -4103,13 +4103,21 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     public void randomizeIntroPokemon() {
         try {
             if (romEntry.romType == Gen4Constants.Type_DP || romEntry.romType == Gen4Constants.Type_Plat) {
-                int introPokemon = randomPokemon().number;
+                Pokemon introPokemon = randomPokemon();
+                while (introPokemon.genderRatio == 0xFE) {
+                    // This is a female-only Pokemon. Gen 4 has an annoying quirk where female-only Pokemon *need*
+                    // to pass a special parameter into the function that loads Pokemon sprites; the game will
+                    // softlock on native hardware otherwise. The way the compiler has optimized the intro Pokemon
+                    // code makes it very hard to modify, so passing in this special parameter is difficult. Rather
+                    // than attempt to patch this code, just reroll until it isn't female-only.
+                    introPokemon = randomPokemon();
+                }
                 byte[] introOverlay = readOverlay(romEntry.getInt("IntroOvlNumber"));
                 for (String prefix : Gen4Constants.dpptIntroPrefixes) {
                     int offset = find(introOverlay, prefix);
                     if (offset > 0) {
                         offset += prefix.length() / 2; // because it was a prefix
-                        writeWord(introOverlay, offset, introPokemon);
+                        writeWord(introOverlay, offset, introPokemon.number);
                     }
                 }
                 writeOverlay(romEntry.getInt("IntroOvlNumber"), introOverlay);
