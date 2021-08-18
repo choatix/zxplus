@@ -3279,7 +3279,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                 if (old.forme > 0) {
                     oldPK = getAltFormeOfPokemon(oldPK, old.forme);
                 }
-                Integer oldBST = oldPK.hp + oldPK.attack + oldPK.defense + oldPK.spatk + oldPK.spdef + oldPK.speed;
+                Integer oldBST = oldPK.bstForPowerLevels();
                 if (oldBST >= 600 && limit600) {
                     if (reallySwapMegaEvos && old.canMegaEvolve()) {
                         newPK = getMegaEvoPokemon(mainPokemonList, pokemonLeft, newStatic);

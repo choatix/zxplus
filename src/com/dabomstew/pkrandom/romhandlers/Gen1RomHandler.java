@@ -139,14 +139,6 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         loadROMInfo();
     }
 
-    private static class GameCornerPokemon {
-        private int[] offsets;
-
-        public String toString() {
-            return Arrays.toString(offsets);
-        }
-    }
-
     private static class TMTextEntry {
         private int number;
         private int offset;
@@ -479,13 +471,13 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     }
 
     private void loadPokemonStats() {
-        pokes = new Pokemon[pokedexCount + 1];
+        pokes = new Gen1Pokemon[pokedexCount + 1];
         // Fetch our names
         String[] pokeNames = readPokemonNames();
         // Get base stats
         int pokeStatsOffset = romEntry.getValue("PokemonStatsOffset");
         for (int i = 1; i <= pokedexCount; i++) {
-            pokes[i] = new Pokemon();
+            pokes[i] = new Gen1Pokemon();
             pokes[i].number = i;
             if (i != Species.mew || romEntry.isYellow) {
                 loadBasicPokeStats(pokes[i], pokeStatsOffset + (i - 1) * Gen1Constants.baseStatsEntrySize);

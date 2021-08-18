@@ -848,7 +848,7 @@ public class Randomizer {
         // Log base stats & types
         log.println("--Pokemon Base Stats & Types--");
         if (romHandler instanceof Gen1RomHandler) {
-            log.println("NUM|NAME         |TYPE             |  HP| ATK| DEF| SPE|SPEC");
+            log.println("NUM|NAME      |TYPE             |  HP| ATK| DEF| SPE|SPEC");
             for (Pokemon pkmn : allPokes) {
                 if (pkmn != null) {
                     String typeString = pkmn.primaryType == null ? "???" : pkmn.primaryType.toString();
@@ -856,7 +856,7 @@ public class Randomizer {
                         typeString += "/" + pkmn.secondaryType.toString();
                     }
                     log.printf("%3d|%-10s|%-17s|%4d|%4d|%4d|%4d|%4d" + NEWLINE, pkmn.number, pkmn.fullName(), typeString,
-                            pkmn.hp, pkmn.attack, pkmn.defense, pkmn.speed, pkmn.spatk, pkmn.spdef );
+                            pkmn.hp, pkmn.attack, pkmn.defense, pkmn.speed, pkmn.special );
                 }
 
             }
