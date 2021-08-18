@@ -528,8 +528,6 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         pkmn.defense = rom[offset + Gen1Constants.bsDefenseOffset] & 0xFF;
         pkmn.speed = rom[offset + Gen1Constants.bsSpeedOffset] & 0xFF;
         pkmn.special = rom[offset + Gen1Constants.bsSpecialOffset] & 0xFF;
-        pkmn.spatk = pkmn.special;
-        pkmn.spdef = pkmn.special;
         // Type
         pkmn.primaryType = idToType(rom[offset + Gen1Constants.bsPrimaryTypeOffset] & 0xFF);
         pkmn.secondaryType = idToType(rom[offset + Gen1Constants.bsSecondaryTypeOffset] & 0xFF);

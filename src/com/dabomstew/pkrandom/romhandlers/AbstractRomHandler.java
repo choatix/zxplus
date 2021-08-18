@@ -367,8 +367,6 @@ public abstract class AbstractRomHandler implements RomHandler {
                     }
                     if ((changedStats.stat & Stat.SPECIAL.val) != 0) {
                         pokes.get(i).special = changedStats.values[statNum];
-                        pokes.get(i).spatk = changedStats.values[statNum];
-                        pokes.get(i).spdef = changedStats.values[statNum];
                     }
                 }
             }
@@ -2807,7 +2805,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                 continue;
             }
 
-            double atkSpAtkRatio = (double)pkmn.attack / ((double)pkmn.attack + (double)pkmn.spatk);
+            double atkSpAtkRatio = pkmn.getAttackSpecialAttackRatio();
 
             // 4 starting moves?
             if (forceStartingMoves) {

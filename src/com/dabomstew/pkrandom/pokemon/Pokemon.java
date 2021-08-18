@@ -181,6 +181,10 @@ public class Pokemon implements Comparable<Pokemon> {
         }
     }
 
+    public double getAttackSpecialAttackRatio() {
+        return (double)attack / ((double)attack + (double)spatk);
+    }
+
     public void copyBaseFormeBaseStats(Pokemon baseForme) {
         hp = baseForme.hp;
         attack = baseForme.attack;

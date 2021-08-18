@@ -110,6 +110,11 @@ public class Gen1Pokemon extends Pokemon {
     }
 
     @Override
+    public double getAttackSpecialAttackRatio() {
+        return (double)attack / ((double)attack + (double)special);
+    }
+
+    @Override
     public String toString() {
         return "Pokemon [name=" + name + ", number=" + number + ", primaryType=" + primaryType + ", secondaryType="
                 + secondaryType + ", hp=" + hp + ", attack=" + attack + ", defense=" + defense + ", special=" + special
