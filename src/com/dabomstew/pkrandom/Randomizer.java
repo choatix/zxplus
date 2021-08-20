@@ -365,22 +365,28 @@ public class Randomizer {
             trainersChanged = true;
         }
 
-        if (trainersChanged) {
-            maybeLogTrainerChanges(log);
-        } else {
-            log.println("Trainers: Unchanged." + NEWLINE);
-        }
+        List<String> originalTrainerNames = getTrainerNames();
+        boolean trainerNamesChanged = false;
 
         // Trainer names & class names randomization
-        // done after trainer log for clarity
         if (romHandler.canChangeTrainerText()) {
             if (settings.isRandomizeTrainerClassNames()) {
                 romHandler.randomizeTrainerClassNames(settings);
+                trainersChanged = true;
+                trainerNamesChanged = true;
             }
 
             if (settings.isRandomizeTrainerNames()) {
                 romHandler.randomizeTrainerNames(settings);
+                trainersChanged = true;
+                trainerNamesChanged = true;
             }
+        }
+
+        if (trainersChanged) {
+            maybeLogTrainerChanges(log, originalTrainerNames, trainerNamesChanged);
+        } else {
+            log.println("Trainers: Unchanged." + NEWLINE);
         }
 
         // Apply metronome only mode now that trainers have been dealt with
@@ -1087,7 +1093,7 @@ public class Randomizer {
         log.println();
     }
 
-    private void maybeLogTrainerChanges(final PrintStream log) {
+    private void maybeLogTrainerChanges(final PrintStream log, List<String> originalTrainerNames, boolean trainerNamesChanged) {
 
         log.println("--Trainers Pokemon--");
         List<Trainer> trainers = romHandler.getTrainers();
@@ -1095,10 +1101,19 @@ public class Randomizer {
         for (Trainer t : trainers) {
             idx++;
             log.print("#" + idx + " ");
+            String originalTrainerName = originalTrainerNames.get(idx);
+            String currentTrainerName = "";
             if (t.fullDisplayName != null) {
-                log.print("(" + t.fullDisplayName + ")");
+                currentTrainerName = t.fullDisplayName;
             } else if (t.name != null) {
-                log.print("(" + t.name + ")");
+                currentTrainerName = t.name;
+            }
+            if (!currentTrainerName.isEmpty()) {
+                if (trainerNamesChanged) {
+                    log.printf("(%s => %s)", originalTrainerName, currentTrainerName);
+                } else {
+                    log.printf("(%s)", currentTrainerName);
+                }
             }
             if (t.offset != idx && t.offset != 0) {
                 log.printf("@%X", t.offset);
@@ -1202,6 +1217,22 @@ public class Randomizer {
             log.println();
         }
         log.println();
+    }
+
+    private List<String> getTrainerNames() {
+        List<String> trainerNames = new ArrayList<>();
+        trainerNames.add(""); // for index 0
+        List<Trainer> trainers = romHandler.getTrainers();
+        for (Trainer t : trainers) {
+            if (t.fullDisplayName != null) {
+                trainerNames.add(t.fullDisplayName);
+            } else if (t.name != null) {
+                trainerNames.add(t.name);
+            } else {
+                trainerNames.add("");
+            }
+        }
+        return trainerNames;
     }
 
     
