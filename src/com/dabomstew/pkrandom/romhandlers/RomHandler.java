@@ -117,7 +117,7 @@ public interface RomHandler {
     // Run the stats shuffler on each Pokemon.
     void shufflePokemonStats(Settings settings);
 
-    // Randomise stats following evolutions for proportions or not (see
+    // Randomize stats following evolutions for proportions or not (see
     // tooltips)
     void randomizePokemonStats(Settings settings);
 
@@ -151,7 +151,7 @@ public interface RomHandler {
 
     boolean typeInGame(Type type);
 
-    // randomise Pokemon types, with a switch on whether evolutions
+    // randomize Pokemon types, with a switch on whether evolutions
     // should follow the same types or not.
     // some evolutions dont anyway, e.g. Eeveelutions, Hitmons
     void randomizePokemonTypes(Settings settings);
