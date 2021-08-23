@@ -276,7 +276,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
     public void loadedRom() {
         romEntry = checkRomEntry(this.rom);
         clearTextTables();
-        readTextTable("gameboy_jap");
+        readTextTable("gameboy_jpn");
         if (romEntry.extraTableFile != null && !romEntry.extraTableFile.equalsIgnoreCase("none")) {
             readTextTable(romEntry.extraTableFile);
         }

@@ -333,7 +333,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         maps = new SubMap[256];
         xAccNerfed = false;
         clearTextTables();
-        readTextTable("gameboy_jap");
+        readTextTable("gameboy_jpn");
         if (romEntry.extraTableFile != null && !romEntry.extraTableFile.equalsIgnoreCase("none")) {
             readTextTable(romEntry.extraTableFile);
         }

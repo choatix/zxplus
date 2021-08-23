@@ -76,9 +76,9 @@ public class Utils {
     // RomHandlers implicitly rely on these - call this before creating settings
     // etc.
     public static void testForRequiredConfigs() throws FileNotFoundException {
-        String[] required = new String[] { "gameboy_jap.tbl", "rby_english.tbl", "rby_freger.tbl", "rby_espita.tbl",
+        String[] required = new String[] { "gameboy_jpn.tbl", "rby_english.tbl", "rby_freger.tbl", "rby_espita.tbl",
                 "green_translation.tbl", "gsc_english.tbl", "gsc_freger.tbl", "gsc_espita.tbl", "gba_english.tbl",
-                "gba_jap.tbl", "Generation4.tbl", "Generation5.tbl", "gen1_offsets.ini", "gen2_offsets.ini",
+                "gba_jpn.tbl", "Generation4.tbl", "Generation5.tbl", "gen1_offsets.ini", "gen2_offsets.ini",
                 "gen3_offsets.ini", "gen4_offsets.ini", "gen5_offsets.ini", "gen6_offsets.ini", "gen7_offsets.ini",
                 SysConstants.customNamesFile };
         for (String filename : required) {
