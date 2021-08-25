@@ -159,8 +159,8 @@ public class Gen7Constants {
     }
 
     public static final List<Integer> uselessAbilities = Arrays.asList(Abilities.forecast, Abilities.multitype,
-            Abilities.zenMode, Abilities.stanceChange, Abilities.shieldsDown, Abilities.schooling, Abilities.disguise,
-            Abilities.battleBond, Abilities.powerConstruct, Abilities.rksSystem);
+            Abilities.flowerGift, Abilities.zenMode, Abilities.stanceChange, Abilities.shieldsDown, Abilities.schooling,
+            Abilities.disguise, Abilities.battleBond, Abilities.powerConstruct, Abilities.rksSystem);
 
     private static final String saveLoadFormeReversionPrefixSM = "00EB040094E50C1094E5F70E80E2", saveLoadFormeReversionPrefixUSUM = "00EB040094E50C1094E5030B80E2EE0F80E2";
     public static final String afterBattleFormeReversionPrefix = "0055E10B00001A0010A0E30700A0E1";

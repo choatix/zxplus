@@ -75,7 +75,7 @@ public class Gen6Constants {
     private static final int highestAbilityIndexXY = 188, highestAbilityIndexORAS = 191;
 
     public static final List<Integer> uselessAbilities = Arrays.asList(Abilities.forecast, Abilities.multitype,
-            Abilities.zenMode, Abilities.stanceChange);
+            Abilities.flowerGift, Abilities.zenMode, Abilities.stanceChange);
 
     public static final MoveCategory[] moveCategoryIndices = { MoveCategory.STATUS, MoveCategory.PHYSICAL,
             MoveCategory.SPECIAL };

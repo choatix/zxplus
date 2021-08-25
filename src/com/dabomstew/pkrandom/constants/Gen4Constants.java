@@ -324,7 +324,8 @@ public class Gen4Constants {
         return map;
     }
 
-    public static final List<Integer> uselessAbilities = Arrays.asList(Abilities.forecast, Abilities.multitype);
+    // Note: Flower Gift is NOT useless in this generation; it is in this list solely for consistency with future generations.
+    public static final List<Integer> uselessAbilities = Arrays.asList(Abilities.forecast, Abilities.multitype, Abilities.flowerGift);
 
     public static final int dpptSetVarScript = 0x28, hgssSetVarScript = 0x29;
 
