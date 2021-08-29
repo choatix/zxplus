@@ -149,6 +149,7 @@ public class Randomizer {
         // Update base stats to a future generation
         if (settings.isUpdateBaseStats()) {
             romHandler.updatePokemonStats(settings);
+            pokemonTraitsChanged = true;
         }
 
         // Standardize EXP curves
