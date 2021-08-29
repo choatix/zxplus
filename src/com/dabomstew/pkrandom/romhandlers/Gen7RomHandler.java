@@ -522,7 +522,16 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                             pk.evolutionsFrom.add(evol);
                             if (!pk.actuallyCosmetic) {
                                 if (evol.forme > 0) {
-                                    species = absolutePokeNumByBaseForme.get(species).get(evol.forme);
+                                    // The forme number for the evolution might represent an actual alt forme, or it
+                                    // might simply represent a cosmetic forme. If it represents an actual alt forme,
+                                    // we'll need to figure out what the absolute species ID for that alt forme is
+                                    // and update its evolutions. If it instead represents a cosmetic forme, then the
+                                    // absolutePokeNumByBaseFormeMap will be null, since there's no secondary species
+                                    // entry for this forme.
+                                    Map<Integer, Integer> absolutePokeNumByBaseFormeMap = absolutePokeNumByBaseForme.get(species);
+                                    if (absolutePokeNumByBaseFormeMap != null) {
+                                        species = absolutePokeNumByBaseFormeMap.get(evol.forme);
+                                    }
                                 }
                                 pokes[species].evolutionsTo.add(evol);
                             }
@@ -724,7 +733,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                 int evosWritten = 0;
                 for (Evolution evo : pk.evolutionsFrom) {
                     Pokemon toPK = evo.to;
-                    if (toPK.formeNumber > 0) {
+                    while (toPK.baseForme != null) {
                         toPK = toPK.baseForme;
                     }
                     writeWord(evoEntry, evosWritten * 8, evo.type.toIndex(7));
