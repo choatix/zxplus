@@ -1100,7 +1100,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         Map<Integer, StatChange> map = GlobalConstants.getStatChanges(generation);
         switch(generation) {
             case 8:
-                map.put(776,new StatChange(Stat.ATK.val | Stat.SPATK.val,140,140));
+                map.put(859,new StatChange(Stat.ATK.val | Stat.SPATK.val,140,140));
                 break;
         }
         return map;
