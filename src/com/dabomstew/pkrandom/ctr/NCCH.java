@@ -331,7 +331,7 @@ public class NCCH {
     private long rebuildExefs(RandomAccessFile fNew, long newExefsOffset) throws IOException, NoSuchAlgorithmException {
         byte[] code = getCode();
         if (codeCompressed) {
-            code = new BLZCoder(null).BLZ_EncodePub(code, false, false, ".code");
+            code = new BLZCoder(null).BLZ_EncodePub(code, false, true, ".code");
         }
 
         // Create a new ExefsFileHeader for our updated .code
