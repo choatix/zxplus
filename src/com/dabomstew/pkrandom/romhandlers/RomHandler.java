@@ -93,7 +93,7 @@ public interface RomHandler {
 
     void removeEvosForPokemonPool();
 
-    // Starters
+    // Randomizer: Starters
     List<Pokemon> getStarters();
 
     boolean setStarters(List<Pokemon> newStarters);
@@ -101,6 +101,14 @@ public interface RomHandler {
     boolean hasStarterAltFormes();
 
     int starterCount();
+
+    void customStarters(Settings settings);
+
+    void randomizeStarters(Settings settings);
+
+    void randomizeBasicTwoEvosStarters(Settings settings);
+
+    List<Pokemon> getPickedStarters();
 
     // Randomizer: Pokemon stats
 
@@ -111,7 +119,7 @@ public interface RomHandler {
     // tooltips)
     void randomizePokemonStats(Settings settings);
 
-    // Update base stats to gen6
+    // Update base stats to specified generation
     void updatePokemonStats(Settings settings);
 
     Map<Integer,StatChange> getUpdatedPokemonStats(int generation);
@@ -136,7 +144,6 @@ public interface RomHandler {
     // Randomizer: types
 
     // return a random type valid in this game.
-    // straightforward except for gen1 where dark&steel are excluded.
     Type randomType();
 
     boolean typeInGame(Type type);
@@ -214,7 +221,6 @@ public interface RomHandler {
     void doubleBattleMode();
 
     // Randomizer: moves
-
     void randomizeMovePowers();
 
     void randomizeMovePPs();
@@ -250,14 +256,6 @@ public interface RomHandler {
     void metronomeOnlyMode();
 
     boolean supportsFourStartingMoves();
-
-    void customStarters(Settings settings);
-
-    void randomizeStarters(Settings settings);
-
-    void randomizeBasicTwoEvosStarters(Settings settings);
-
-    List<Pokemon> getPickedStarters();
 
     // Randomizer: static pokemon (except starters)
 
@@ -327,13 +325,9 @@ public interface RomHandler {
 
     void fullTMHMCompatibility();
 
-    // tm/moveset sanity
-
     void ensureTMCompatSanity();
 
     void ensureTMEvolutionSanity();
-
-    // new 170: full HM (but not TM) compat override
 
     void fullHMCompatibility();
 
@@ -356,8 +350,6 @@ public interface RomHandler {
     void randomizeMoveTutorCompatibility(Settings settings);
 
     void fullMoveTutorCompatibility();
-
-    // mt/moveset sanity
 
     void ensureMoveTutorCompatSanity();
 
@@ -405,7 +397,7 @@ public interface RomHandler {
 
     List<Integer> getDoublesTrainerClasses();
 
-    // Items
+    // Randomizer: Items
 
     ItemList getAllowedItems();
 
@@ -451,7 +443,23 @@ public interface RomHandler {
 
     void randomizeFieldItems(Settings settings);
 
-    // Trades
+    // Shop methods
+
+    boolean hasShopRandomization();
+
+    void shuffleShopItems();
+
+    void randomizeShopItems(Settings settings);
+
+    Map<Integer, List<Integer>> getShopItems();
+
+    void setShopItems(Map<Integer, List<Integer>> shopItems);
+
+    void setShopPrices();
+
+    List<Integer> getMainGameShops();
+
+    // Randomizer: Trades
 
     List<IngameTrade> getIngameTrades();
 
@@ -465,7 +473,7 @@ public interface RomHandler {
 
     int maxTradeOTNameLength();
 
-    // Evos
+    // Randomizer: Evos
 
     void removeImpossibleEvolutions(Settings settings);
 
@@ -484,20 +492,6 @@ public interface RomHandler {
     void randomizeEvolutions(Settings settings);
 
     void changeCatchRates(Settings settings);
-
-    boolean hasShopRandomization();
-
-    void shuffleShopItems();
-
-    void randomizeShopItems(Settings settings);
-
-    Map<Integer, List<Integer>> getShopItems();
-
-    void setShopItems(Map<Integer, List<Integer>> shopItems);
-
-    void setShopPrices();
-
-    List<Integer> getMainGameShops();
 
     // stats stuff
     void minimumCatchRate(int rateNonLegendary, int rateLegendary);
@@ -549,6 +543,8 @@ public interface RomHandler {
     void applyMiscTweak(MiscTweak tweak);
 
     void renderPlacementHistory();
+
+    // Forme stuff
 
     List<Pokemon> getAbilityDependentFormes();
 
