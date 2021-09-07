@@ -93,20 +93,10 @@ public interface RomHandler {
 
     void removeEvosForPokemonPool();
 
-    // Randomizer: Starters
-    // Get starters, they should be ordered with Pokemon
-    // following the one it is SE against.
-    // E.g. Grass, Fire, Water or Fire, Water, Grass etc.
+    // Starters
     List<Pokemon> getStarters();
 
-    // Change the starter data in the ROM.
-    // Optionally also change the starter used by the rival in
-    // the level 5 battle, if there is one.
     boolean setStarters(List<Pokemon> newStarters);
-
-    // Tells whether this ROM has the ability to have starters changed.
-    // Was for before CUE's compressors were found and arm9 was untouchable.
-    boolean canChangeStarters();
 
     boolean hasStarterAltFormes();
 

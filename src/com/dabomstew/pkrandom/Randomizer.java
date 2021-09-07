@@ -249,30 +249,28 @@ public class Randomizer {
 
         // Starter Pokemon
         // Applied after type to update the strings correctly based on new types
-        if (romHandler.canChangeStarters()) {
-            switch(settings.getStartersMod()) {
-                case CUSTOM:
-                    romHandler.customStarters(settings);
-                    startersChanged = true;
-                    break;
-                case COMPLETELY_RANDOM:
-                    romHandler.randomizeStarters(settings);
-                    startersChanged = true;
-                    break;
-                case RANDOM_WITH_TWO_EVOLUTIONS:
-                    romHandler.randomizeBasicTwoEvosStarters(settings);
-                    startersChanged = true;
-                    break;
-                default:
-                    break;
-            }
-            if (settings.isRandomizeStartersHeldItems() && !(romHandler instanceof Gen1RomHandler)) {
-                romHandler.randomizeStarterHeldItems(settings);
-            }
+        switch(settings.getStartersMod()) {
+            case CUSTOM:
+                romHandler.customStarters(settings);
+                startersChanged = true;
+                break;
+            case COMPLETELY_RANDOM:
+                romHandler.randomizeStarters(settings);
+                startersChanged = true;
+                break;
+            case RANDOM_WITH_TWO_EVOLUTIONS:
+                romHandler.randomizeBasicTwoEvosStarters(settings);
+                startersChanged = true;
+                break;
+            default:
+                break;
+        }
+        if (settings.isRandomizeStartersHeldItems() && !(romHandler instanceof Gen1RomHandler)) {
+            romHandler.randomizeStarterHeldItems(settings);
+        }
 
-            if (startersChanged) {
-                logStarters(log);
-            }
+        if (startersChanged) {
+            logStarters(log);
         }
 
         // Move Data Log

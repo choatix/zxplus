@@ -2520,16 +2520,14 @@ public class NewRandomizerGUI {
             spUnchangedRadioButton.setEnabled(true);
             spUnchangedRadioButton.setSelected(true);
 
-            if (romHandler.canChangeStarters()) {
-                spCustomRadioButton.setEnabled(true);
-                spRandomCompletelyRadioButton.setEnabled(true);
-                spRandomTwoEvosRadioButton.setEnabled(true);
-                spAllowAltFormesCheckBox.setVisible(romHandler.hasStarterAltFormes());
-                if (romHandler.isYellow()) {
-                    spComboBox3.setVisible(false);
-                }
-                populateDropdowns();
+            spCustomRadioButton.setEnabled(true);
+            spRandomCompletelyRadioButton.setEnabled(true);
+            spRandomTwoEvosRadioButton.setEnabled(true);
+            spAllowAltFormesCheckBox.setVisible(romHandler.hasStarterAltFormes());
+            if (romHandler.isYellow()) {
+                spComboBox3.setVisible(false);
             }
+            populateDropdowns();
 
             boolean hasStarterHeldItems = (pokemonGeneration == 2 || pokemonGeneration == 3);
             spRandomizeStarterHeldItemsCheckBox.setEnabled(hasStarterHeldItems);

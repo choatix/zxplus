@@ -3580,11 +3580,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public boolean canChangeStarters() {
-        return true;
-    }
-
-    @Override
     public boolean hasStarterAltFormes() {
         return false;
     }

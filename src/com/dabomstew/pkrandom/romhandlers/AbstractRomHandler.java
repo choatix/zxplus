@@ -6186,12 +6186,6 @@ public abstract class AbstractRomHandler implements RomHandler {
      * The implication here is that these WILL be overridden by at least one
      * subclass.
      */
-
-    @Override
-    public boolean canChangeStarters() {
-        return true;
-    }
-
     @Override
     public boolean typeInGame(Type type) {
         return !type.isHackOnly && !(type == Type.FAIRY && generationOfPokemon() < 6);
