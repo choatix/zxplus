@@ -49,7 +49,7 @@ public class Settings {
 
     public static final int VERSION = Version.VERSION;
 
-    public static final int LENGTH_OF_SETTINGS_DATA = 49;
+    public static final int LENGTH_OF_SETTINGS_DATA = 50;
 
     private CustomNamesSet customNames;
 
@@ -304,6 +304,13 @@ public class Settings {
     private boolean guaranteeEvolutionItems;
     private boolean guaranteeXItems;
 
+    public enum PickupItemsMod {
+        UNCHANGED, RANDOM
+    }
+
+    private PickupItemsMod pickupItemsMod = PickupItemsMod.UNCHANGED;
+    private boolean banBadRandomPickupItems;
+
     // to and from strings etc
     public void write(FileOutputStream out) throws IOException {
         byte[] settings = toString().getBytes("UTF-8");
@@ -366,7 +373,6 @@ public class Settings {
                 limitPokemon, typesFollowMegaEvolutions));
 
         // 3: v171: changed to the abilities byte
-
         out.write(makeByteSelected(abilitiesMod == AbilitiesMod.UNCHANGED, abilitiesMod == AbilitiesMod.RANDOMIZE,
                 allowWonderGuard, abilitiesFollowEvolutions, banTrappingAbilities, banNegativeAbilities, banBadAbilities,
                 abilitiesFollowMegaEvolutions));
@@ -376,7 +382,7 @@ public class Settings {
                 startersMod == StartersMod.UNCHANGED, startersMod == StartersMod.RANDOM_WITH_TWO_EVOLUTIONS,
                 randomizeStartersHeldItems, banBadRandomStarterHeldItems, allowStarterAltFormes));
 
-        // @5 dropdowns
+        // 5 - 10: dropdowns
         write2ByteInt(out, customStarters[0] - 1);
         write2ByteInt(out, customStarters[1] - 1);
         write2ByteInt(out, customStarters[2] - 1);
@@ -391,7 +397,6 @@ public class Settings {
         out.write((movesetsForceGoodDamaging ? 0x80 : 0) | movesetsGoodDamagingPercent);
 
         // 13 trainer pokemon
-        // changed 160
         out.write(makeByteSelected(trainersMod == TrainersMod.UNCHANGED,
                 trainersMod == TrainersMod.RANDOM,
                 trainersMod == TrainersMod.DISTRIBUTED,
@@ -410,7 +415,6 @@ public class Settings {
                 wildPokemonMod == WildPokemonMod.UNCHANGED, useTimeBasedEncounters));
 
         // 16 wild pokemon 2
-        // bugfix 161
         out.write(makeByteSelected(useMinimumCatchRate, blockWildLegendaries,
                 wildPokemonRestrictionMod == WildPokemonRestrictionMod.SIMILAR_STRENGTH, randomizeWildPokemonHeldItems,
                 banBadRandomWildPokemonHeldItems, false, false, balanceShakingGrass)
@@ -424,7 +428,6 @@ public class Settings {
                 limitMainGameLegendaries, limit600, allowStaticAltFormes, swapStaticMegaEvos));
 
         // 18 tm randomization
-        // new stuff 162
         out.write(makeByteSelected(tmsHmsCompatibilityMod == TMsHMsCompatibilityMod.COMPLETELY_RANDOM,
                 tmsHmsCompatibilityMod == TMsHMsCompatibilityMod.RANDOM_PREFER_TYPE,
                 tmsHmsCompatibilityMod == TMsHMsCompatibilityMod.UNCHANGED, tmsMod == TMsMod.RANDOM,
@@ -432,7 +435,6 @@ public class Settings {
                 tmsHmsCompatibilityMod == TMsHMsCompatibilityMod.FULL));
 
         // 19 tms part 2
-        // new in 170
         out.write(makeByteSelected(fullHMCompat, tmsFollowEvolutions, tutorFollowEvolutions));
 
         // 20 tms good damaging
@@ -449,7 +451,6 @@ public class Settings {
         // 22 tutors good damaging
         out.write((tutorsForceGoodDamaging ? 0x80 : 0) | tutorsGoodDamagingPercent);
 
-        // new 150
         // 23 in game trades
         out.write(makeByteSelected(inGameTradesMod == InGameTradesMod.RANDOMIZE_GIVEN_AND_REQUESTED,
                 inGameTradesMod == InGameTradesMod.RANDOMIZE_GIVEN, randomizeInGameTradesItems,
@@ -460,7 +461,6 @@ public class Settings {
         out.write(makeByteSelected(fieldItemsMod == FieldItemsMod.RANDOM, fieldItemsMod == FieldItemsMod.SHUFFLE,
                 fieldItemsMod == FieldItemsMod.UNCHANGED, banBadRandomFieldItems, fieldItemsMod == FieldItemsMod.RANDOM_EVEN));
 
-        // new 170
         // 25 move randomizers
         // + static music
         out.write(makeByteSelected(randomizeMovePowers, randomizeMoveAccuracies, randomizeMovePPs, randomizeMoveTypes,
@@ -479,7 +479,7 @@ public class Settings {
                 swapTrainerMegaEvos,
                 shinyChance));
 
-        // @ 28 pokemon restrictions
+        // 28 - 31: pokemon restrictions
         try {
             if (currentRestrictions != null) {
                 writeFullInt(out, currentRestrictions.toInt());
@@ -490,21 +490,25 @@ public class Settings {
             e.printStackTrace(); // better than nothing
         }
 
-        // @ 32 misc tweaks
+        // 32 - 35: misc tweaks
         try {
             writeFullInt(out, currentMiscTweaks);
         } catch (IOException e) {
             e.printStackTrace(); // better than nothing
         }
 
-        // @ 36 trainer pokemon level modifier
+        // 36 trainer pokemon level modifier
         out.write((trainersLevelModified ? 0x80 : 0) | (trainersLevelModifier+50));
 
+        // 37 shop items
         out.write(makeByteSelected(shopItemsMod == ShopItemsMod.RANDOM, shopItemsMod == ShopItemsMod.SHUFFLE,
-                shopItemsMod == ShopItemsMod.UNCHANGED, banBadRandomShopItems, banRegularShopItems, banOPShopItems, balanceShopPrices, guaranteeEvolutionItems));
+                shopItemsMod == ShopItemsMod.UNCHANGED, banBadRandomShopItems, banRegularShopItems, banOPShopItems,
+                balanceShopPrices, guaranteeEvolutionItems));
 
+        // 38 wild level modifier
         out.write((wildLevelsModified ? 0x80 : 0) | (wildLevelModifier+50));
 
+        // 39 EXP curve mod, block broken moves, alt forme stuff
         out.write(makeByteSelected(
                 expCurveMod == ExpCurveMod.LEGENDARIES,
                 expCurveMod == ExpCurveMod.STRONG_LEGENDARIES,
@@ -515,12 +519,13 @@ public class Settings {
                 allowTrainerAlternateFormes,
                 allowWildAltFormes));
 
-        // 40
+        // 40 Double Battle Mode, Additional Boss/Important Trainer Pokemon, Weigh Duplicate Abilities
         out.write((doubleBattleMode ? 0x1 : 0) |
                 (additionalBossTrainerPokemon << 1) |
                 (additionalImportantTrainerPokemon << 4) |
                 (weighDuplicateAbilitiesTogether ? 0x80 : 0));
 
+        // 41 Additional Regular Trainer Pokemon, Aura modification, evolution moves, guarantee X items
         out.write(additionalRegularTrainerPokemon |
                 ((auraMod == AuraMod.UNCHANGED) ? 0x8 : 0) |
                 ((auraMod == AuraMod.RANDOM) ? 0x10 : 0) |
@@ -528,6 +533,7 @@ public class Settings {
                 (evolutionMovesForAll ? 0x40 : 0) |
                 (guaranteeXItems ? 0x80 : 0));
 
+        // 42 Totem Pokemon settings
         out.write(makeByteSelected(
                 totemPokemonMod == TotemPokemonMod.UNCHANGED,
                 totemPokemonMod == TotemPokemonMod.RANDOM,
@@ -536,18 +542,19 @@ public class Settings {
                 allyPokemonMod == AllyPokemonMod.RANDOM,
                 allyPokemonMod == AllyPokemonMod.SIMILAR_STRENGTH,
                 randomizeTotemHeldItems,
-                allowTotemAltFormes
-        ));
+                allowTotemAltFormes));
 
+        // 43 Totem level modifier
         out.write((totemLevelsModified ? 0x80 : 0) | (totemLevelModifier+50));
 
-        // These two get a byte each for future proofing
+        // 44 - 45: These two get a byte each for future proofing
         out.write(updateBaseStatsToGeneration);
-
         out.write(updateMovesToGeneration);
 
+        // 46 Selected EXP curve
         out.write(selectedEXPCurve.toByte());
 
+        // 47 Static level modifier
         out.write((staticLevelModified ? 0x80 : 0) | (staticLevelModifier+50));
 
         // 48 trainer pokemon held items.
@@ -557,6 +564,10 @@ public class Settings {
                 consumableItemsOnlyForTrainerPokemon,
                 sensibleItemsOnlyForTrainerPokemon,
                 highestLevelOnlyGetsItemsForTrainerPokemon));
+
+        // 49 pickup item randomization
+        out.write(makeByteSelected(pickupItemsMod == PickupItemsMod.UNCHANGED,
+                pickupItemsMod == PickupItemsMod.RANDOM, banBadRandomPickupItems));
 
         try {
             byte[] romName = this.romName.getBytes("US-ASCII");
@@ -834,6 +845,11 @@ public class Settings {
         settings.setConsumableItemsOnlyForTrainers(restoreState(data[48], 3));
         settings.setSensibleItemsOnlyForTrainers(restoreState(data[48], 4));
         settings.setHighestLevelGetsItemsForTrainers(restoreState(data[48], 5));
+
+        settings.setPickupItemsMod(restoreEnum(PickupItemsMod.class, data[49],
+                1, // UNCHANGED
+                0));       // RANDOMIZE
+        settings.setBanBadRandomPickupItems(restoreState(data[49], 2));
 
         int romNameLength = data[LENGTH_OF_SETTINGS_DATA] & 0xFF;
         String romName = new String(data, LENGTH_OF_SETTINGS_DATA + 1, romNameLength, "US-ASCII");
@@ -2193,6 +2209,26 @@ public class Settings {
 
     public void setGuaranteeXItems(boolean guaranteeXItems) {
         this.guaranteeXItems = guaranteeXItems;
+    }
+
+    public PickupItemsMod getPickupItemsMod() {
+        return pickupItemsMod;
+    }
+
+    public void setPickupItemsMod(boolean... bools) {
+        setPickupItemsMod(getEnum(PickupItemsMod.class, bools));
+    }
+
+    private void setPickupItemsMod(PickupItemsMod pickupItemsMod) {
+        this.pickupItemsMod = pickupItemsMod;
+    }
+
+    public boolean isBanBadRandomPickupItems() {
+        return banBadRandomPickupItems;
+    }
+
+    public void setBanBadRandomPickupItems(boolean banBadRandomPickupItems) {
+        this.banBadRandomPickupItems = banBadRandomPickupItems;
     }
 
     private static int makeByteSelected(boolean... bools) {

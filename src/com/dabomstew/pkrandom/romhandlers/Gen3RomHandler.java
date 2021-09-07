@@ -76,6 +76,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         private boolean copyStaticPokemon;
         private Map<String, Integer> entries = new HashMap<>();
         private Map<String, int[]> arrayEntries = new HashMap<>();
+        private Map<String, String> strings = new HashMap<>();
         private List<StaticPokemon> staticPokemon = new ArrayList<>();
         private List<StaticPokemon> roamingPokemon = new ArrayList<>();
         private List<TMOrMTTextEntry> tmmtTexts = new ArrayList<>();
@@ -94,6 +95,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             this.copyStaticPokemon = toCopy.copyStaticPokemon;
             this.entries.putAll(toCopy.entries);
             this.arrayEntries.putAll(toCopy.arrayEntries);
+            this.strings.putAll(toCopy.strings);
             this.staticPokemon.addAll(toCopy.staticPokemon);
             this.roamingPokemon.addAll(toCopy.roamingPokemon);
             this.tmmtTexts.addAll(toCopy.tmmtTexts);
@@ -105,6 +107,13 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 entries.put(key, 0);
             }
             return entries.get(key);
+        }
+
+        private String getString(String key) {
+            if (!strings.containsKey(key)) {
+                strings.put(key, "");
+            }
+            return strings.get(key);
         }
     }
 
@@ -210,6 +219,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                                     // copy from here
                                     current.arrayEntries.putAll(otherEntry.arrayEntries);
                                     current.entries.putAll(otherEntry.entries);
+                                    current.strings.putAll(otherEntry.strings);
                                     boolean cTT = (current.getValue("CopyTMText") == 1);
                                     if (current.copyStaticPokemon) {
                                         current.staticPokemon.addAll(otherEntry.staticPokemon);
@@ -224,6 +234,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                                     current.tableFile = otherEntry.tableFile;
                                 }
                             }
+                        } else if (r[0].endsWith("Locator")) {
+                            current.strings.put(r[0], r[1]);
                         } else {
                             if (r[1].startsWith("[") && r[1].endsWith("]")) {
                                 String[] offsets = r[1].substring(1, r[1].length() - 1).split(",");
@@ -332,6 +344,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     private int pokedexCount;
     private String[] pokeNames;
     private ItemList allowedItems, nonBadItems;
+    private int pickupItemsTableOffset;
 
     @Override
     public boolean detectRom(byte[] rom) {
@@ -2754,6 +2767,41 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     @Override
     public List<Integer> getMainGameShops() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public List<Integer> getPickupItems() {
+        List<Integer> pickupItems = new ArrayList<>();
+        int pickupItemCount = romEntry.getValue("PickupItemCount");
+        int sizeOfPickupEntry = romEntry.romType == Gen3Constants.RomType_Em ? 2 : 4;
+
+        if (pickupItemsTableOffset == 0) {
+            String pickupTableStartLocator = romEntry.getString("PickupTableStartLocator");
+            int offset = find(pickupTableStartLocator);
+            if (offset > 0) {
+                pickupItemsTableOffset = offset;
+            }
+        }
+
+        if (pickupItemsTableOffset > 0) {
+            for (int i = 0; i < pickupItemCount; i++) {
+                int itemOffset = pickupItemsTableOffset + (sizeOfPickupEntry * i);
+                int item = FileFunctions.read2ByteInt(rom, itemOffset);
+                pickupItems.add(item);
+            }
+        }
+        return pickupItems;
+    }
+
+    @Override
+    public void setPickupItems(List<Integer> pickupItems) {
+        int sizeOfPickupEntry = romEntry.romType == Gen3Constants.RomType_Em ? 2 : 4;
+        if (pickupItemsTableOffset > 0) {
+            for (int i = 0; i < pickupItems.size(); i++) {
+                int itemOffset = pickupItemsTableOffset + (sizeOfPickupEntry * i);
+                FileFunctions.write2ByteInt(rom, itemOffset, pickupItems.get(i));
+            }
+        }
     }
 
     @Override

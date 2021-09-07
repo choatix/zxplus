@@ -643,6 +643,13 @@ public class Randomizer {
             logShops(log);
         }
 
+        // Pickup Items
+        if (settings.getPickupItemsMod() == Settings.PickupItemsMod.RANDOM) {
+            List<Integer> oldPickupItems = romHandler.getPickupItems();
+            romHandler.randomizePickupItems(settings);
+            logPickupItems(log, oldPickupItems);
+        }
+
         // Test output for placement history
         // romHandler.renderPlacementHistory();
 
@@ -1213,6 +1220,19 @@ public class Randomizer {
                 log.println();
             }
             
+            log.println();
+        }
+        log.println();
+    }
+
+    private void logPickupItems(final PrintStream log, List<Integer> oldPickupItems) {
+        List<Integer> pickupItems = romHandler.getPickupItems();
+        String[] itemNames = romHandler.getItemNames();
+        log.println("--Pickup Items--");
+        for (int i = 0; i < oldPickupItems.size(); i++) {
+            int item = pickupItems.get(i);
+            int oldItem = oldPickupItems.get(i);
+            log.printf("%s => %s", itemNames[oldItem], itemNames[item]);
             log.println();
         }
         log.println();

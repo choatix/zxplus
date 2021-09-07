@@ -287,6 +287,10 @@ public class NewRandomizerGUI {
     private JCheckBox tpConsumableItemsOnlyCheckBox;
     private JCheckBox tpSensibleItemsCheckBox;
     private JCheckBox tpHighestLevelGetsItemCheckBox;
+    private JPanel pickupItemsPanel;
+    private JRadioButton puUnchangedRadioButton;
+    private JRadioButton puRandomRadioButton;
+    private JCheckBox puBanBadItemsCheckBox;
 
     private static JFrame frame;
 
@@ -449,6 +453,8 @@ public class NewRandomizerGUI {
         shUnchangedRadioButton.addActionListener(e -> enableOrDisableSubControls());
         shShuffleRadioButton.addActionListener(e -> enableOrDisableSubControls());
         shRandomRadioButton.addActionListener(e -> enableOrDisableSubControls());
+        puUnchangedRadioButton.addActionListener(e -> enableOrDisableSubControls());
+        puRandomRadioButton.addActionListener(e -> enableOrDisableSubControls());
         websiteLinkLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -1497,6 +1503,9 @@ public class NewRandomizerGUI {
         shGuaranteeEvolutionItemsCheckBox.setSelected(settings.isGuaranteeEvolutionItems());
         shGuaranteeXItemsCheckBox.setSelected(settings.isGuaranteeXItems());
 
+        puUnchangedRadioButton.setSelected(settings.getPickupItemsMod() == Settings.PickupItemsMod.UNCHANGED);
+        puRandomRadioButton.setSelected(settings.getPickupItemsMod() == Settings.PickupItemsMod.RANDOM);
+        puBanBadItemsCheckBox.setSelected(settings.isBanBadRandomPickupItems());
 
         int mtsSelected = settings.getCurrentMiscTweaks();
         int mtCount = MiscTweak.allTweaks.size();
@@ -1676,7 +1685,6 @@ public class NewRandomizerGUI {
         settings.setBanBadRandomFieldItems(fiBanBadItemsCheckBox.isSelected());
 
         settings.setShopItemsMod(shUnchangedRadioButton.isSelected(), shShuffleRadioButton.isSelected(), shRandomRadioButton.isSelected());
-
         settings.setBanBadRandomShopItems(shBanBadItemsCheckBox.isSelected());
         settings.setBanRegularShopItems(shBanRegularShopItemsCheckBox.isSelected());
         settings.setBanOPShopItems(shBanOverpoweredShopItemsCheckBox.isSelected());
@@ -1684,6 +1692,8 @@ public class NewRandomizerGUI {
         settings.setGuaranteeEvolutionItems(shGuaranteeEvolutionItemsCheckBox.isSelected());
         settings.setGuaranteeXItems(shGuaranteeXItemsCheckBox.isSelected());
 
+        settings.setPickupItemsMod(puUnchangedRadioButton.isSelected(), puRandomRadioButton.isSelected());
+        settings.setBanBadRandomPickupItems(puBanBadItemsCheckBox.isSelected());
 
         int currentMiscTweaks = 0;
         int mtCount = MiscTweak.allTweaks.size();
@@ -2383,6 +2393,15 @@ public class NewRandomizerGUI {
         shGuaranteeXItemsCheckBox.setVisible(true);
         shGuaranteeXItemsCheckBox.setEnabled(false);
         shGuaranteeXItemsCheckBox.setSelected(false);
+        puUnchangedRadioButton.setVisible(true);
+        puUnchangedRadioButton.setEnabled(false);
+        puUnchangedRadioButton.setSelected(false);
+        puRandomRadioButton.setVisible(true);
+        puRandomRadioButton.setEnabled(false);
+        puRandomRadioButton.setSelected(false);
+        puBanBadItemsCheckBox.setVisible(true);
+        puBanBadItemsCheckBox.setEnabled(false);
+        puBanBadItemsCheckBox.setSelected(false);
         miscBWExpPatchCheckBox.setVisible(true);
         miscBWExpPatchCheckBox.setEnabled(false);
         miscBWExpPatchCheckBox.setSelected(false);
@@ -2731,6 +2750,11 @@ public class NewRandomizerGUI {
             shUnchangedRadioButton.setSelected(true);
             shShuffleRadioButton.setEnabled(true);
             shRandomRadioButton.setEnabled(true);
+
+            pickupItemsPanel.setVisible(romHandler.generationOfPokemon() == 3);
+            puUnchangedRadioButton.setEnabled(true);
+            puUnchangedRadioButton.setSelected(true);
+            puRandomRadioButton.setEnabled(true);
 
             int mtsAvailable = romHandler.miscTweaksAvailable();
             int mtCount = MiscTweak.allTweaks.size();
@@ -3332,6 +3356,13 @@ public class NewRandomizerGUI {
             shGuaranteeEvolutionItemsCheckBox.setSelected(false);
             shGuaranteeXItemsCheckBox.setEnabled(false);
             shGuaranteeXItemsCheckBox.setSelected(false);
+        }
+
+        if (puRandomRadioButton.isSelected() && puRandomRadioButton.isVisible() && puRandomRadioButton.isEnabled()) {
+            puBanBadItemsCheckBox.setEnabled(true);
+        } else {
+            puBanBadItemsCheckBox.setEnabled(false);
+            puBanBadItemsCheckBox.setSelected(false);
         }
     }
 

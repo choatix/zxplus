@@ -4943,6 +4943,21 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     @Override
+    public void randomizePickupItems(Settings settings) {
+        boolean banBadItems = settings.isBanBadRandomPickupItems();
+
+        ItemList possibleItems = banBadItems ? this.getNonBadItems() : this.getAllowedItems();
+        List<Integer> currentItems = this.getPickupItems();
+        List<Integer> newItems = new ArrayList<>();
+        for (int i = 0; i < currentItems.size(); i++) {
+            // TODO: Should we allow TMs in Gen 3/4?
+            newItems.add(possibleItems.randomNonTM(this.random));
+        }
+
+        this.setPickupItems(newItems);
+    }
+
+    @Override
     public void minimumCatchRate(int rateNonLegendary, int rateLegendary) {
         List<Pokemon> pokes = getPokemonInclFormes();
         for (Pokemon pkmn : pokes) {
@@ -6333,5 +6348,15 @@ public abstract class AbstractRomHandler implements RomHandler {
     @Override
     public List<Pokemon> getBannedFormesForTrainerPokemon() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public List<Integer> getPickupItems() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void setPickupItems(List<Integer> pickupItems) {
+        // do nothing
     }
 }
