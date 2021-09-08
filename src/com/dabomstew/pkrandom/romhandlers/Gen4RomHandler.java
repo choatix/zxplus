@@ -427,6 +427,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     private ItemList allowedItems, nonBadItems;
     private boolean roamerRandomizationEnabled;
     private boolean effectivenessUpdated;
+    private int pickupItemsTableOffset, rarePickupItemsTableOffset;
 
     private RomEntry romEntry;
 
@@ -3993,6 +3994,64 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         return Arrays.stream(romEntry.arrayEntries.get("MainGameShops"))
                 .boxed()
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Integer> getPickupItems() {
+        List<Integer> pickupItems = new ArrayList<>();
+        try {
+            byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
+            if (pickupItemsTableOffset == 0) {
+                int offset = find(battleOverlay, Gen4Constants.pickupTableLocator);
+                if (offset > 0) {
+                    pickupItemsTableOffset = offset;
+                }
+            }
+            if (rarePickupItemsTableOffset == 0) {
+                int offset = find(battleOverlay, Gen4Constants.rarePickupTableLocator);
+                if (offset > 0) {
+                    rarePickupItemsTableOffset = offset;
+                }
+            }
+            if (pickupItemsTableOffset > 0 && rarePickupItemsTableOffset > 0) {
+                for (int i = 0; i < Gen4Constants.numberOfCommonPickupItems; i++) {
+                    int itemOffset = pickupItemsTableOffset + (2 * i);
+                    int item = FileFunctions.read2ByteInt(battleOverlay, itemOffset);
+                    pickupItems.add(item);
+                }
+                for (int i = 0; i < Gen4Constants.numberOfRarePickupItems; i++) {
+                    int itemOffset = rarePickupItemsTableOffset + (2 * i);
+                    int item = FileFunctions.read2ByteInt(battleOverlay, itemOffset);
+                    pickupItems.add(item);
+                }
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+        return pickupItems;
+    }
+
+    @Override
+    public void setPickupItems(List<Integer> pickupItems) {
+        try {
+            if (pickupItemsTableOffset > 0 && rarePickupItemsTableOffset > 0) {
+                byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
+                Iterator<Integer> itemIterator = pickupItems.iterator();
+                for (int i = 0; i < Gen4Constants.numberOfCommonPickupItems; i++) {
+                    int itemOffset = pickupItemsTableOffset + (2 * i);
+                    int item = itemIterator.next();
+                    FileFunctions.write2ByteInt(battleOverlay, itemOffset, item);
+                }
+                for (int i = 0; i < Gen4Constants.numberOfRarePickupItems; i++) {
+                    int itemOffset = rarePickupItemsTableOffset + (2 * i);
+                    int item = itemIterator.next();
+                    FileFunctions.write2ByteInt(battleOverlay, itemOffset, item);
+                }
+                writeOverlay(romEntry.getInt("BattleOvlNumber"), battleOverlay);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
     }
 
     @Override

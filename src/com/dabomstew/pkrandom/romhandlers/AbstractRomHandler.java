@@ -4950,8 +4950,13 @@ public abstract class AbstractRomHandler implements RomHandler {
         List<Integer> currentItems = this.getPickupItems();
         List<Integer> newItems = new ArrayList<>();
         for (int i = 0; i < currentItems.size(); i++) {
-            // TODO: Should we allow TMs in Gen 3/4?
-            newItems.add(possibleItems.randomNonTM(this.random));
+            if (this.generationOfPokemon() == 3 || this.generationOfPokemon() == 4) {
+                // Allow TMs in Gen 3/4 since they aren't infinite (and you get TMs from Pickup in the vanilla game)
+                newItems.add(possibleItems.randomItem(this.random));
+            } else {
+                newItems.add(possibleItems.randomNonTM(this.random));
+            }
+
         }
 
         this.setPickupItems(newItems);
