@@ -345,6 +345,8 @@ public class Gen5Constants {
 
     public static final String typeEffectivenessTableLocator = "0404040404020400";
 
+    public static final String forceChallengeModePrefix = "816A406B0B1C07490022434090000858834201D1";
+
     // https://bulbapedia.bulbagarden.net/wiki/List_of_items_by_index_number_(Generation_V)
     // Held items we randomize from Gen 5 are a superset of the held items from Gen 4. Thus, we list only the
     // new ones here.

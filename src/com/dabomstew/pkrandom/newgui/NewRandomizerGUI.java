@@ -291,6 +291,7 @@ public class NewRandomizerGUI {
     private JRadioButton puUnchangedRadioButton;
     private JRadioButton puRandomRadioButton;
     private JCheckBox puBanBadItemsCheckBox;
+    private JCheckBox miscForceChallengeModeCheckBox;
 
     private static JFrame frame;
 

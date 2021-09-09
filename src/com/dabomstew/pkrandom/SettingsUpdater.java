@@ -181,7 +181,7 @@ public class SettingsUpdater {
                 oldTweaks |= MiscTweak.UPDATE_TYPE_EFFECTIVENESS.getValue();
             }
             if ((dataBlock[2] & (1 << 5)) != 0) {
-                oldTweaks |= MiscTweak.UNUSED1.getValue();
+                oldTweaks |= MiscTweak.FORCE_CHALLENGE_MODE.getValue();
             }
             FileFunctions.writeFullInt(dataBlock, 27, oldTweaks);
 
@@ -234,7 +234,6 @@ public class SettingsUpdater {
         }
 
         if (oldVersion < 300) {
-
             // wild level modifier
             insertExtraByte(38, (byte) 50);
 
@@ -243,7 +242,6 @@ public class SettingsUpdater {
         }
 
         if (oldVersion < 311) {
-
             // double battle mode + boss/important extra pokemon
             insertExtraByte(40, (byte) 0);
 
@@ -264,7 +262,6 @@ public class SettingsUpdater {
         }
 
         if (oldVersion < 314) {
-
             // exp curve
             insertExtraByte(46, (byte) 0);
 
@@ -273,15 +270,22 @@ public class SettingsUpdater {
         }
 
         if (oldVersion < 315) {
-
             int oldTweaks = FileFunctions.readFullInt(dataBlock, 32);
 
-            oldTweaks &= ~MiscTweak.UNUSED1.getValue();
+            // This tweak used to be "Randomize Hidden Hollows", which got moved to static Pokemon
+            // randomization, so the misc tweak became unused in this version. It eventually *was*
+            // used in a future version for something else, but don't get confused by the new name.
+            oldTweaks &= ~MiscTweak.FORCE_CHALLENGE_MODE.getValue();
 
             FileFunctions.writeFullInt(dataBlock, 32, oldTweaks);
 
+            // Trainer Pokemon held items
             insertExtraByte(48, (byte) 0);
+        }
 
+        if (oldVersion < 316) {
+            // Pickup items
+            insertExtraByte(49, (byte) 0);
         }
 
         // fix checksum

@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.dabomstew.pkrandom.newgui.NewRandomizerGUI">
   <grid id="27dc6" binding="mainPanel" layout-manager="GridBagLayout">
     <constraints>
-      <xy x="7" y="20" width="1084" height="831"/>
+      <xy x="7" y="20" width="1135" height="831"/>
     </constraints>
     <properties/>
     <border type="none">
@@ -3530,6 +3530,17 @@
                       <enabled value="false"/>
                       <text resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="CodeTweaks.fasterHpAndExpBars.name"/>
                       <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="CodeTweaks.fasterHpAndExpBars.toolTipText"/>
+                    </properties>
+                  </component>
+                  <component id="531ae" class="javax.swing.JCheckBox" binding="miscForceChallengeModeCheckBox">
+                    <constraints>
+                      <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties>
+                      <enabled value="false"/>
+                      <text resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="CodeTweaks.forceChallengeMode.name"/>
+                      <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="CodeTweaks.forceChallengeMode.toolTipText"/>
                     </properties>
                   </component>
                 </children>
