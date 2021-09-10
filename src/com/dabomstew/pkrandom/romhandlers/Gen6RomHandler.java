@@ -216,6 +216,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     private List<String> shopNames;
     private int shopItemsOffset;
     private ItemList allowedItems, nonBadItems;
+    private int pickupItemsTableOffset;
 
     private GARCArchive pokeGarc, moveGarc, stringsGarc, storyTextGarc;
 
@@ -3590,6 +3591,36 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     @Override
     public List<Integer> getMainGameShops() {
         return Gen6Constants.getMainGameShops(romEntry.romType);
+    }
+
+    @Override
+    public List<Integer> getPickupItems() {
+        List<Integer> pickupItems = new ArrayList<>();
+        if (pickupItemsTableOffset == 0) {
+            int offset = find(code, Gen6Constants.pickupTableLocator);
+            if (offset > 0) {
+                pickupItemsTableOffset = offset;
+            }
+        }
+        if (pickupItemsTableOffset > 0) {
+            for (int i = 0; i < Gen6Constants.numberOfPickupItems; i++) {
+                int itemOffset = pickupItemsTableOffset + (2 * i);
+                int item = FileFunctions.read2ByteInt(code, itemOffset);
+                pickupItems.add(item);
+            }
+        }
+        return pickupItems;
+    }
+
+    @Override
+    public void setPickupItems(List<Integer> pickupItems) {
+        if (pickupItemsTableOffset > 0) {
+            for (int i = 0; i < Gen6Constants.numberOfPickupItems; i++) {
+                int itemOffset = pickupItemsTableOffset + (2 * i);
+                int item = pickupItems.get(i);
+                FileFunctions.write2ByteInt(code, itemOffset, item);
+            }
+        }
     }
 
     @Override

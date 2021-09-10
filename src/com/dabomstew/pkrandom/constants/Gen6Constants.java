@@ -244,6 +244,9 @@ public class Gen6Constants {
             orasGetHoennDexCaughtFunctionPrefix = "170F122F1CC15800";
     public static final int megastoneTableStartingOffsetORAS = 0xABA, megastoneTableEntrySizeORAS = 0x20, megastoneTableLengthORAS = 27;
 
+    public static final String pickupTableLocator = "110012001A00";
+    public static final int numberOfPickupItems = 29;
+
     // https://bulbapedia.bulbagarden.net/wiki/List_of_items_by_index_number_(Generation_VI)
     // Held items we randomize from Gen 6 are a superset of the held items from Gen 5. Thus, we list only the
     // new ones here.
