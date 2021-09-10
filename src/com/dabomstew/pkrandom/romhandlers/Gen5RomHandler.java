@@ -371,6 +371,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     private boolean hiddenHollowCounted = false;
     private List<Integer> originalDoubleTrainers = new ArrayList<>();
     private boolean effectivenessUpdated;
+    private int pickupItemsTableOffset;
     
     private NARCArchive pokeNarc, moveNarc, stringsNarc, storyTextNarc, scriptNarc, shopNarc;
 
@@ -3815,6 +3816,47 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     @Override
     public List<Integer> getMainGameShops() {
         return Gen5Constants.getMainGameShops(romEntry.romType);
+    }
+
+    @Override
+    public List<Integer> getPickupItems() {
+        List<Integer> pickupItems = new ArrayList<>();
+        try {
+            byte[] battleOverlay = readOverlay(romEntry.getInt("PickupOvlNumber"));
+            if (pickupItemsTableOffset == 0) {
+                int offset = find(battleOverlay, Gen5Constants.pickupTableLocator);
+                if (offset > 0) {
+                    pickupItemsTableOffset = offset;
+                }
+            }
+            if (pickupItemsTableOffset > 0) {
+                for (int i = 0; i < Gen5Constants.numberOfPickupItems; i++) {
+                    int itemOffset = pickupItemsTableOffset + (2 * i);
+                    int item = FileFunctions.read2ByteInt(battleOverlay, itemOffset);
+                    pickupItems.add(item);
+                }
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+        return pickupItems;
+    }
+
+    @Override
+    public void setPickupItems(List<Integer> pickupItems) {
+        try {
+            if (pickupItemsTableOffset > 0) {
+                byte[] battleOverlay = readOverlay(romEntry.getInt("PickupOvlNumber"));
+                for (int i = 0; i < Gen5Constants.numberOfPickupItems; i++) {
+                    int itemOffset = pickupItemsTableOffset + (2 * i);
+                    int item = pickupItems.get(i);
+                    FileFunctions.write2ByteInt(battleOverlay, itemOffset, item);
+                }
+                writeOverlay(romEntry.getInt("PickupOvlNumber"), battleOverlay);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
     }
 
     @Override
