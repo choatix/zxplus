@@ -1136,11 +1136,47 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             int oeOffset = romEntry.getValue("StaticPokemonOddEggOffset");
             int oeSize = romEntry.getValue("StaticPokemonOddEggDataSize");
             for (int i = 0; i < Gen2Constants.oddEggPokemonCount; i++) {
-                rom[oeOffset + i * oeSize] = (byte) statics.next().pkmn.number;
+                int oddEggPokemonNumber = statics.next().pkmn.number;
+                rom[oeOffset + i * oeSize] = (byte) oddEggPokemonNumber;
+                setMovesForOddEggPokemon(oddEggPokemonNumber, oeOffset + i * oeSize);
             }
         }
 
         return true;
+    }
+
+    // This method depends on movesets being randomized before static Pokemon. This is currently true,
+    // but may not *always* be true, so take care.
+    private void setMovesForOddEggPokemon(int oddEggPokemonNumber, int oddEggPokemonOffset) {
+        // Determine the level 5 moveset, minus Dizzy Punch
+        Map<Integer, List<MoveLearnt>> movesets = this.getMovesLearnt();
+        List<Move> moves = this.getMoves();
+        List<MoveLearnt> moveset = movesets.get(oddEggPokemonNumber);
+        Queue<Integer> level5Moveset = new LinkedList<>();
+        int currentMoveIndex = 0;
+        while (moveset.size() > currentMoveIndex && moveset.get(currentMoveIndex).level <= 5) {
+            if (level5Moveset.size() == 4) {
+                level5Moveset.remove();
+            }
+            level5Moveset.add(moveset.get(currentMoveIndex).move);
+            currentMoveIndex++;
+        }
+
+        // Now add Dizzy Punch and write the moveset and PP
+        if (level5Moveset.size() == 4) {
+            level5Moveset.remove();
+        }
+        level5Moveset.add(Moves.dizzyPunch);
+        for (int i = 0; i < 4; i++) {
+            int move = 0;
+            int pp = 0;
+            if (level5Moveset.size() > 0) {
+                move = level5Moveset.remove();
+                pp = moves.get(move).pp; // This assumes the ordering of moves matches the internal order
+            }
+            rom[oddEggPokemonOffset + 2 + i] = (byte) move;
+            rom[oddEggPokemonOffset + 23 + i] = (byte) pp;
+        }
     }
 
     @Override
