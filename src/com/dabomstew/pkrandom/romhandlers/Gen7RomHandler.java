@@ -3173,6 +3173,40 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public List<Integer> getPickupItems() {
+        List<Integer> pickupItems = new ArrayList<>();
+        try {
+            GARCArchive pickupGarc = this.readGARC(romEntry.getString("PickupData"), false);
+            byte[] pickupData = pickupGarc.getFile(0);
+            int numberOfPickupItems = FileFunctions.readFullIntLittleEndian(pickupData, 0) - 1; // GameFreak why???
+            for (int i = 0; i < numberOfPickupItems; i++) {
+                int offset = 4 + (i * 0xC);
+                int item = FileFunctions.read2ByteInt(pickupData, offset);
+                pickupItems.add(item);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+        return pickupItems;
+    }
+
+    @Override
+    public void setPickupItems(List<Integer> pickupItems) {
+        try {
+            GARCArchive pickupGarc = this.readGARC(romEntry.getString("PickupData"), false);
+            byte[] pickupData = pickupGarc.getFile(0);
+            for (int i = 0; i < pickupItems.size(); i++) {
+                int offset = 4 + (i * 0xC);
+                int item = pickupItems.get(i);
+                FileFunctions.write2ByteInt(pickupData, offset, item);
+            }
+            this.writeGARC(romEntry.getString("PickupData"), pickupGarc);
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+    }
+
+    @Override
     public BufferedImage getMascotImage() {
         try {
             GARCArchive pokespritesGARC = this.readGARC(romEntry.getString("PokemonGraphics"), false);
