@@ -125,8 +125,10 @@ public abstract class AbstractRomHandler implements RomHandler {
                 addPokesFromRange(mainPokemonList, allPokemon, Species.rowlet, maxGen7SpeciesID);
             }
 
-            // Add all the evolutionary relatives for everything in the mainPokemonList
-            addEvolutionaryRelatives(mainPokemonList);
+            // If the user specified it, add all the evolutionary relatives for everything in the mainPokemonList
+            if (restrictions.allow_evolutionary_relatives) {
+                addEvolutionaryRelatives(mainPokemonList);
+            }
 
             // Now that mainPokemonList has all the selected Pokemon, update mainPokemonListInclFormes too
             addAllPokesInclFormes(mainPokemonList, mainPokemonListInclFormes);
@@ -5125,10 +5127,31 @@ public abstract class AbstractRomHandler implements RomHandler {
             if (!evolutionaryRelatives.contains(ev.from)) {
                 Pokemon preEvo = ev.from;
                 evolutionaryRelatives.add(preEvo);
+
+                // At this point, preEvo is basically the "parent" of pk. Run
+                // getEvolutionaryRelatives on preEvo in order to get pk's
+                // "sibling" evolutions too. For example, if pk is Espeon, then
+                // preEvo here will be Eevee, and this will add all the other
+                // eeveelutions to the relatives list.
+                List<Pokemon> relativesForPreEvo = getEvolutionaryRelatives(preEvo);
+                for (Pokemon preEvoRelative : relativesForPreEvo) {
+                    if (!evolutionaryRelatives.contains(preEvoRelative)) {
+                        evolutionaryRelatives.add(preEvoRelative);
+                    }
+                }
+
                 while (preEvo.evolutionsTo.size() > 0) {
                     preEvo = preEvo.evolutionsTo.get(0).from;
                     if (!evolutionaryRelatives.contains(preEvo)) {
                         evolutionaryRelatives.add(preEvo);
+
+                        // Similar to above, get the "sibling" evolutions here too.
+                        relativesForPreEvo = getEvolutionaryRelatives(preEvo);
+                        for (Pokemon preEvoRelative : relativesForPreEvo) {
+                            if (!evolutionaryRelatives.contains(preEvoRelative)) {
+                                evolutionaryRelatives.add(preEvoRelative);
+                            }
+                        }
                     }
                 }
             }
