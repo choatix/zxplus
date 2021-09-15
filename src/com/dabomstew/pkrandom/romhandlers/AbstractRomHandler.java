@@ -98,51 +98,18 @@ public abstract class AbstractRomHandler implements RomHandler {
 
             if (restrictions.allow_gen1) {
                 addPokesFromRange(mainPokemonList, allPokemon, Species.bulbasaur, Species.mew);
-                if (restrictions.assoc_g1_g2 && allPokemon.size() > Gen2Constants.pokemonCount) {
-                    addEvosFromRange(mainPokemonList, Species.bulbasaur, Species.mew, Species.chikorita, Species.celebi);
-                }
-                if (restrictions.assoc_g1_g4 && allPokemon.size() > Gen4Constants.pokemonCount) {
-                    addEvosFromRange(mainPokemonList, Species.bulbasaur, Species.mew, Species.turtwig, Species.arceus);
-                }
-                if (restrictions.assoc_g1_g6 && allPokemon.size() > 721) {
-                    addEvosFromRange(mainPokemonList, Species.bulbasaur, Species.mew, Species.chespin, Species.volcanion);
-                }
             }
 
             if (restrictions.allow_gen2 && allPokemon.size() > Gen2Constants.pokemonCount) {
                 addPokesFromRange(mainPokemonList, allPokemon, Species.chikorita, Species.celebi);
-                if (restrictions.assoc_g2_g1) {
-                    addEvosFromRange(mainPokemonList, Species.chikorita, Species.celebi, Species.bulbasaur, Species.mew);
-                }
-                if (restrictions.assoc_g2_g3 && allPokemon.size() > Gen3Constants.pokemonCount) {
-                    addEvosFromRange(mainPokemonList, Species.chikorita, Species.celebi, Species.treecko, Species.deoxys);
-                }
-                if (restrictions.assoc_g2_g4 && allPokemon.size() > Gen4Constants.pokemonCount) {
-                    addEvosFromRange(mainPokemonList, Species.chikorita, Species.celebi, Species.turtwig, Species.arceus);
-                }
             }
 
             if (restrictions.allow_gen3 && allPokemon.size() > Gen3Constants.pokemonCount) {
                 addPokesFromRange(mainPokemonList, allPokemon, Species.treecko, Species.deoxys);
-                if (restrictions.assoc_g3_g2) {
-                    addEvosFromRange(mainPokemonList, Species.treecko, Species.deoxys, Species.chikorita, Species.celebi);
-                }
-                if (restrictions.assoc_g3_g4 && allPokemon.size() > Gen4Constants.pokemonCount) {
-                    addEvosFromRange(mainPokemonList, Species.treecko, Species.deoxys, Species.turtwig, Species.arceus);
-                }
             }
 
             if (restrictions.allow_gen4 && allPokemon.size() > Gen4Constants.pokemonCount) {
                 addPokesFromRange(mainPokemonList, allPokemon, Species.turtwig, Species.arceus);
-                if (restrictions.assoc_g4_g1) {
-                    addEvosFromRange(mainPokemonList, Species.turtwig, Species.arceus, Species.bulbasaur, Species.mew);
-                }
-                if (restrictions.assoc_g4_g2) {
-                    addEvosFromRange(mainPokemonList, Species.turtwig, Species.arceus, Species.chikorita, Species.celebi);
-                }
-                if (restrictions.assoc_g4_g3) {
-                    addEvosFromRange(mainPokemonList, Species.turtwig, Species.arceus, Species.treecko, Species.deoxys);
-                }
             }
 
             if (restrictions.allow_gen5 && allPokemon.size() > Gen5Constants.pokemonCount) {
@@ -151,15 +118,15 @@ public abstract class AbstractRomHandler implements RomHandler {
 
             if (restrictions.allow_gen6 && allPokemon.size() > Gen6Constants.pokemonCount) {
                 addPokesFromRange(mainPokemonList, allPokemon, Species.chespin, Species.volcanion);
-                if (restrictions.assoc_g6_g1) {
-                    addEvosFromRange(mainPokemonList, Species.chespin, Species.volcanion, Species.bulbasaur, Species.mew);
-                }
             }
 
             int maxGen7SpeciesID = isSM ? Species.marshadow : Species.zeraora;
             if (restrictions.allow_gen7 && allPokemon.size() > maxGen7SpeciesID) {
                 addPokesFromRange(mainPokemonList, allPokemon, Species.rowlet, maxGen7SpeciesID);
             }
+
+            // Add all the evolutionary relatives for everything in the mainPokemonList
+            addEvolutionaryRelatives(mainPokemonList);
 
             // Now that mainPokemonList has all the selected Pokemon, update mainPokemonListInclFormes too
             addAllPokesInclFormes(mainPokemonList, mainPokemonListInclFormes);
@@ -214,25 +181,13 @@ public abstract class AbstractRomHandler implements RomHandler {
         }
     }
 
-    private void addEvosFromRange(List<Pokemon> pokemonPool, int first_min, int first_max, int second_min,
-            int second_max) {
+    private void addEvolutionaryRelatives(List<Pokemon> pokemonPool) {
         Set<Pokemon> newPokemon = new TreeSet<>();
         for (Pokemon pk : pokemonPool) {
-            if (pk.number >= first_min && pk.number <= first_max) {
-                for (Evolution ev : pk.evolutionsFrom) {
-                    if (ev.to.number >= second_min && ev.to.number <= second_max) {
-                        if (!pokemonPool.contains(ev.to) && !newPokemon.contains(ev.to)) {
-                            newPokemon.add(ev.to);
-                        }
-                    }
-                }
-
-                for (Evolution ev : pk.evolutionsTo) {
-                    if (ev.from.number >= second_min && ev.from.number <= second_max) {
-                        if (!pokemonPool.contains(ev.from) && !newPokemon.contains(ev.from)) {
-                            newPokemon.add(ev.from);
-                        }
-                    }
+            List<Pokemon> evolutionaryRelatives = getEvolutionaryRelatives(pk);
+            for (Pokemon relative : evolutionaryRelatives) {
+                if (!pokemonPool.contains(relative) && !newPokemon.contains(relative)) {
+                    newPokemon.add(relative);
                 }
             }
         }
@@ -5146,6 +5101,40 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
         }
         return null;
+    }
+
+    private List<Pokemon> getEvolutionaryRelatives(Pokemon pk) {
+        List<Pokemon> evolutionaryRelatives = new ArrayList<>();
+        for (Evolution ev : pk.evolutionsFrom) {
+            if (!evolutionaryRelatives.contains(ev.to)) {
+                Pokemon evo = ev.to;
+                evolutionaryRelatives.add(evo);
+                Queue<Evolution> evolutionsList = new LinkedList<>();
+                evolutionsList.addAll(evo.evolutionsFrom);
+                while (evolutionsList.size() > 0) {
+                    evo = evolutionsList.remove().to;
+                    if (!evolutionaryRelatives.contains(evo)) {
+                        evolutionaryRelatives.add(evo);
+                        evolutionsList.addAll(evo.evolutionsFrom);
+                    }
+                }
+            }
+        }
+
+        for (Evolution ev : pk.evolutionsTo) {
+            if (!evolutionaryRelatives.contains(ev.from)) {
+                Pokemon preEvo = ev.from;
+                evolutionaryRelatives.add(preEvo);
+                while (preEvo.evolutionsTo.size() > 0) {
+                    preEvo = preEvo.evolutionsTo.get(0).from;
+                    if (!evolutionaryRelatives.contains(preEvo)) {
+                        evolutionaryRelatives.add(preEvo);
+                    }
+                }
+            }
+        }
+
+        return evolutionaryRelatives;
     }
 
     private static class EvolutionPair {

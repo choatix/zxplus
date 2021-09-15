@@ -32,12 +32,6 @@ public class GenRestrictions {
 
     public boolean allow_gen1, allow_gen2, allow_gen3, allow_gen4, allow_gen5, allow_gen6, allow_gen7;
 
-    public boolean assoc_g1_g2, assoc_g1_g4, assoc_g1_g6;
-    public boolean assoc_g2_g1, assoc_g2_g3, assoc_g2_g4;
-    public boolean assoc_g3_g2, assoc_g3_g4;
-    public boolean assoc_g4_g1, assoc_g4_g2, assoc_g4_g3;
-    public boolean assoc_g6_g1;
-
     public GenRestrictions() {
     }
 
@@ -49,23 +43,6 @@ public class GenRestrictions {
         allow_gen5 = (state & 16) > 0;
         allow_gen6 = (state & 32) > 0;
         allow_gen7 = (state & 64) > 0;
-
-        assoc_g1_g2 = (state & 128) > 0;
-        assoc_g1_g4 = (state & 256) > 0;
-        assoc_g1_g6 = (state & 512) > 0;
-
-        assoc_g2_g1 = (state & 1024) > 0;
-        assoc_g2_g3 = (state & 2048) > 0;
-        assoc_g2_g4 = (state & 4096) > 0;
-
-        assoc_g3_g2 = (state & 8192) > 0;
-        assoc_g3_g4 = (state & 16384) > 0;
-
-        assoc_g4_g1 = (state & 32768) > 0;
-        assoc_g4_g2 = (state & 65536) > 0;
-        assoc_g4_g3 = (state & 131072) > 0;
-
-        assoc_g6_g1 = (state & 262144) > 0;
     }
 
     public boolean nothingSelected() {
@@ -73,38 +50,24 @@ public class GenRestrictions {
     }
 
     public int toInt() {
-        return makeIntSelected(allow_gen1, allow_gen2, allow_gen3, allow_gen4, allow_gen5, allow_gen6, allow_gen7,
-                assoc_g1_g2, assoc_g1_g4, assoc_g1_g6, assoc_g2_g1, assoc_g2_g3, assoc_g2_g4, assoc_g3_g2, assoc_g3_g4,
-                assoc_g4_g1, assoc_g4_g2, assoc_g4_g3, assoc_g6_g1);
+        return makeIntSelected(allow_gen1, allow_gen2, allow_gen3, allow_gen4, allow_gen5, allow_gen6, allow_gen7);
     }
 
     public void limitToGen(int generation) {
         if (generation < 2) {
             allow_gen2 = false;
-            assoc_g1_g2 = false;
-            assoc_g2_g1 = false;
         }
         if (generation < 3) {
             allow_gen3 = false;
-            assoc_g2_g3 = false;
-            assoc_g3_g2 = false;
         }
         if (generation < 4) {
             allow_gen4 = false;
-            assoc_g1_g4 = false;
-            assoc_g2_g4 = false;
-            assoc_g3_g4 = false;
-            assoc_g4_g1 = false;
-            assoc_g4_g2 = false;
-            assoc_g4_g3 = false;
         }
         if (generation < 5) {
             allow_gen5 = false;
         }
         if (generation < 6) {
             allow_gen6 = false;
-            assoc_g1_g6 = false;
-            assoc_g6_g1 = false;
         }
         if (generation < 7) {
             allow_gen7 = false;

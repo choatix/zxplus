@@ -270,22 +270,25 @@ public class SettingsUpdater {
         }
 
         if (oldVersion < 315) {
-            int oldTweaks = FileFunctions.readFullInt(dataBlock, 32);
-
             // This tweak used to be "Randomize Hidden Hollows", which got moved to static Pokemon
             // randomization, so the misc tweak became unused in this version. It eventually *was*
             // used in a future version for something else, but don't get confused by the new name.
+            int oldTweaks = FileFunctions.readFullInt(dataBlock, 32);
             oldTweaks &= ~MiscTweak.FORCE_CHALLENGE_MODE.getValue();
-
             FileFunctions.writeFullInt(dataBlock, 32, oldTweaks);
 
             // Trainer Pokemon held items
             insertExtraByte(48, (byte) 0);
         }
 
-        if (oldVersion < 316) {
+        if (oldVersion < 317) {
             // Pickup items
             insertExtraByte(49, (byte) 0);
+
+            // Clear "assoc" state from GenRestrictions as it doesn't exist any longer
+            int genRestrictions = FileFunctions.readFullInt(dataBlock, 28);
+            genRestrictions &= 127;
+            FileFunctions.writeFullInt(dataBlock, 28, genRestrictions);
         }
 
         // fix checksum
