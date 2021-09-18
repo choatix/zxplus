@@ -645,9 +645,8 @@ public class Randomizer {
 
         // Pickup Items
         if (settings.getPickupItemsMod() == Settings.PickupItemsMod.RANDOM) {
-            List<Integer> oldPickupItems = romHandler.getPickupItems();
             romHandler.randomizePickupItems(settings);
-            logPickupItems(log, oldPickupItems);
+            logPickupItems(log);
         }
 
         // Test output for placement history
@@ -1225,14 +1224,33 @@ public class Randomizer {
         log.println();
     }
 
-    private void logPickupItems(final PrintStream log, List<Integer> oldPickupItems) {
-        List<Integer> pickupItems = romHandler.getPickupItems();
+    private void logPickupItems(final PrintStream log) {
+        List<PickupItem> pickupItems = romHandler.getPickupItems();
         String[] itemNames = romHandler.getItemNames();
         log.println("--Pickup Items--");
-        for (int i = 0; i < oldPickupItems.size(); i++) {
-            int item = pickupItems.get(i);
-            int oldItem = oldPickupItems.get(i);
-            log.printf("%s => %s", itemNames[oldItem], itemNames[item]);
+        for (int levelRange = 0; levelRange < 10; levelRange++) {
+            int startingLevel = (levelRange * 10) + 1;
+            int endingLevel = (levelRange + 1) * 10;
+            log.printf("Level %s-%s", startingLevel, endingLevel);
+            log.println();
+            TreeMap<Integer, List<String>> itemListPerProbability = new TreeMap<>();
+            for (PickupItem pickupItem : pickupItems) {
+                int probability = pickupItem.probabilities[levelRange];
+                if (itemListPerProbability.containsKey(probability)) {
+                    itemListPerProbability.get(probability).add(itemNames[pickupItem.item]);
+                } else if (probability > 0) {
+                    List<String> itemList = new ArrayList<>();
+                    itemList.add(itemNames[pickupItem.item]);
+                    itemListPerProbability.put(probability, itemList);
+                }
+            }
+            for (Map.Entry<Integer, List<String>> itemListPerProbabilityEntry : itemListPerProbability.descendingMap().entrySet()) {
+                int probability = itemListPerProbabilityEntry.getKey();
+                List<String> itemList = itemListPerProbabilityEntry.getValue();
+                String itemsString = String.join(", ", itemList);
+                log.printf("%d%%: %s", probability, itemsString);
+                log.println();
+            }
             log.println();
         }
         log.println();

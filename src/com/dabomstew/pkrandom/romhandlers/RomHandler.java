@@ -525,9 +525,9 @@ public interface RomHandler {
     // Pickup Items
     // ============
 
-    List<Integer> getPickupItems();
+    List<PickupItem> getPickupItems();
 
-    void setPickupItems(List<Integer> pickupItems);
+    void setPickupItems(List<PickupItem> pickupItems);
 
     void randomizePickupItems(Settings settings);
 

@@ -4904,16 +4904,19 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean banBadItems = settings.isBanBadRandomPickupItems();
 
         ItemList possibleItems = banBadItems ? this.getNonBadItems() : this.getAllowedItems();
-        List<Integer> currentItems = this.getPickupItems();
-        List<Integer> newItems = new ArrayList<>();
+        List<PickupItem> currentItems = this.getPickupItems();
+        List<PickupItem> newItems = new ArrayList<>();
         for (int i = 0; i < currentItems.size(); i++) {
+            int item;
             if (this.generationOfPokemon() == 3 || this.generationOfPokemon() == 4) {
                 // Allow TMs in Gen 3/4 since they aren't infinite (and you get TMs from Pickup in the vanilla game)
-                newItems.add(possibleItems.randomItem(this.random));
+                item = possibleItems.randomItem(this.random);
             } else {
-                newItems.add(possibleItems.randomNonTM(this.random));
+                item = possibleItems.randomNonTM(this.random);
             }
-
+            PickupItem pickupItem = new PickupItem(item);
+            pickupItem.probabilities = Arrays.copyOf(currentItems.get(i).probabilities, currentItems.size());
+            newItems.add(pickupItem);
         }
 
         this.setPickupItems(newItems);
@@ -6368,12 +6371,12 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     @Override
-    public List<Integer> getPickupItems() {
+    public List<PickupItem> getPickupItems() {
         return new ArrayList<>();
     }
 
     @Override
-    public void setPickupItems(List<Integer> pickupItems) {
+    public void setPickupItems(List<PickupItem> pickupItems) {
         // do nothing
     }
 }

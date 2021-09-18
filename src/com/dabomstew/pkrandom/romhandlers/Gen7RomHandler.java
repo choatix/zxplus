@@ -3173,8 +3173,8 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
-    public List<Integer> getPickupItems() {
-        List<Integer> pickupItems = new ArrayList<>();
+    public List<PickupItem> getPickupItems() {
+        List<PickupItem> pickupItems = new ArrayList<>();
         try {
             GARCArchive pickupGarc = this.readGARC(romEntry.getString("PickupData"), false);
             byte[] pickupData = pickupGarc.getFile(0);
@@ -3182,7 +3182,11 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             for (int i = 0; i < numberOfPickupItems; i++) {
                 int offset = 4 + (i * 0xC);
                 int item = FileFunctions.read2ByteInt(pickupData, offset);
-                pickupItems.add(item);
+                PickupItem pickupItem = new PickupItem(item);
+                for (int levelRange = 0; levelRange < 10; levelRange++) {
+                    pickupItem.probabilities[levelRange] = pickupData[offset + levelRange + 2];
+                }
+                pickupItems.add(pickupItem);
             }
         } catch (IOException e) {
             throw new RandomizerIOException(e);
@@ -3191,13 +3195,13 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
-    public void setPickupItems(List<Integer> pickupItems) {
+    public void setPickupItems(List<PickupItem> pickupItems) {
         try {
             GARCArchive pickupGarc = this.readGARC(romEntry.getString("PickupData"), false);
             byte[] pickupData = pickupGarc.getFile(0);
             for (int i = 0; i < pickupItems.size(); i++) {
                 int offset = 4 + (i * 0xC);
-                int item = pickupItems.get(i);
+                int item = pickupItems.get(i).item;
                 FileFunctions.write2ByteInt(pickupData, offset, item);
             }
             this.writeGARC(romEntry.getString("PickupData"), pickupGarc);

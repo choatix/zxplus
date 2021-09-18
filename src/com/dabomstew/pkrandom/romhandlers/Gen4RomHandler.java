@@ -3997,8 +3997,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public List<Integer> getPickupItems() {
-        List<Integer> pickupItems = new ArrayList<>();
+    public List<PickupItem> getPickupItems() {
+        List<PickupItem> pickupItems = new ArrayList<>();
         try {
             byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
             if (pickupItemsTableOffset == 0) {
@@ -4007,22 +4007,44 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     pickupItemsTableOffset = offset;
                 }
             }
+
+            // If we haven't found the pickup table for this ROM already, find it.
             if (rarePickupItemsTableOffset == 0) {
                 int offset = find(battleOverlay, Gen4Constants.rarePickupTableLocator);
                 if (offset > 0) {
                     rarePickupItemsTableOffset = offset;
                 }
             }
+
+            // Assuming we've found the pickup table, extract the items out of it.
             if (pickupItemsTableOffset > 0 && rarePickupItemsTableOffset > 0) {
                 for (int i = 0; i < Gen4Constants.numberOfCommonPickupItems; i++) {
                     int itemOffset = pickupItemsTableOffset + (2 * i);
                     int item = FileFunctions.read2ByteInt(battleOverlay, itemOffset);
-                    pickupItems.add(item);
+                    PickupItem pickupItem = new PickupItem(item);
+                    pickupItems.add(pickupItem);
                 }
                 for (int i = 0; i < Gen4Constants.numberOfRarePickupItems; i++) {
                     int itemOffset = rarePickupItemsTableOffset + (2 * i);
                     int item = FileFunctions.read2ByteInt(battleOverlay, itemOffset);
-                    pickupItems.add(item);
+                    PickupItem pickupItem = new PickupItem(item);
+                    pickupItems.add(pickupItem);
+                }
+            }
+
+            // Assuming we got the items from the last step, fill out the probabilities.
+            if (pickupItems.size() > 0) {
+                for (int levelRange = 0; levelRange < 10; levelRange++) {
+                    int startingCommonItemOffset = levelRange;
+                    int startingRareItemOffset = 18 + levelRange;
+                    pickupItems.get(startingCommonItemOffset).probabilities[levelRange] = 30;
+                    for (int i = 1; i < 7; i++) {
+                        pickupItems.get(startingCommonItemOffset + i).probabilities[levelRange] = 10;
+                    }
+                    pickupItems.get(startingCommonItemOffset + 7).probabilities[levelRange] = 4;
+                    pickupItems.get(startingCommonItemOffset + 8).probabilities[levelRange] = 4;
+                    pickupItems.get(startingRareItemOffset).probabilities[levelRange] = 1;
+                    pickupItems.get(startingRareItemOffset + 1).probabilities[levelRange] = 1;
                 }
             }
         } catch (IOException e) {
@@ -4032,19 +4054,19 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public void setPickupItems(List<Integer> pickupItems) {
+    public void setPickupItems(List<PickupItem> pickupItems) {
         try {
             if (pickupItemsTableOffset > 0 && rarePickupItemsTableOffset > 0) {
                 byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
-                Iterator<Integer> itemIterator = pickupItems.iterator();
+                Iterator<PickupItem> itemIterator = pickupItems.iterator();
                 for (int i = 0; i < Gen4Constants.numberOfCommonPickupItems; i++) {
                     int itemOffset = pickupItemsTableOffset + (2 * i);
-                    int item = itemIterator.next();
+                    int item = itemIterator.next().item;
                     FileFunctions.write2ByteInt(battleOverlay, itemOffset, item);
                 }
                 for (int i = 0; i < Gen4Constants.numberOfRarePickupItems; i++) {
                     int itemOffset = rarePickupItemsTableOffset + (2 * i);
-                    int item = itemIterator.next();
+                    int item = itemIterator.next().item;
                     FileFunctions.write2ByteInt(battleOverlay, itemOffset, item);
                 }
                 writeOverlay(romEntry.getInt("BattleOvlNumber"), battleOverlay);

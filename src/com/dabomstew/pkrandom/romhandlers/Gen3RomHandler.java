@@ -2770,11 +2770,12 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     @Override
-    public List<Integer> getPickupItems() {
-        List<Integer> pickupItems = new ArrayList<>();
+    public List<PickupItem> getPickupItems() {
+        List<PickupItem> pickupItems = new ArrayList<>();
         int pickupItemCount = romEntry.getValue("PickupItemCount");
         int sizeOfPickupEntry = romEntry.romType == Gen3Constants.RomType_Em ? 2 : 4;
 
+        // If we haven't found the pickup table for this ROM already, find it.
         if (pickupItemsTableOffset == 0) {
             String pickupTableStartLocator = romEntry.getString("PickupTableStartLocator");
             int offset = find(pickupTableStartLocator);
@@ -2783,23 +2784,66 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             }
         }
 
+        // Assuming we've found the pickup table, extract the items out of it.
         if (pickupItemsTableOffset > 0) {
             for (int i = 0; i < pickupItemCount; i++) {
                 int itemOffset = pickupItemsTableOffset + (sizeOfPickupEntry * i);
                 int item = FileFunctions.read2ByteInt(rom, itemOffset);
-                pickupItems.add(item);
+                PickupItem pickupItem = new PickupItem(item);
+                pickupItems.add(pickupItem);
+            }
+        }
+
+        // Assuming we got the items from the last step, fill out the probabilities based on the game.
+        if (pickupItems.size() > 0) {
+            if (romEntry.romType == Gen3Constants.RomType_Ruby || romEntry.romType == Gen3Constants.RomType_Sapp) {
+                for (int levelRange = 0; levelRange < 10; levelRange++) {
+                    pickupItems.get(0).probabilities[levelRange] = 30;
+                    pickupItems.get(7).probabilities[levelRange] = 5;
+                    pickupItems.get(8).probabilities[levelRange] = 4;
+                    pickupItems.get(9).probabilities[levelRange] = 1;
+                    for (int i = 1; i < 7; i++) {
+                        pickupItems.get(i).probabilities[levelRange] = 10;
+                    }
+                }
+            } else if (romEntry.romType == Gen3Constants.RomType_FRLG) {
+                for (int levelRange = 0; levelRange < 10; levelRange++) {
+                    pickupItems.get(0).probabilities[levelRange] = 15;
+                    for (int i = 1; i < 7; i++) {
+                        pickupItems.get(i).probabilities[levelRange] = 10;
+                    }
+                    for (int i = 7; i < 11; i++) {
+                        pickupItems.get(i).probabilities[levelRange] = 5;
+                    }
+                    for (int i = 11; i < 16; i++) {
+                        pickupItems.get(i).probabilities[levelRange] = 1;
+                    }
+                }
+            } else {
+                for (int levelRange = 0; levelRange < 10; levelRange++) {
+                    int startingCommonItemOffset = levelRange;
+                    int startingRareItemOffset = 18 + levelRange;
+                    pickupItems.get(startingCommonItemOffset).probabilities[levelRange] = 30;
+                    for (int i = 1; i < 7; i++) {
+                        pickupItems.get(startingCommonItemOffset + i).probabilities[levelRange] = 10;
+                    }
+                    pickupItems.get(startingCommonItemOffset + 7).probabilities[levelRange] = 4;
+                    pickupItems.get(startingCommonItemOffset + 8).probabilities[levelRange] = 4;
+                    pickupItems.get(startingRareItemOffset).probabilities[levelRange] = 1;
+                    pickupItems.get(startingRareItemOffset + 1).probabilities[levelRange] = 1;
+                }
             }
         }
         return pickupItems;
     }
 
     @Override
-    public void setPickupItems(List<Integer> pickupItems) {
+    public void setPickupItems(List<PickupItem> pickupItems) {
         int sizeOfPickupEntry = romEntry.romType == Gen3Constants.RomType_Em ? 2 : 4;
         if (pickupItemsTableOffset > 0) {
             for (int i = 0; i < pickupItems.size(); i++) {
                 int itemOffset = pickupItemsTableOffset + (sizeOfPickupEntry * i);
-                FileFunctions.write2ByteInt(rom, itemOffset, pickupItems.get(i));
+                FileFunctions.write2ByteInt(rom, itemOffset, pickupItems.get(i).item);
             }
         }
     }
