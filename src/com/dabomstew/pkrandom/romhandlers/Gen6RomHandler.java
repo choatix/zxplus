@@ -1641,12 +1641,9 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     private void updatePokedexAreaDataFromEncounterSet(EncounterSet es, byte[] pokedexAreaData, int areaIndex, int encounterType) {
         for (Encounter enc : es.encounters) {
             Pokemon pkmn = enc.pokemon;
-            while (pkmn.baseForme != null) { // Failsafe if we need to write encounters without modifying species
-                pkmn = pkmn.baseForme;
-            }
             int perPokemonAreaDataLength = romEntry.romType == Gen6Constants.Type_XY ?
                     Gen6Constants.perPokemonAreaDataLengthXY : Gen6Constants.perPokemonAreaDataLengthORAS;
-            int offset = pkmn.number * perPokemonAreaDataLength + areaIndex * 4;
+            int offset = pkmn.getBaseNumber() * perPokemonAreaDataLength + areaIndex * 4;
             int value = FileFunctions.readFullIntLittleEndian(pokedexAreaData, offset);
             value |= encounterType;
             FileFunctions.writeFullIntLittleEndian(pokedexAreaData, offset, value);
@@ -1656,10 +1653,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     private void writeEncounter(byte[] data, int offset, List<Encounter> encounters) {
         for (int i = 0; i < encounters.size(); i++) {
             Encounter encounter = encounters.get(i);
-            while (encounter.pokemon.baseForme != null) { // Failsafe if we need to write encounters without modifying species
-                encounter.pokemon = encounter.pokemon.baseForme;
-            }
-            int speciesAndFormeData = (encounter.formeNumber << 11) + encounter.pokemon.number;
+            int speciesAndFormeData = (encounter.formeNumber << 11) + encounter.pokemon.getBaseNumber();
             writeWord(data, offset + i * 4, speciesAndFormeData);
             data[offset + 2 + i * 4] = (byte) encounter.level;
             data[offset + 3 + i * 4] = (byte) encounter.maxLevel;
@@ -1669,10 +1663,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     private void writeFieldEncounter(byte[] data, int offset, List<Encounter> encounters) {
         for (int i = 0; i < encounters.size(); i++) {
             Encounter encounter = encounters.get(i);
-            while (encounter.pokemon.baseForme != null) { // Failsafe if we need to write encounters without modifying species
-                encounter.pokemon = encounter.pokemon.baseForme;
-            }
-            writeWord(data, offset + 4 + i * 8, encounter.pokemon.number);
+            writeWord(data, offset + 4 + i * 8, encounter.pokemon.getBaseNumber());
             data[offset + 8 + i * 8] = (byte) encounter.level;
         }
     }

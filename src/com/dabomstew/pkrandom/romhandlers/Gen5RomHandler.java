@@ -39,7 +39,6 @@ import com.dabomstew.pkrandom.*;
 import com.dabomstew.pkrandom.constants.*;
 import com.dabomstew.pkrandom.exceptions.RandomizationException;
 import com.dabomstew.pkrandom.pokemon.*;
-import javafx.scene.effect.Effect;
 import pptxt.PPTxtHandler;
 
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
@@ -1114,10 +1113,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 for (int e = 0; e < amounts[i]; e++) {
                     Pokemon pkmn = pokes[((entry[startOffset + offset + e * 4] & 0xFF) + ((entry[startOffset + offset
                             + 1 + e * 4] & 0x03) << 8))];
-                    while (pkmn.baseForme != null) {
-                        pkmn = pkmn.baseForme;
-                    }
-                    byte[] pokeFile = areaData.get(pkmn.number - 1);
+                    byte[] pokeFile = areaData.get(pkmn.getBaseNumber() - 1);
                     int areaIndex = wildFileToAreaMap[fileNumber];
                     // Route 4?
                     if (romEntry.romType == Gen5Constants.Type_BW2 && areaIndex == Gen5Constants.bw2Route4AreaIndex) {
@@ -1203,12 +1199,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 EncounterSet area = encounters.next();
                 for (int j = 0; j < amounts[i]; j++) {
                     Encounter enc = area.encounters.get(j);
-                    if (enc.pokemon.formeNumber > 0) { // Failsafe if we need to write encounters without modifying species
-                        if (enc.pokemon.baseForme != null) {
-                            enc.pokemon = enc.pokemon.baseForme;
-                        }
-                    }
-                    int speciesAndFormeData = (enc.formeNumber << 11) + enc.pokemon.number;
+                    int speciesAndFormeData = (enc.formeNumber << 11) + enc.pokemon.getBaseNumber();
                     writeWord(entry, startOffset + offset + j * 4, speciesAndFormeData);
                     entry[startOffset + offset + j * 4 + 2] = (byte) enc.level;
                     entry[startOffset + offset + j * 4 + 3] = (byte) enc.maxLevel;

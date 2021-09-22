@@ -185,6 +185,14 @@ public class Pokemon implements Comparable<Pokemon> {
         return (double)attack / ((double)attack + (double)spatk);
     }
 
+    public int getBaseNumber() {
+        Pokemon base = this;
+        while (base.baseForme != null) {
+            base = base.baseForme;
+        }
+        return base.number;
+    }
+
     public void copyBaseFormeBaseStats(Pokemon baseForme) {
         hp = baseForme.hp;
         attack = baseForme.attack;

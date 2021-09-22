@@ -733,12 +733,9 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                 int evosWritten = 0;
                 for (Evolution evo : pk.evolutionsFrom) {
                     Pokemon toPK = evo.to;
-                    while (toPK.baseForme != null) {
-                        toPK = toPK.baseForme;
-                    }
                     writeWord(evoEntry, evosWritten * 8, evo.type.toIndex(7));
                     writeWord(evoEntry, evosWritten * 8 + 2, evo.type.usesLevel() ? 0 : evo.extraInfo);
-                    writeWord(evoEntry, evosWritten * 8 + 4, toPK.number);
+                    writeWord(evoEntry, evosWritten * 8 + 4, toPK.getBaseNumber());
                     evoEntry[evosWritten * 8 + 6] = (byte)evo.forme;
                     evoEntry[evosWritten * 8 + 7] = evo.type.usesLevel() ? (byte)evo.extraInfo : (byte)evo.level;
                     evosWritten++;
@@ -1269,19 +1266,13 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         for (int i = 0; i < numberOfEncounterSlots; i++) {
             int currentOffset = offset + 0xC + (i * 4);
             Encounter enc = encounter.next();
-            if (enc.pokemon.formeNumber > 0) { // Failsafe if we need to write encounters without modifying species
-                enc.pokemon = enc.pokemon.baseForme;
-            }
-            int speciesAndFormeData = (enc.formeNumber << 11) + enc.pokemon.number;
+            int speciesAndFormeData = (enc.formeNumber << 11) + enc.pokemon.getBaseNumber();
             writeWord(encounterTable, currentOffset, speciesAndFormeData);
 
             // SOS encounters for this encounter
             for (int j = 1; j < 8; j++) {
                 Encounter sosEncounter = encounter.next();
-                if (sosEncounter.pokemon.formeNumber > 0) { // Failsafe if we need to write encounters without modifying species
-                    sosEncounter.pokemon = sosEncounter.pokemon.baseForme;
-                }
-                speciesAndFormeData = (sosEncounter.formeNumber << 11) + sosEncounter.pokemon.number;
+                speciesAndFormeData = (sosEncounter.formeNumber << 11) + sosEncounter.pokemon.getBaseNumber();
                 writeWord(encounterTable, currentOffset + (40 * j), speciesAndFormeData);
             }
         }
@@ -1291,10 +1282,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             for (int i = 0; i < 6; i++) {
                 int currentOffset = offset + 0x14C + (i * 4);
                 Encounter weatherSOSEncounter = encounter.next();
-                if (weatherSOSEncounter.pokemon.formeNumber > 0) { // Failsafe if we need to write encounters without modifying species
-                    weatherSOSEncounter.pokemon = weatherSOSEncounter.pokemon.baseForme;
-                }
-                int speciesAndFormeData = (weatherSOSEncounter.formeNumber << 11) + weatherSOSEncounter.pokemon.number;
+                int speciesAndFormeData = (weatherSOSEncounter.formeNumber << 11) + weatherSOSEncounter.pokemon.getBaseNumber();
                 writeWord(encounterTable, currentOffset, speciesAndFormeData);
             }
         }
@@ -1642,10 +1630,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             for (int i = 0; i < numberOfBoostEntries; i++) {
                 Pokemon boostedPokemon = uniquePokemon.get(i);
                 int auraNumber = getAuraNumberForHighestStat(boostedPokemon);
-                while (boostedPokemon.baseForme != null) {
-                    boostedPokemon = boostedPokemon.baseForme;
-                }
-                int speciesNumber = boostedPokemon.number;
+                int speciesNumber = boostedPokemon.getBaseNumber();
                 FileFunctions.write2ByteInt(battleCRO, offset + (i * 0x10), speciesNumber);
                 battleCRO[offset + (i * 0x10) + 2] = (byte) auraNumber;
             }
