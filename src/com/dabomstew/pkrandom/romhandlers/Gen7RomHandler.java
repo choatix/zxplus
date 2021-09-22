@@ -1628,14 +1628,24 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         if (offset > 0) {
             offset += Gen7Constants.beastLusaminePokemonBoostsPrefix.length() / 2; // because it was a prefix
 
-            // The game only has room for five boost entries
-            for (int i = 0; i < 5; i++) {
-                Pokemon boostedPokemon = beastLusamine.pokemon.get(i).pokemon;
-                int speciesNumber = boostedPokemon.number;
-                if (boostedPokemon.baseForme != null) {
-                    speciesNumber = boostedPokemon.baseForme.number;
+            // The game only has room for five boost entries, where each boost entry is determined by species ID.
+            // However, Beast Lusamine might have duplicates in her party, meaning that two Pokemon can share the
+            // same boost entry. First, figure out all the unique Pokemon in her party. We avoid using a Set here
+            // in order to preserve the original ordering; we want to make sure to boost the *first* five Pokemon
+            List<Pokemon> uniquePokemon = new ArrayList<>();
+            for (int i = 0; i < beastLusamine.pokemon.size(); i++) {
+                if (!uniquePokemon.contains(beastLusamine.pokemon.get(i).pokemon)) {
+                    uniquePokemon.add(beastLusamine.pokemon.get(i).pokemon);
                 }
+            }
+            int numberOfBoostEntries = Math.min(uniquePokemon.size(), 5);
+            for (int i = 0; i < numberOfBoostEntries; i++) {
+                Pokemon boostedPokemon = uniquePokemon.get(i);
                 int auraNumber = getAuraNumberForHighestStat(boostedPokemon);
+                while (boostedPokemon.baseForme != null) {
+                    boostedPokemon = boostedPokemon.baseForme;
+                }
+                int speciesNumber = boostedPokemon.number;
                 FileFunctions.write2ByteInt(battleCRO, offset + (i * 0x10), speciesNumber);
                 battleCRO[offset + (i * 0x10) + 2] = (byte) auraNumber;
             }
