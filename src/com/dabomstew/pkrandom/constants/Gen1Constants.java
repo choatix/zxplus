@@ -69,7 +69,7 @@ public class Gen1Constants {
 
     public static final List<Integer> earlyRequiredHMs = Collections.singletonList(Moves.cut);
 
-    public static final int hmsStartIndex = 0xC4, tmsStartIndex = 0xC9;
+    public static final int hmsStartIndex = Gen1Items.hm01, tmsStartIndex = Gen1Items.tm01;
 
     public static final List<Integer> requiredFieldTMs = Arrays.asList(3, 4, 8, 10, 12, 14, 16, 19, 20,
             22, 25, 26, 30, 40, 43, 44, 45, 47);
@@ -110,15 +110,17 @@ public class Gen1Constants {
     public static final ItemList allowedItems = setupAllowedItems();
 
     private static ItemList setupAllowedItems() {
-        ItemList allowedItems = new ItemList(250); // 251-255 are junk TMs
+        ItemList allowedItems = new ItemList(Gen1Items.tm50); // 251-255 are junk TMs
         // Assorted key items & junk
         // 23/01/2014: ban fake PP Up
-        allowedItems.banSingles(5, 6, 7, 8, 9, 31, 48, 50, 59, 63, 64);
-        allowedItems.banRange(21, 8);
-        allowedItems.banRange(41, 5);
-        allowedItems.banRange(69, 10);
+        allowedItems.banSingles(Gen1Items.townMap, Gen1Items.bicycle, Gen1Items.questionMark7,
+                Gen1Items.safariBall, Gen1Items.pokedex, Gen1Items.oldAmber, Gen1Items.cardKey, Gen1Items.ppUpGlitch,
+                Gen1Items.coin, Gen1Items.ssTicket, Gen1Items.goldTeeth);
+        allowedItems.banRange(Gen1Items.boulderBadge, 8);
+        allowedItems.banRange(Gen1Items.domeFossil, 5);
+        allowedItems.banRange(Gen1Items.coinCase, 10);
         // Unused
-        allowedItems.banRange(84, 112);
+        allowedItems.banRange(Gen1Items.unused84, 112);
         // HMs
         allowedItems.banRange(hmsStartIndex, hmCount);
         // Real TMs
