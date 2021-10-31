@@ -91,10 +91,9 @@ public class Gen2Constants {
     public static final List<Integer> illegalVietCrystalMoves = Arrays.asList(
             Moves.protect, Moves.rest, Moves.spikeCannon, Moves.detect);
 
-    public static final int tmBlockOneIndex = 191, tmBlockOneSize = 4, tmBlockTwoIndex = 196, tmBlockTwoSize = 24,
-            tmBlockThreeIndex = 221, tmBlockThreeSize = 22;
-
-    public static final int luckyEggIndex = 0x7E;
+    public static final int tmBlockOneIndex = Gen2Items.tm01, tmBlockOneSize = 4,
+            tmBlockTwoIndex = Gen2Items.tm05, tmBlockTwoSize = 24,
+            tmBlockThreeIndex = Gen2Items.tm29, tmBlockThreeSize = 22;
 
     private static Type[] constructTypeTable() {
         Type[] table = new Type[256];
@@ -171,17 +170,23 @@ public class Gen2Constants {
     }
 
     private static void setupAllowedItems() {
-        allowedItems = new ItemList(249); // 250-255 are junk and cancel
+        allowedItems = new ItemList(Gen2Items.hm07); // 250-255 are junk and cancel
         // Assorted key items
-        allowedItems.banSingles(6, 54, 55, 58, 59, 61, 115, 116, 133, 134, 175, 178);
-        allowedItems.banRange(66, 6);
-        allowedItems.banRange(127, 4);
+        allowedItems.banSingles(Gen2Items.bicycle, Gen2Items.coinCase, Gen2Items.itemfinder, Gen2Items.oldRod,
+                Gen2Items.goodRod, Gen2Items.superRod, Gen2Items.gsBall, Gen2Items.blueCard, Gen2Items.basementKey,
+                Gen2Items.pass, Gen2Items.squirtBottle, Gen2Items.rainbowWing);
+        allowedItems.banRange(Gen2Items.redScale, 6);
+        allowedItems.banRange(Gen2Items.cardKey, 4);
         // HMs
-        allowedItems.banRange(243, 7);
+        allowedItems.banRange(Gen2Items.hm01, 7);
         // Unused items (Teru-Samas and dummy TMs)
-        allowedItems.banSingles(7, 25, 45, 50, 56, 90, 100, 120, 135, 136, 137);
-        allowedItems.banSingles(141, 142, 145, 147, 148, 149, 153, 154, 155, 162, 171);
-        allowedItems.banSingles(176, 179, 190, 220, 195);
+        allowedItems.banSingles(Gen2Items.terusama6, Gen2Items.terusama25, Gen2Items.terusama45,
+                Gen2Items.terusama50, Gen2Items.terusama56, Gen2Items.terusama90, Gen2Items.terusama100,
+                Gen2Items.terusama120, Gen2Items.terusama135, Gen2Items.terusama136, Gen2Items.terusama137,
+                Gen2Items.terusama141, Gen2Items.terusama142, Gen2Items.terusama145, Gen2Items.terusama147,
+                Gen2Items.terusama148, Gen2Items.terusama149, Gen2Items.terusama153, Gen2Items.terusama154,
+                Gen2Items.terusama155, Gen2Items.terusama162, Gen2Items.terusama171, Gen2Items.terusama176,
+                Gen2Items.terusama179, Gen2Items.terusama190, Gen2Items.tm04Unused, Gen2Items.tm28Unused);
         // Real TMs
         allowedItems.tmRange(tmBlockOneIndex, tmBlockOneSize);
         allowedItems.tmRange(tmBlockTwoIndex, tmBlockTwoSize);
@@ -190,11 +195,13 @@ public class Gen2Constants {
         // non-bad items
         // ban specific pokemon hold items, berries, apricorns, mail
         nonBadItems = allowedItems.copy();
-        nonBadItems
-                .banSingles(0x1E, 0x23, 0x3C, 0x4B, 0x55, 0x59, 0x61, 0x63, 0x65, 0x69, 0x76, 0x9E, 0xA3, 0xAD, 0xB4);
-        nonBadItems.banRange(0x5C, 2);
-        nonBadItems.banRange(0xA7, 2);
-        nonBadItems.banRange(0xB5, 9);
+        nonBadItems.banSingles(Gen2Items.luckyPunch, Gen2Items.metalPowder, Gen2Items.silverLeaf,
+                Gen2Items.goldLeaf, Gen2Items.redApricorn, Gen2Items.bluApricorn, Gen2Items.whtApricorn,
+                Gen2Items.blkApricorn, Gen2Items.pnkApricorn, Gen2Items.stick, Gen2Items.thickClub,
+                Gen2Items.flowerMail, Gen2Items.lightBall, Gen2Items.berry, Gen2Items.brickPiece);
+        nonBadItems.banRange(Gen2Items.ylwApricorn, 2);
+        nonBadItems.banRange(Gen2Items.normalBox, 2);
+        nonBadItems.banRange(Gen2Items.surfMail, 9);
     }
 
     public static void universalTrainerTags(List<Trainer> allTrainers) {

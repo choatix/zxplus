@@ -300,7 +300,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         // VietCrystal: exclude Burn Heal, Calcium, and Elixir
         // crashes your game if used, glitches out your inventory if carried
         if (isVietCrystal) {
-            allowedItems.banSingles(10, 31, 65);
+            allowedItems.banSingles(Gen2Items.burnHeal, Gen2Items.calcium, Gen2Items.elixer);
         }
     }
 
@@ -1509,7 +1509,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                         if (evol.from.number == Species.slowpoke) {
                             // Slowpoke: Make water stone => Slowking
                             evol.type = EvolutionType.STONE;
-                            evol.extraInfo = 24; // water stone
+                            evol.extraInfo = Gen2Items.waterStone;
                             addEvoUpdateStone(impossibleEvolutionUpdates, evol, itemNames[24]);
                         } else if (evol.from.number == Species.seadra) {
                             // Seadra: level 40
@@ -1550,12 +1550,12 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                     if (evol.type == EvolutionType.HAPPINESS_DAY) {
                         // Eevee: Make sun stone => Espeon
                         evol.type = EvolutionType.STONE;
-                        evol.extraInfo = 169; // sun stone
+                        evol.extraInfo = Gen2Items.sunStone;
                         addEvoUpdateStone(timeBasedEvolutionUpdates, evol, itemNames[169]);
                     } else if (evol.type == EvolutionType.HAPPINESS_NIGHT) {
                         // Eevee: Make moon stone => Umbreon
                         evol.type = EvolutionType.STONE;
-                        evol.extraInfo = 8; // moon stone
+                        evol.extraInfo = Gen2Items.moonStone;
                         addEvoUpdateStone(timeBasedEvolutionUpdates, evol, itemNames[8]);
                     }
                 }
@@ -1845,8 +1845,8 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         } else if (tweak == MiscTweak.RANDOMIZE_CATCHING_TUTORIAL) {
             randomizeCatchingTutorial();
         } else if (tweak == MiscTweak.BAN_LUCKY_EGG) {
-            allowedItems.banSingles(Gen2Constants.luckyEggIndex);
-            nonBadItems.banSingles(Gen2Constants.luckyEggIndex);
+            allowedItems.banSingles(Gen2Items.luckyEgg);
+            nonBadItems.banSingles(Gen2Items.luckyEgg);
         } else if (tweak == MiscTweak.UPDATE_TYPE_EFFECTIVENESS) {
             updateTypeEffectiveness();
         }
