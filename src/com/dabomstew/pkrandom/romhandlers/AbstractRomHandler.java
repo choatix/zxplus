@@ -4821,7 +4821,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             guaranteedItems.addAll(getEvolutionItems());
         }
         if (placeXItems) {
-            guaranteedItems.addAll(GlobalConstants.xItems);
+            guaranteedItems.addAll(getXItems());
         }
         if (placeEvolutionItems || placeXItems) {
             newItems.addAll(guaranteedItems);
@@ -6356,6 +6356,11 @@ public abstract class AbstractRomHandler implements RomHandler {
     @Override
     public void applyMiscTweak(MiscTweak tweak) {
         // default: do nothing
+    }
+
+    @Override
+    public List<Integer> getXItems() {
+        return GlobalConstants.xItems;
     }
 
     @Override

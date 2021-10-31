@@ -1486,12 +1486,19 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public String[] getShopNames() {
-        return null;
+        return Gen3Constants.getShopNames(romEntry.romType).toArray(new String[0]);
     }
+
     @Override
     public List<Integer> getEvolutionItems() {
-        return null;
+        return Gen3Constants.evolutionItems;
     }
+
+    @Override
+    public List<Integer> getXItems() {
+        return Gen3Constants.xItems;
+    }
+
     @Override
     public List<Integer> getMainPlaythroughTrainers() {
         return new ArrayList<>(); // Not implemented
@@ -2652,14 +2659,14 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                     if (evo.type == EvolutionType.HAPPINESS_DAY && romEntry.romType == Gen3Constants.RomType_FRLG) {
                         // happiness day change to Sun Stone
                         evo.type = EvolutionType.STONE;
-                        evo.extraInfo = Gen3Constants.sunStoneIndex; // sun stone
-                        addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames[Gen3Constants.sunStoneIndex]);
+                        evo.extraInfo = Gen3Items.sunStone;
+                        addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames[Gen3Items.sunStone]);
                     }
                     if (evo.type == EvolutionType.HAPPINESS_NIGHT && romEntry.romType == Gen3Constants.RomType_FRLG) {
                         // happiness night change to Moon Stone
                         evo.type = EvolutionType.STONE;
-                        evo.extraInfo = Gen3Constants.moonStoneIndex; // moon stone
-                        addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames[Gen3Constants.moonStoneIndex]);
+                        evo.extraInfo = Gen3Items.moonStone;
+                        addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames[Gen3Items.moonStone]);
                     }
                     if (evo.type == EvolutionType.LEVEL_HIGH_BEAUTY && romEntry.romType == Gen3Constants.RomType_FRLG) {
                         // beauty change to level 35
@@ -2685,25 +2692,25 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                         } else if (evo.from.number == Species.slowpoke) {
                             // Slowpoke: Water Stone
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen3Constants.waterStoneIndex; // water stone
-                            addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames[Gen3Constants.waterStoneIndex]);
+                            evo.extraInfo = Gen3Items.waterStone;
+                            addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames[Gen3Items.waterStone]);
                         } else if (evo.from.number == Species.seadra) {
                             // Seadra: Lv 40
                             evo.type = EvolutionType.LEVEL;
                             evo.extraInfo = 40;
                             addEvoUpdateLevel(impossibleEvolutionUpdates, evo);
                         } else if (evo.from.number == Species.clamperl
-                                && evo.extraInfo == Gen3Constants.deepSeaToothIndex) {
+                                && evo.extraInfo == Gen3Items.deepSeaTooth) {
                             // Clamperl -> Huntail: Lv30
                             evo.type = EvolutionType.LEVEL;
                             evo.extraInfo = 30;
                             addEvoUpdateLevel(impossibleEvolutionUpdates, evo);
                         } else if (evo.from.number == Species.clamperl
-                                && evo.extraInfo == Gen3Constants.deepSeaScaleIndex) {
+                                && evo.extraInfo == Gen3Items.deepSeaScale) {
                             // Clamperl -> Gorebyss: Water Stone
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen3Constants.waterStoneIndex; // water stone
-                            addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames[Gen3Constants.waterStoneIndex]);
+                            evo.extraInfo = Gen3Items.waterStone;
+                            addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames[Gen3Items.waterStone]);
                         } else {
                             // Onix, Scyther or Porygon: Lv30
                             evo.type = EvolutionType.LEVEL;
@@ -2731,12 +2738,12 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                     if (evol.type == EvolutionType.HAPPINESS_DAY) {
                         // Eevee: Make sun stone => Espeon
                         evol.type = EvolutionType.STONE;
-                        evol.extraInfo = Gen3Constants.sunStoneIndex;
+                        evol.extraInfo = Gen3Items.sunStone;
                         addEvoUpdateStone(timeBasedEvolutionUpdates, evol, itemNames[evol.extraInfo]);
                     } else if (evol.type == EvolutionType.HAPPINESS_NIGHT) {
                         // Eevee: Make moon stone => Umbreon
                         evol.type = EvolutionType.STONE;
-                        evol.extraInfo = Gen3Constants.moonStoneIndex;
+                        evol.extraInfo = Gen3Items.moonStone;
                         addEvoUpdateStone(timeBasedEvolutionUpdates, evol, itemNames[evol.extraInfo]);
                     }
                 }
@@ -2746,27 +2753,66 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public boolean hasShopRandomization() {
-        return false;
+        return true;
     }
 
     @Override
     public Map<Integer, List<Integer>> getShopItems() {
-        return null; // Not implemented
+        List<Integer> skipShops =
+                Arrays.stream(romEntry.arrayEntries.get("SkipShops"))
+                .boxed()
+                .collect(Collectors.toList());
+        Map<Integer, List<Integer>> shopItemsMap = new TreeMap<>();
+        int[] shopItemOffsets = romEntry.arrayEntries.get("ShopItemOffsets");
+        for (int i = 0; i < shopItemOffsets.length; i++) {
+            if (!skipShops.contains(i)) {
+                int offset = shopItemOffsets[i];
+                List<Integer> items = new ArrayList<>();
+                int val = FileFunctions.read2ByteInt(rom, offset);
+                while (val != 0x0000) {
+                    items.add(val);
+                    offset += 2;
+                    val = FileFunctions.read2ByteInt(rom, offset);
+                }
+                shopItemsMap.put(i, items);
+            }
+        }
+        return shopItemsMap;
     }
 
     @Override
     public void setShopItems(Map<Integer, List<Integer>> shopItems) {
-        // Not implemented
+        int[] shopItemOffsets = romEntry.arrayEntries.get("ShopItemOffsets");
+        for (int i = 0; i < shopItemOffsets.length; i++) {
+            List<Integer> thisShopItems = shopItems.get(i);
+            if (thisShopItems != null) {
+                int offset = shopItemOffsets[i];
+                Iterator<Integer> iterItems = thisShopItems.iterator();
+                while (iterItems.hasNext()) {
+                    FileFunctions.write2ByteInt(rom, offset, iterItems.next());
+                    offset += 2;
+                }
+            }
+        }
     }
 
     @Override
     public void setShopPrices() {
-        // Not implemented
+        int itemDataOffset = romEntry.getValue("ItemData");
+        int entrySize = romEntry.getValue("ItemEntrySize");
+        int itemCount = romEntry.getValue("ItemCount");
+        for (int i = 1; i < itemCount; i++) {
+            int balancedPrice = Gen3Constants.balancedItemPrices.get(i) * 10;
+            int offset = itemDataOffset + (i * entrySize) + 16;
+            FileFunctions.write2ByteInt(rom, offset, balancedPrice);
+        }
     }
 
     @Override
     public List<Integer> getMainGameShops() {
-        return new ArrayList<>();
+        return Arrays.stream(romEntry.arrayEntries.get("MainGameShops"))
+                .boxed()
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -3321,12 +3367,12 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public List<Integer> getRegularShopItems() {
-        return null; // Not implemented
+        return Gen3Constants.regularShopItems;
     }
 
     @Override
     public List<Integer> getOPShopItems() {
-        return null; // Not implemented
+        return Gen3Constants.opShopItems;
     }
 
     private void loadItemNames() {
@@ -3600,8 +3646,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         } else if (tweak == MiscTweak.RANDOMIZE_CATCHING_TUTORIAL) {
             randomizeCatchingTutorial();
         } else if (tweak == MiscTweak.BAN_LUCKY_EGG) {
-            allowedItems.banSingles(Gen3Constants.luckyEggIndex);
-            nonBadItems.banSingles(Gen3Constants.luckyEggIndex);
+            allowedItems.banSingles(Gen3Items.luckyEgg);
+            nonBadItems.banSingles(Gen3Items.luckyEgg);
         } else if (tweak == MiscTweak.RANDOMIZE_PC_POTION) {
             randomizePCPotion();
         } else if (tweak == MiscTweak.RUN_WITHOUT_RUNNING_SHOES) {
@@ -3848,14 +3894,14 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 continue;
             }
             if (GBConstants.physicalTypes.contains(move.type) && move.power > 0) {
-                items.add(Gen3Constants.liechiBerry);
+                items.add(Gen3Items.liechiBerry);
                 if (!consumableOnly) {
                     items.addAll(Gen3Constants.typeBoostingItems.get(move.type));
-                    items.add(Gen3Constants.choiceBand);
+                    items.add(Gen3Items.choiceBand);
                 }
             }
             if (!GBConstants.physicalTypes.contains(move.type) && move.power > 0) {
-                items.add(Gen3Constants.petayaBerry);
+                items.add(Gen3Items.petayaBerry);
                 if (!consumableOnly) {
                     items.addAll(Gen3Constants.typeBoostingItems.get(move.type));
                 }

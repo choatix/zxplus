@@ -469,6 +469,8 @@ public interface RomHandler {
 
     List<Integer> getEvolutionItems();
 
+    List<Integer> getXItems();
+
     List<Integer> getUniqueNoSellItems();
 
     List<Integer> getRegularShopItems();

@@ -25,6 +25,9 @@ package com.dabomstew.pkrandom.constants;
 /*----------------------------------------------------------------------------*/
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import com.dabomstew.pkrandom.pokemon.ItemList;
 import com.dabomstew.pkrandom.pokemon.Trainer;
@@ -109,7 +112,7 @@ public class Gen3Constants {
     public static final List<Integer> hmMoves = Arrays.asList(
             Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.rockSmash, Moves.waterfall, Moves.dive);
 
-    public static final int tmItemOffset = 289;
+    public static final int tmItemOffset = Gen3Items.tm01;
 
     public static final int rseItemDescCharsPerLine = 18, frlgItemDescCharsPerLine = 24;
 
@@ -163,8 +166,6 @@ public class Gen3Constants {
 
     public static final int evolutionMethodCount = 15;
 
-    public static final int sunStoneIndex = 93, moonStoneIndex = 94, waterStoneIndex = 97, deepSeaToothIndex = 192, deepSeaScaleIndex = 193;
-
     public static final int cacophonyIndex = 76, airLockIndex = 77, highestAbilityIndex = 77;
 
     public static final Map<Integer,List<Integer>> abilityVariations = setupAbilityVariations();
@@ -204,84 +205,166 @@ public class Gen3Constants {
     public static final List<Integer> rseEarlyRequiredHMMoves = Collections.singletonList(Moves.rockSmash);
 
     public static final List<Integer> frlgEarlyRequiredHMMoves = Collections.singletonList(Moves.cut);
-    
-    public static final int luckyEggIndex = 0xC5;
 
-    // https://bulbapedia.bulbagarden.net/wiki/List_of_items_by_index_number_(Generation_III)
-    // Berries that can be eaten in battle listed. They are in numeric order and roughly categorized.
-    public static final int
-        // status effect berries
-        cheriBerry = 0x85, chestoBerry = 0x86, pechaBerry = 0x87, rawstBerry = 0x88, aspearBerry = 0x89,
-        leppaBerry = 0x8a, oranBerry = 0x8b, persimBerry = 0x8c, lumBerry = 0x8d, sitrusBerry = 0x8e,
-        // Restore 1/8 HP when below 50% but may cause confusion
-        figyBerry = 0x8f, wikiBerry = 0x90, magoBerry = 0x91, aguavBerry = 0x92, iapapaBerry = 0x93,
-        // Increase stat (or other buff) when below 25%
-        liechiBerry = 0xa8, ganlonBerry = 0xa9, salacBerry = 0xaa, petayaBerry = 0xab, apicotBerry = 0xac,
-        lansatBerry = 0xad, starfBerry = 0xae;
-    // Other consumable held items
-    public static final int berryJuice = 0x2c, whiteHerb = 0xb4, mentalHerb = 0xb9;
-    // non-consumable held items with in-battle NPC effect (not specific to one pokemon family)
-    public static final int brightPowder = 0x0b3, quickClaw = 0x0b7, choiceBand = 0x0ba, kingsRock = 0x0bb,
-            silverPowder = 0x0bc, focusBand = 0x0c4, scopeLens = 0x0c6, metalCoat = 0x0c7, leftovers = 0x0c8,
-            softSand = 0x0cb, hardStone = 0x0cc, miracleSeed = 0x0cd, blackGlasses = 0x0ce, blackBelt = 0x0cf,
-            magnet = 0x0d0, mysticWater = 0x0d1, sharpBeak = 0x0d2, poisonBarb = 0x0d3, neverMeltIce = 0x0d4,
-            spellTag = 0x0d5, twistedSpoon = 0x0d6, charcoal = 0x0d7, dragonFang = 0x0d8, silkScarf = 0x0d9,
-            shellBell = 0x0db, seaIncense = 0x0dc, laxIncense = 0x0dd;
-    // species-specific held items.
-    public static final int soulDew = 0x0bf, lightBall = 0x0ca, luckyPunch = 0x0de, metalPowder = 0x0df,
-            thickClub = 0x0e0, stick = 0x0e1;
+    private static List<String> rsShopNames = Arrays.asList(
+            "Slateport Vitamins",
+            "Slateport TMs",
+            "Oldale Poké Mart (Before Pokédex)",
+            "Oldale Poké Mart (After Pokédex)",
+            "Lavaridge Herbs",
+            "Lavaridge Poké Mart",
+            "Fallarbor Poké Mart",
+            "Verdanturf Poké Mart",
+            "Petalburg Poké Mart (Before 4 Badges)",
+            "Petalburg Poké Mart (After 4 Badges)",
+            "Slateport Poké Mart",
+            "Mauville Poké Mart",
+            "Rustboro Poké Mart (Before Delivering Devon Goods)",
+            "Rustboro Poké Mart (After Delivering Devon Goods)",
+            "Fortree Poké Mart",
+            "Lilycove Department Store 2F Left",
+            "Lilycove Department Store 2F Right",
+            "Lilycove Department Store 3F Left",
+            "Lilycove Department Store 3F Right",
+            "Lilycove Department Store 4F Left (TMs)",
+            "Lilycove Department Store 4F Right (TMs)",
+            "Mossdeep Poké Mart",
+            "Sootopolis Poké Mart",
+            "Pokémon League Poké Mart"
+    );
+
+    private static List<String> frlgShopNames = Arrays.asList(
+            "Trainer Tower Poké Mart",
+            "Two Island Market Stall (Initial)",
+            "Two Island Market Stall (After Saving Lostelle)",
+            "Two Island Market Stall (After Hall of Fame)",
+            "Two Island Market Stall (After Ruby/Sapphire Quest)",
+            "Viridian Poké Mart",
+            "Pewter Poké Mart",
+            "Cerulean Poké Mart",
+            "Lavender Poké Mart",
+            "Vermillion Poké Mart",
+            "Celadon Department 2F South",
+            "Celadon Department 2F North (TMs)",
+            "Celadon Department 4F",
+            "Celadon Department 5F South",
+            "Celadon Department 5F North",
+            "Fuchsia Poké Mart",
+            "Cinnabar Poké Mart",
+            "Indigo Plateau Poké Mart",
+            "Saffron Poké Mart",
+            "Seven Island Poké Mart",
+            "Three Island Poké Mart",
+            "Four Island Poké Mart",
+            "Six Island Poké Mart"
+    );
+
+    private static List<String> emShopNames = Arrays.asList(
+            "Slateport Vitamins",
+            "Slateport TMs",
+            "Oldale Poké Mart (Before Pokédex)",
+            "Oldale Poké Mart (After Pokédex)",
+            "Lavaridge Herbs",
+            "Lavaridge Poké Mart",
+            "Fallarbor Poké Mart",
+            "Verdanturf Poké Mart",
+            "Petalburg Poké Mart (Before 4 Badges)",
+            "Petalburg Poké Mart (After 4 Badges)",
+            "Slateport Poké Mart",
+            "Mauville Poké Mart",
+            "Rustboro Poké Mart (Before Delivering Devon Goods)",
+            "Rustboro Poké Mart (After Delivering Devon Goods)",
+            "Fortree Poké Mart",
+            "Lilycove Department Store 2F Left",
+            "Lilycove Department Store 2F Right",
+            "Lilycove Department Store 3F Left",
+            "Lilycove Department Store 3F Right",
+            "Lilycove Department Store 4F Left (TMs)",
+            "Lilycove Department Store 4F Right (TMs)",
+            "Mossdeep Poké Mart",
+            "Sootopolis Poké Mart",
+            "Pokémon League Poké Mart",
+            "Battle Frontier Poké Mart",
+            "Trainer Hill Poké Mart (Before Hall of Fame)",
+            "Trainer Hill Poké Mart (After Hall of Fame)"
+    );
+
+    public static List<String> getShopNames(int romType) {
+        if (romType == RomType_Ruby || romType == RomType_Sapp) {
+            return rsShopNames;
+        } else if (romType == RomType_FRLG) {
+            return frlgShopNames;
+        } else if (romType == RomType_Em) {
+            return emShopNames;
+        }
+        return null;
+    }
+
+    public static final List<Integer> evolutionItems = Arrays.asList(Gen3Items.sunStone, Gen3Items.moonStone,
+            Gen3Items.fireStone, Gen3Items.thunderstone, Gen3Items.waterStone, Gen3Items.leafStone);
+
+    public static final List<Integer> xItems = Arrays.asList(Gen3Items.guardSpec, Gen3Items.direHit, Gen3Items.xAttack,
+            Gen3Items.xDefend, Gen3Items.xSpeed, Gen3Items.xAccuracy, Gen3Items.xSpecial);
 
     public static final List<Integer> consumableHeldItems = Collections.unmodifiableList(Arrays.asList(
-            cheriBerry, chestoBerry, pechaBerry, rawstBerry, aspearBerry, leppaBerry, oranBerry, persimBerry,
-            lumBerry, sitrusBerry, figyBerry, wikiBerry, magoBerry, aguavBerry, iapapaBerry, liechiBerry,
-            ganlonBerry, salacBerry, petayaBerry, apicotBerry, lansatBerry, starfBerry, berryJuice, whiteHerb,
-            mentalHerb));
+            Gen3Items.cheriBerry, Gen3Items.chestoBerry, Gen3Items.pechaBerry, Gen3Items.rawstBerry,
+            Gen3Items.rawstBerry, Gen3Items.leppaBerry, Gen3Items.oranBerry, Gen3Items.persimBerry, Gen3Items.lumBerry,
+            Gen3Items.sitrusBerry, Gen3Items.figyBerry, Gen3Items.wikiBerry, Gen3Items.magoBerry, Gen3Items.aguavBerry,
+            Gen3Items.iapapaBerry, Gen3Items.liechiBerry, Gen3Items.ganlonBerry, Gen3Items.salacBerry,
+            Gen3Items.petayaBerry, Gen3Items.apicotBerry, Gen3Items.lansatBerry, Gen3Items.starfBerry,
+            Gen3Items.berryJuice, Gen3Items.whiteHerb, Gen3Items.mentalHerb));
 
     public static final List<Integer> allHeldItems = setupAllHeldItems();
 
     private static List<Integer> setupAllHeldItems() {
         List<Integer> list = new ArrayList<>();
-        list.addAll(Arrays.asList(brightPowder, quickClaw, choiceBand, kingsRock, silverPowder, focusBand,
-                scopeLens, metalCoat, leftovers, softSand, hardStone, miracleSeed, blackGlasses, blackBelt, magnet,
-                mysticWater, sharpBeak, poisonBarb, neverMeltIce, spellTag, twistedSpoon, charcoal, dragonFang,
-                silkScarf, shellBell, seaIncense, laxIncense));
+        list.addAll(Arrays.asList(Gen3Items.brightPowder, Gen3Items.quickClaw, Gen3Items.choiceBand,
+                Gen3Items.kingsRock, Gen3Items.silverPowder, Gen3Items.focusBand, Gen3Items.scopeLens,
+                Gen3Items.metalCoat, Gen3Items.leftovers, Gen3Items.softSand, Gen3Items.hardStone,
+                Gen3Items.miracleSeed, Gen3Items.blackGlasses, Gen3Items.blackBelt, Gen3Items.magnet,
+                Gen3Items.mysticWater, Gen3Items.sharpBeak, Gen3Items.poisonBarb, Gen3Items.neverMeltIce,
+                Gen3Items.spellTag, Gen3Items.twistedSpoon, Gen3Items.charcoal, Gen3Items.dragonFang,
+                Gen3Items.silkScarf, Gen3Items.shellBell, Gen3Items.seaIncense, Gen3Items.laxIncense));
         list.addAll(consumableHeldItems);
         return Collections.unmodifiableList(list);
     }
 
     public static final List<Integer> generalPurposeConsumableItems = Collections.unmodifiableList(Arrays.asList(
-            cheriBerry, chestoBerry, pechaBerry, rawstBerry, aspearBerry, leppaBerry,
-            oranBerry, persimBerry, lumBerry, sitrusBerry, ganlonBerry, salacBerry,
+            Gen3Items.cheriBerry, Gen3Items.chestoBerry, Gen3Items.pechaBerry, Gen3Items.rawstBerry,
+            Gen3Items.aspearBerry, Gen3Items.leppaBerry, Gen3Items.oranBerry, Gen3Items.persimBerry, Gen3Items.lumBerry,
+            Gen3Items.sitrusBerry, Gen3Items.ganlonBerry, Gen3Items.salacBerry,
             // An NPC pokemon's nature is generated randomly with IVs during gameplay. Therefore, we do not include
             // the flavor berries because, prior to Gen 7, they aren't worth the risk.
-            apicotBerry, lansatBerry, starfBerry, berryJuice, whiteHerb, mentalHerb
+            Gen3Items.apicotBerry, Gen3Items.lansatBerry, Gen3Items.starfBerry, Gen3Items.berryJuice,
+            Gen3Items.whiteHerb, Gen3Items.mentalHerb
     ));
 
     public static final List<Integer> generalPurposeItems = Collections.unmodifiableList(Arrays.asList(
-            brightPowder, quickClaw, kingsRock, focusBand, scopeLens, leftovers, shellBell, laxIncense
+            Gen3Items.brightPowder, Gen3Items.quickClaw, Gen3Items.kingsRock, Gen3Items.focusBand, Gen3Items.scopeLens,
+            Gen3Items.leftovers, Gen3Items.shellBell, Gen3Items.laxIncense
     ));
 
     public static final Map<Type, List<Integer>> typeBoostingItems = initializeTypeBoostingItems();
 
     private static Map<Type, List<Integer>> initializeTypeBoostingItems() {
         Map<Type, List<Integer>> map = new HashMap<>();
-        map.put(Type.BUG, Arrays.asList(silverPowder));
-        map.put(Type.DARK, Arrays.asList(blackGlasses));
-        map.put(Type.DRAGON, Arrays.asList(dragonFang));
-        map.put(Type.ELECTRIC, Arrays.asList(magnet));
-        map.put(Type.FIGHTING, Arrays.asList(blackBelt));
-        map.put(Type.FIRE, Arrays.asList(charcoal));
-        map.put(Type.FLYING, Arrays.asList(sharpBeak));
-        map.put(Type.GHOST, Arrays.asList(spellTag));
-        map.put(Type.GRASS, Arrays.asList(miracleSeed));
-        map.put(Type.GROUND, Arrays.asList(softSand));
-        map.put(Type.ICE, Arrays.asList(neverMeltIce));
-        map.put(Type.NORMAL, Arrays.asList(silkScarf));
-        map.put(Type.POISON, Arrays.asList(poisonBarb));
-        map.put(Type.PSYCHIC, Arrays.asList(twistedSpoon));
-        map.put(Type.ROCK, Arrays.asList(hardStone));
-        map.put(Type.STEEL, Arrays.asList(metalCoat));
-        map.put(Type.WATER, Arrays.asList(mysticWater, seaIncense));
+        map.put(Type.BUG, Arrays.asList(Gen3Items.silverPowder));
+        map.put(Type.DARK, Arrays.asList(Gen3Items.blackGlasses));
+        map.put(Type.DRAGON, Arrays.asList(Gen3Items.dragonFang));
+        map.put(Type.ELECTRIC, Arrays.asList(Gen3Items.magnet));
+        map.put(Type.FIGHTING, Arrays.asList(Gen3Items.blackBelt));
+        map.put(Type.FIRE, Arrays.asList(Gen3Items.charcoal));
+        map.put(Type.FLYING, Arrays.asList(Gen3Items.sharpBeak));
+        map.put(Type.GHOST, Arrays.asList(Gen3Items.spellTag));
+        map.put(Type.GRASS, Arrays.asList(Gen3Items.miracleSeed));
+        map.put(Type.GROUND, Arrays.asList(Gen3Items.softSand));
+        map.put(Type.ICE, Arrays.asList(Gen3Items.neverMeltIce));
+        map.put(Type.NORMAL, Arrays.asList(Gen3Items.silkScarf));
+        map.put(Type.POISON, Arrays.asList(Gen3Items.poisonBarb));
+        map.put(Type.PSYCHIC, Arrays.asList(Gen3Items.twistedSpoon));
+        map.put(Type.ROCK, Arrays.asList(Gen3Items.hardStone));
+        map.put(Type.STEEL, Arrays.asList(Gen3Items.metalCoat));
+        map.put(Type.WATER, Arrays.asList(Gen3Items.mysticWater, Gen3Items.seaIncense));
         map.put(null, Collections.emptyList()); // ??? type
         return Collections.unmodifiableMap(map);
     }
@@ -290,15 +373,15 @@ public class Gen3Constants {
 
     private static Map<Integer, List<Integer>> initializeSpeciesBoostingItems() {
         Map<Integer, List<Integer>> map = new HashMap<>();
-        map.put(Species.latias, Arrays.asList(soulDew));
-        map.put(Species.latios, Arrays.asList(soulDew));
-        map.put(Species.clamperl, Arrays.asList(deepSeaToothIndex, deepSeaScaleIndex));
-        map.put(Species.pikachu, Arrays.asList(lightBall));
-        map.put(Species.chansey, Arrays.asList(luckyPunch));
-        map.put(Species.ditto, Arrays.asList(metalPowder));
-        map.put(Species.cubone, Arrays.asList(thickClub));
-        map.put(Species.marowak, Arrays.asList(thickClub));
-        map.put(Species.farfetchd, Arrays.asList(stick));
+        map.put(Species.latias, Arrays.asList(Gen3Items.soulDew));
+        map.put(Species.latios, Arrays.asList(Gen3Items.soulDew));
+        map.put(Species.clamperl, Arrays.asList(Gen3Items.deepSeaTooth, Gen3Items.deepSeaScale));
+        map.put(Species.pikachu, Arrays.asList(Gen3Items.lightBall));
+        map.put(Species.chansey, Arrays.asList(Gen3Items.luckyPunch));
+        map.put(Species.ditto, Arrays.asList(Gen3Items.metalPowder));
+        map.put(Species.cubone, Arrays.asList(Gen3Items.thickClub));
+        map.put(Species.marowak, Arrays.asList(Gen3Items.thickClub));
+        map.put(Species.farfetchd, Arrays.asList(Gen3Items.stick));
         return Collections.unmodifiableMap(map);
     }
 
@@ -369,6 +452,7 @@ public class Gen3Constants {
     }
 
     public static ItemList allowedItems, nonBadItems;
+    public static List<Integer> regularShopItems, opShopItems;
 
     public static String getRunningShoesCheckPrefix(int romType) {
         if (romType == Gen3Constants.RomType_Ruby || romType == Gen3Constants.RomType_Sapp) {
@@ -385,32 +469,46 @@ public class Gen3Constants {
     }
 
     private static void setupAllowedItems() {
-        allowedItems = new ItemList(376);
+        allowedItems = new ItemList(Gen3Items.oldSeaMap);
         // Key items (+1 unknown item)
-        allowedItems.banRange(259, 30);
-        allowedItems.banRange(349, 28);
+        allowedItems.banRange(Gen3Items.machBike, 30);
+        allowedItems.banRange(Gen3Items.oaksParcel, 28);
         // Unknown blank items
-        allowedItems.banRange(52, 11);
-        allowedItems.banRange(87, 6);
-        allowedItems.banRange(99, 4);
-        allowedItems.banRange(112, 9);
-        allowedItems.banRange(176, 3);
-        allowedItems.banRange(226, 28);
-        allowedItems.banRange(347, 2);
-        allowedItems.banSingles(72, 82, 105, 267);
+        allowedItems.banRange(Gen3Items.unknown52, 11);
+        allowedItems.banRange(Gen3Items.unknown87, 6);
+        allowedItems.banRange(Gen3Items.unknown99, 4);
+        allowedItems.banRange(Gen3Items.unknown112, 9);
+        allowedItems.banRange(Gen3Items.unknown176, 3);
+        allowedItems.banRange(Gen3Items.unknown226, 28);
+        allowedItems.banRange(Gen3Items.unknown347, 2);
+        allowedItems.banSingles(Gen3Items.unknown72, Gen3Items.unknown82, Gen3Items.unknown105, Gen3Items.unknown267);
         // HMs
-        allowedItems.banRange(339, 8);
+        allowedItems.banRange(Gen3Items.hm01, 8);
         // TMs
-        allowedItems.tmRange(289, 50);
+        allowedItems.tmRange(Gen3Items.tm01, 50);
 
         // non-bad items
         // ban specific pokemon hold items, berries, apricorns, mail
         nonBadItems = allowedItems.copy();
-        nonBadItems.banSingles(0xCA, 0x8B); // light ball, oran berry
-        nonBadItems.banRange(0x79, 12); // mail
-        nonBadItems.banRange(0x8F, 33); // berries
-        nonBadItems.banRange(0xDE, 4); // pokemon specific
-        nonBadItems.banRange(0xFE, 5); // contest scarves
+        nonBadItems.banSingles(Gen3Items.lightBall, Gen3Items.oranBerry);
+        nonBadItems.banRange(Gen3Items.orangeMail, 12); // mail
+        nonBadItems.banRange(Gen3Items.figyBerry, 33); // berries
+        nonBadItems.banRange(Gen3Items.luckyPunch, 4); // pokemon specific
+        nonBadItems.banRange(Gen3Items.redScarf, 5); // contest scarves
+
+        regularShopItems = new ArrayList<>();
+
+        regularShopItems.addAll(IntStream.rangeClosed(Gen3Items.ultraBall,Gen3Items.pokeBall).boxed().collect(Collectors.toList()));
+        regularShopItems.addAll(IntStream.rangeClosed(Gen3Items.potion,Gen3Items.revive).boxed().collect(Collectors.toList()));
+        regularShopItems.addAll(IntStream.rangeClosed(Gen3Items.superRepel,Gen3Items.repel).boxed().collect(Collectors.toList()));
+
+        opShopItems = new ArrayList<>();
+
+        // "Money items" etc
+        opShopItems.add(Gen3Items.rareCandy);
+        opShopItems.addAll(IntStream.rangeClosed(Gen3Items.tinyMushroom,Gen3Items.bigMushroom).boxed().collect(Collectors.toList()));
+        opShopItems.addAll(IntStream.rangeClosed(Gen3Items.pearl,Gen3Items.nugget).boxed().collect(Collectors.toList()));
+        opShopItems.add(Gen3Items.luckyEgg);
     }
 
     public static void trainerTagsRS(List<Trainer> trs, int romType) {
@@ -792,4 +890,383 @@ public class Gen3Constants {
         }
     }
 
+    public static final Map<Integer,Integer> balancedItemPrices = Stream.of(new Integer[][] {
+            // Skip item index 0. All prices divided by 10
+            {Gen3Items.masterBall, 300},
+            {Gen3Items.ultraBall, 120},
+            {Gen3Items.greatBall, 60},
+            {Gen3Items.pokeBall, 20},
+            {Gen3Items.safariBall, 50},
+            {Gen3Items.netBall, 100},
+            {Gen3Items.diveBall, 100},
+            {Gen3Items.nestBall, 100},
+            {Gen3Items.repeatBall, 100},
+            {Gen3Items.timerBall, 100},
+            {Gen3Items.luxuryBall, 100},
+            {Gen3Items.premierBall, 20},
+            {Gen3Items.potion, 30},
+            {Gen3Items.antidote, 10},
+            {Gen3Items.burnHeal, 25},
+            {Gen3Items.iceHeal, 25},
+            {Gen3Items.awakening, 25},
+            {Gen3Items.parlyzHeal, 20},
+            {Gen3Items.fullRestore, 300},
+            {Gen3Items.maxPotion, 250},
+            {Gen3Items.hyperPotion, 120},
+            {Gen3Items.superPotion, 70},
+            {Gen3Items.fullHeal, 60},
+            {Gen3Items.revive, 150},
+            {Gen3Items.maxRevive, 400},
+            {Gen3Items.freshWater, 40},
+            {Gen3Items.sodaPop, 60},
+            {Gen3Items.lemonade, 70},
+            {Gen3Items.moomooMilk, 80},
+            {Gen3Items.energyPowder, 40},
+            {Gen3Items.energyRoot, 110},
+            {Gen3Items.healPowder, 45},
+            {Gen3Items.revivalHerb, 280},
+            {Gen3Items.ether, 300},
+            {Gen3Items.maxEther, 450},
+            {Gen3Items.elixir, 1500},
+            {Gen3Items.maxElixir, 1800},
+            {Gen3Items.lavaCookie, 45},
+            {Gen3Items.blueFlute, 2},
+            {Gen3Items.yellowFlute, 2},
+            {Gen3Items.redFlute, 2},
+            {Gen3Items.blackFlute, 2},
+            {Gen3Items.whiteFlute, 2},
+            {Gen3Items.berryJuice, 10},
+            {Gen3Items.sacredAsh, 1000},
+            {Gen3Items.shoalSalt, 2},
+            {Gen3Items.shoalShell, 2},
+            {Gen3Items.redShard, 40},
+            {Gen3Items.blueShard, 40},
+            {Gen3Items.yellowShard, 40},
+            {Gen3Items.greenShard, 40},
+            {Gen3Items.unknown52, 0},
+            {Gen3Items.unknown53, 0},
+            {Gen3Items.unknown54, 0},
+            {Gen3Items.unknown55, 0},
+            {Gen3Items.unknown56, 0},
+            {Gen3Items.unknown57, 0},
+            {Gen3Items.unknown58, 0},
+            {Gen3Items.unknown59, 0},
+            {Gen3Items.unknown60, 0},
+            {Gen3Items.unknown61, 0},
+            {Gen3Items.unknown62, 0},
+            {Gen3Items.hpUp, 980},
+            {Gen3Items.protein, 980},
+            {Gen3Items.iron, 980},
+            {Gen3Items.carbos, 980},
+            {Gen3Items.calcium, 980},
+            {Gen3Items.rareCandy, 1000},
+            {Gen3Items.ppUp, 980},
+            {Gen3Items.zinc, 980},
+            {Gen3Items.ppMax, 2490},
+            {Gen3Items.unknown72, 0},
+            {Gen3Items.guardSpec, 70},
+            {Gen3Items.direHit, 65},
+            {Gen3Items.xAttack, 50},
+            {Gen3Items.xDefend, 55},
+            {Gen3Items.xSpeed, 35},
+            {Gen3Items.xAccuracy, 95},
+            {Gen3Items.xSpecial, 35},
+            {Gen3Items.pokeDoll, 100},
+            {Gen3Items.fluffyTail, 100},
+            {Gen3Items.unknown82, 0},
+            {Gen3Items.superRepel, 50},
+            {Gen3Items.maxRepel, 70},
+            {Gen3Items.escapeRope, 55},
+            {Gen3Items.repel, 35},
+            {Gen3Items.unknown87, 0},
+            {Gen3Items.unknown88, 0},
+            {Gen3Items.unknown89, 0},
+            {Gen3Items.unknown90, 0},
+            {Gen3Items.unknown91, 0},
+            {Gen3Items.unknown92, 0},
+            {Gen3Items.sunStone, 300},
+            {Gen3Items.moonStone, 300},
+            {Gen3Items.fireStone, 300},
+            {Gen3Items.thunderstone, 300},
+            {Gen3Items.waterStone, 300},
+            {Gen3Items.leafStone, 300},
+            {Gen3Items.unknown99, 0},
+            {Gen3Items.unknown100, 0},
+            {Gen3Items.unknown101, 0},
+            {Gen3Items.unknown102, 0},
+            {Gen3Items.tinyMushroom, 50},
+            {Gen3Items.bigMushroom, 500},
+            {Gen3Items.unknown105, 0},
+            {Gen3Items.pearl, 140},
+            {Gen3Items.bigPearl, 750},
+            {Gen3Items.stardust, 200},
+            {Gen3Items.starPiece, 980},
+            {Gen3Items.nugget, 1000},
+            {Gen3Items.heartScale, 500},
+            {Gen3Items.unknown112, 0},
+            {Gen3Items.unknown113, 0},
+            {Gen3Items.unknown114, 0},
+            {Gen3Items.unknown115, 0},
+            {Gen3Items.unknown116, 0},
+            {Gen3Items.unknown117, 0},
+            {Gen3Items.unknown118, 0},
+            {Gen3Items.unknown119, 0},
+            {Gen3Items.unknown120, 0},
+            {Gen3Items.orangeMail, 5},
+            {Gen3Items.harborMail, 5},
+            {Gen3Items.glitterMail, 5},
+            {Gen3Items.mechMail, 5},
+            {Gen3Items.woodMail, 5},
+            {Gen3Items.waveMail, 5},
+            {Gen3Items.beadMail, 5},
+            {Gen3Items.shadowMail, 5},
+            {Gen3Items.tropicMail, 5},
+            {Gen3Items.dreamMail, 5},
+            {Gen3Items.fabMail, 5},
+            {Gen3Items.retroMail, 5},
+            {Gen3Items.cheriBerry, 20},
+            {Gen3Items.chestoBerry, 25},
+            {Gen3Items.pechaBerry, 10},
+            {Gen3Items.rawstBerry, 25},
+            {Gen3Items.aspearBerry, 25},
+            {Gen3Items.leppaBerry, 300},
+            {Gen3Items.oranBerry, 5},
+            {Gen3Items.persimBerry, 20},
+            {Gen3Items.lumBerry, 50},
+            {Gen3Items.sitrusBerry, 50},
+            {Gen3Items.figyBerry, 10},
+            {Gen3Items.wikiBerry, 10},
+            {Gen3Items.magoBerry, 10},
+            {Gen3Items.aguavBerry, 10},
+            {Gen3Items.iapapaBerry, 10},
+            {Gen3Items.razzBerry, 50},
+            {Gen3Items.blukBerry, 50},
+            {Gen3Items.nanabBerry, 50},
+            {Gen3Items.wepearBerry, 50},
+            {Gen3Items.pinapBerry, 50},
+            {Gen3Items.pomegBerry, 50},
+            {Gen3Items.kelpsyBerry, 50},
+            {Gen3Items.qualotBerry, 50},
+            {Gen3Items.hondewBerry, 50},
+            {Gen3Items.grepaBerry, 50},
+            {Gen3Items.tamatoBerry, 50},
+            {Gen3Items.cornnBerry, 50},
+            {Gen3Items.magostBerry, 50},
+            {Gen3Items.rabutaBerry, 50},
+            {Gen3Items.nomelBerry, 50},
+            {Gen3Items.spelonBerry, 50},
+            {Gen3Items.pamtreBerry, 50},
+            {Gen3Items.watmelBerry, 50},
+            {Gen3Items.durinBerry, 50},
+            {Gen3Items.belueBerry, 50},
+            {Gen3Items.liechiBerry, 100},
+            {Gen3Items.ganlonBerry, 100},
+            {Gen3Items.salacBerry, 100},
+            {Gen3Items.petayaBerry, 100},
+            {Gen3Items.apicotBerry, 100},
+            {Gen3Items.lansatBerry, 100},
+            {Gen3Items.starfBerry, 100},
+            {Gen3Items.enigmaBerry, 100},
+            {Gen3Items.unknown176, 0},
+            {Gen3Items.unknown177, 0},
+            {Gen3Items.unknown178, 0},
+            {Gen3Items.brightPowder, 300},
+            {Gen3Items.whiteHerb, 100},
+            {Gen3Items.machoBrace, 300},
+            {Gen3Items.expShare, 600},
+            {Gen3Items.quickClaw, 450},
+            {Gen3Items.sootheBell, 100},
+            {Gen3Items.mentalHerb, 100},
+            {Gen3Items.choiceBand, 1000},
+            {Gen3Items.kingsRock, 500},
+            {Gen3Items.silverPowder, 200},
+            {Gen3Items.amuletCoin, 1500},
+            {Gen3Items.cleanseTag, 100},
+            {Gen3Items.soulDew, 20},
+            {Gen3Items.deepSeaTooth, 300},
+            {Gen3Items.deepSeaScale, 300},
+            {Gen3Items.smokeBall, 20},
+            {Gen3Items.everstone, 20},
+            {Gen3Items.focusBand, 300},
+            {Gen3Items.luckyEgg, 1000},
+            {Gen3Items.scopeLens, 500},
+            {Gen3Items.metalCoat, 300},
+            {Gen3Items.leftovers, 1000},
+            {Gen3Items.dragonScale, 300},
+            {Gen3Items.lightBall, 10},
+            {Gen3Items.softSand, 200},
+            {Gen3Items.hardStone, 200},
+            {Gen3Items.miracleSeed, 200},
+            {Gen3Items.blackGlasses, 200},
+            {Gen3Items.blackBelt, 200},
+            {Gen3Items.magnet, 200},
+            {Gen3Items.mysticWater, 200},
+            {Gen3Items.sharpBeak, 200},
+            {Gen3Items.poisonBarb, 200},
+            {Gen3Items.neverMeltIce, 200},
+            {Gen3Items.spellTag, 200},
+            {Gen3Items.twistedSpoon, 200},
+            {Gen3Items.charcoal, 200},
+            {Gen3Items.dragonFang, 200},
+            {Gen3Items.silkScarf, 200},
+            {Gen3Items.upGrade, 300},
+            {Gen3Items.shellBell, 600},
+            {Gen3Items.seaIncense, 200},
+            {Gen3Items.laxIncense, 300},
+            {Gen3Items.luckyPunch, 1},
+            {Gen3Items.metalPowder, 1},
+            {Gen3Items.thickClub, 50},
+            {Gen3Items.stick, 20},
+            {Gen3Items.unknown226, 0},
+            {Gen3Items.unknown227, 0},
+            {Gen3Items.unknown228, 0},
+            {Gen3Items.unknown229, 0},
+            {Gen3Items.unknown230, 0},
+            {Gen3Items.unknown231, 0},
+            {Gen3Items.unknown232, 0},
+            {Gen3Items.unknown233, 0},
+            {Gen3Items.unknown234, 0},
+            {Gen3Items.unknown235, 0},
+            {Gen3Items.unknown236, 0},
+            {Gen3Items.unknown237, 0},
+            {Gen3Items.unknown238, 0},
+            {Gen3Items.unknown239, 0},
+            {Gen3Items.unknown240, 0},
+            {Gen3Items.unknown241, 0},
+            {Gen3Items.unknown242, 0},
+            {Gen3Items.unknown243, 0},
+            {Gen3Items.unknown244, 0},
+            {Gen3Items.unknown245, 0},
+            {Gen3Items.unknown246, 0},
+            {Gen3Items.unknown247, 0},
+            {Gen3Items.unknown248, 0},
+            {Gen3Items.unknown249, 0},
+            {Gen3Items.unknown250, 0},
+            {Gen3Items.unknown251, 0},
+            {Gen3Items.unknown252, 0},
+            {Gen3Items.unknown253, 0},
+            {Gen3Items.redScarf, 10},
+            {Gen3Items.blueScarf, 10},
+            {Gen3Items.pinkScarf, 10},
+            {Gen3Items.greenScarf, 10},
+            {Gen3Items.yellowScarf, 10},
+            {Gen3Items.machBike, 0},
+            {Gen3Items.coinCase, 0},
+            {Gen3Items.itemfinder, 0},
+            {Gen3Items.oldRod, 0},
+            {Gen3Items.goodRod, 0},
+            {Gen3Items.superRod, 0},
+            {Gen3Items.ssTicket, 0},
+            {Gen3Items.contestPass, 0},
+            {Gen3Items.unknown267, 0},
+            {Gen3Items.wailmerPail, 0},
+            {Gen3Items.devonGoods, 0},
+            {Gen3Items.sootSack, 0},
+            {Gen3Items.basementKey, 0},
+            {Gen3Items.acroBike, 0},
+            {Gen3Items.pokeblockCase, 0},
+            {Gen3Items.letter, 0},
+            {Gen3Items.eonTicket, 0},
+            {Gen3Items.redOrb, 0},
+            {Gen3Items.blueOrb, 0},
+            {Gen3Items.scanner, 0},
+            {Gen3Items.goGoggles, 0},
+            {Gen3Items.meteorite, 0},
+            {Gen3Items.rm1Key, 0},
+            {Gen3Items.rm2Key, 0},
+            {Gen3Items.rm4Key, 0},
+            {Gen3Items.rm6Key, 0},
+            {Gen3Items.storageKey, 0},
+            {Gen3Items.rootFossil, 0},
+            {Gen3Items.clawFossil, 0},
+            {Gen3Items.devonScope, 0},
+            {Gen3Items.tm01, 300},
+            {Gen3Items.tm02, 300},
+            {Gen3Items.tm03, 300},
+            {Gen3Items.tm04, 150},
+            {Gen3Items.tm05, 100},
+            {Gen3Items.tm06, 300},
+            {Gen3Items.tm07, 200},
+            {Gen3Items.tm08, 150},
+            {Gen3Items.tm09, 200},
+            {Gen3Items.tm10, 200},
+            {Gen3Items.tm11, 200},
+            {Gen3Items.tm12, 150},
+            {Gen3Items.tm13, 300},
+            {Gen3Items.tm14, 550},
+            {Gen3Items.tm15, 750},
+            {Gen3Items.tm16, 200},
+            {Gen3Items.tm17, 200},
+            {Gen3Items.tm18, 200},
+            {Gen3Items.tm19, 300},
+            {Gen3Items.tm20, 200},
+            {Gen3Items.tm21, 100},
+            {Gen3Items.tm22, 300},
+            {Gen3Items.tm23, 300},
+            {Gen3Items.tm24, 300},
+            {Gen3Items.tm25, 550},
+            {Gen3Items.tm26, 300},
+            {Gen3Items.tm27, 100},
+            {Gen3Items.tm28, 200},
+            {Gen3Items.tm29, 300},
+            {Gen3Items.tm30, 300},
+            {Gen3Items.tm31, 300},
+            {Gen3Items.tm32, 100},
+            {Gen3Items.tm33, 200},
+            {Gen3Items.tm34, 300},
+            {Gen3Items.tm35, 300},
+            {Gen3Items.tm36, 300},
+            {Gen3Items.tm37, 200},
+            {Gen3Items.tm38, 550},
+            {Gen3Items.tm39, 200},
+            {Gen3Items.tm40, 300},
+            {Gen3Items.tm41, 150},
+            {Gen3Items.tm42, 300},
+            {Gen3Items.tm43, 200},
+            {Gen3Items.tm44, 300},
+            {Gen3Items.tm45, 300},
+            {Gen3Items.tm46, 200},
+            {Gen3Items.tm47, 300},
+            {Gen3Items.tm48, 300},
+            {Gen3Items.tm49, 150},
+            {Gen3Items.tm50, 550},
+            {Gen3Items.hm01, 0},
+            {Gen3Items.hm02, 0},
+            {Gen3Items.hm03, 0},
+            {Gen3Items.hm04, 0},
+            {Gen3Items.hm05, 0},
+            {Gen3Items.hm06, 0},
+            {Gen3Items.hm07, 0},
+            {Gen3Items.hm08, 0},
+            {Gen3Items.unknown347, 0},
+            {Gen3Items.unknown348, 0},
+            {Gen3Items.oaksParcel, 0},
+            {Gen3Items.pokeFlute, 0},
+            {Gen3Items.secretKey, 0},
+            {Gen3Items.bikeVoucher, 0},
+            {Gen3Items.goldTeeth, 0},
+            {Gen3Items.oldAmber, 0},
+            {Gen3Items.cardKey, 0},
+            {Gen3Items.liftKey, 0},
+            {Gen3Items.helixFossil, 0},
+            {Gen3Items.domeFossil, 0},
+            {Gen3Items.silphScope, 0},
+            {Gen3Items.bicycle, 0},
+            {Gen3Items.townMap, 0},
+            {Gen3Items.vsSeeker, 0},
+            {Gen3Items.fameChecker, 0},
+            {Gen3Items.tmCase, 0},
+            {Gen3Items.berryPouch, 0},
+            {Gen3Items.teachyTV, 0},
+            {Gen3Items.triPass, 0},
+            {Gen3Items.rainbowPass, 0},
+            {Gen3Items.tea, 0},
+            {Gen3Items.mysticTicket, 0},
+            {Gen3Items.auroraTicket, 0},
+            {Gen3Items.powderJar, 0},
+            {Gen3Items.ruby, 0},
+            {Gen3Items.sapphire, 0},
+            {Gen3Items.magmaEmblem, 0},
+            {Gen3Items.oldSeaMap, 0},
+    }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
 }
