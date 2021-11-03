@@ -251,11 +251,18 @@ public abstract class AbstractRomHandler implements RomHandler {
     public void randomizePokemonStats(Settings settings) {
         boolean evolutionSanity = settings.isBaseStatsFollowEvolutions();
         boolean megaEvolutionSanity = settings.isBaseStatsFollowMegaEvolutions();
+        boolean assignEvoStatsRandomly = settings.isAssignEvoStatsRandomly();
 
         if (evolutionSanity) {
-            copyUpEvolutionsHelper(pk -> pk.randomizeStatsWithinBST(AbstractRomHandler.this.random),
-                    (evFrom, evTo, toMonIsFinalEvo) -> evTo.copyRandomizedStatsUpEvolution(evFrom)
-            );
+            if (assignEvoStatsRandomly) {
+                copyUpEvolutionsHelper(pk -> pk.randomizeStatsWithinBST(AbstractRomHandler.this.random),
+                        (evFrom, evTo, toMonIsFinalEvo) -> evTo.assignNewStatsForEvolution(evFrom, this.random)
+                );
+            } else {
+                copyUpEvolutionsHelper(pk -> pk.randomizeStatsWithinBST(AbstractRomHandler.this.random),
+                        (evFrom, evTo, toMonIsFinalEvo) -> evTo.copyRandomizedStatsUpEvolution(evFrom)
+                );
+            }
         } else {
             List<Pokemon> allPokes = this.getPokemonInclFormes();
             for (Pokemon pk : allPokes) {
@@ -276,7 +283,11 @@ public abstract class AbstractRomHandler implements RomHandler {
             List<MegaEvolution> allMegaEvos = getMegaEvolutions();
             for (MegaEvolution megaEvo: allMegaEvos) {
                 if (megaEvo.from.megaEvolutionsFrom.size() > 1) continue;
-                megaEvo.to.copyRandomizedStatsUpEvolution(megaEvo.from);
+                if (assignEvoStatsRandomly) {
+                    megaEvo.to.assignNewStatsForEvolution(megaEvo.from, this.random);
+                } else {
+                    megaEvo.to.copyRandomizedStatsUpEvolution(megaEvo.from);
+                }
             }
         }
     }

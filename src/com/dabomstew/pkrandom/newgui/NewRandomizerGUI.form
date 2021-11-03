@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.dabomstew.pkrandom.newgui.NewRandomizerGUI">
   <grid id="27dc6" binding="mainPanel" layout-manager="GridBagLayout">
     <constraints>
-      <xy x="7" y="20" width="1084" height="831"/>
+      <xy x="7" y="20" width="1084" height="836"/>
     </constraints>
     <properties/>
     <border type="none">
@@ -169,17 +169,6 @@
                       <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsShuffleRadioButton.toolTipText"/>
                     </properties>
                   </component>
-                  <component id="4535b" class="javax.swing.JRadioButton" binding="pbsRandomRadioButton" default-binding="true">
-                    <constraints>
-                      <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                      <gridbag weightx="0.0" weighty="0.0"/>
-                    </constraints>
-                    <properties>
-                      <enabled value="false"/>
-                      <text resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsRandomRadioButton.text"/>
-                      <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsRandomRadioButton.toolTipText"/>
-                    </properties>
-                  </component>
                   <component id="8625b" class="javax.swing.JRadioButton" binding="pbsLegendariesSlowRadioButton">
                     <constraints>
                       <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -202,17 +191,6 @@
                       <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsStrongLegendariesSlowRadioButton.toolTipText"/>
                     </properties>
                   </component>
-                  <component id="213c9" class="javax.swing.JRadioButton" binding="pbsAllMediumFastRadioButton">
-                    <constraints>
-                      <grid row="3" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                      <gridbag weightx="0.0" weighty="0.0"/>
-                    </constraints>
-                    <properties>
-                      <enabled value="false"/>
-                      <text resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsAllMediumFastRadioButton.text"/>
-                      <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsAllMediumFastRadioButton.toolTipText"/>
-                    </properties>
-                  </component>
                   <component id="db430" class="javax.swing.JCheckBox" binding="pbsStandardizeEXPCurvesCheckBox">
                     <constraints>
                       <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -226,8 +204,8 @@
                   </component>
                   <component id="986c1" class="javax.swing.JCheckBox" binding="pbsFollowEvolutionsCheckBox" default-binding="true">
                     <constraints>
-                      <grid row="1" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                      <gridbag weightx="0.6" weighty="0.0"/>
+                      <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties>
                       <enabled value="false"/>
@@ -243,7 +221,7 @@
                   </hspacer>
                   <vspacer id="14884">
                     <constraints>
-                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                      <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.0" weighty="0.0"/>
                     </constraints>
                   </vspacer>
@@ -255,7 +233,7 @@
                   </vspacer>
                   <component id="5b04a" class="javax.swing.JCheckBox" binding="pbsUpdateBaseStatsCheckBox">
                     <constraints>
-                      <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties>
@@ -266,7 +244,7 @@
                   </component>
                   <component id="6768d" class="javax.swing.JCheckBox" binding="pbsFollowMegaEvosCheckBox">
                     <constraints>
-                      <grid row="2" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties>
@@ -277,8 +255,8 @@
                   </component>
                   <component id="4d643" class="javax.swing.JComboBox" binding="pbsUpdateComboBox">
                     <constraints>
-                      <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                      <gridbag top="0" left="5" bottom="0" right="0" weightx="0.0" weighty="0.0"/>
+                      <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag top="0" left="5" bottom="0" right="0" weightx="0.6" weighty="0.0"/>
                     </constraints>
                     <properties>
                       <enabled value="false"/>
@@ -297,6 +275,39 @@
                       <model>
                         <item value="Medium Fast"/>
                       </model>
+                    </properties>
+                  </component>
+                  <component id="97567" class="javax.swing.JCheckBox" binding="pbsAssignEvoStatsRandomlyCheckBox">
+                    <constraints>
+                      <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties>
+                      <enabled value="false"/>
+                      <text resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsAssignEvoStatsRandomlyCheckBox.text"/>
+                      <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsAssignEvoStatsRandomlyCheckBox.tooltipText"/>
+                    </properties>
+                  </component>
+                  <component id="4535b" class="javax.swing.JRadioButton" binding="pbsRandomRadioButton" default-binding="true">
+                    <constraints>
+                      <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties>
+                      <enabled value="false"/>
+                      <text resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsRandomRadioButton.text"/>
+                      <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsRandomRadioButton.toolTipText"/>
+                    </properties>
+                  </component>
+                  <component id="213c9" class="javax.swing.JRadioButton" binding="pbsAllMediumFastRadioButton">
+                    <constraints>
+                      <grid row="3" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties>
+                      <enabled value="false"/>
+                      <text resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsAllMediumFastRadioButton.text"/>
+                      <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsAllMediumFastRadioButton.toolTipText"/>
                     </properties>
                   </component>
                 </children>

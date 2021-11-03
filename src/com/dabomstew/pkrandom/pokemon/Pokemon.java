@@ -168,6 +168,34 @@ public class Pokemon implements Comparable<Pokemon> {
         spdef = (int) Math.min(255, Math.max(1, Math.round(evolvesFrom.spdef * bstRatio)));
     }
 
+    public void assignNewStatsForEvolution(Pokemon evolvesFrom, Random random) {
+
+        double ourBST = bst();
+        double theirBST = evolvesFrom.bst();
+
+        double bstDiff = ourBST - theirBST;
+
+        // Make weightings
+        double hpW = random.nextDouble(), atkW = random.nextDouble(), defW = random.nextDouble();
+        double spaW = random.nextDouble(), spdW = random.nextDouble(), speW = random.nextDouble();
+
+        double totW = hpW + atkW + defW + spaW + spdW + speW;
+
+        double hpDiff = Math.round((hpW / totW) * bstDiff);
+        double atkDiff = Math.round((atkW / totW) * bstDiff);
+        double defDiff = Math.round((defW / totW) * bstDiff);
+        double spaDiff = Math.round((spaW / totW) * bstDiff);
+        double spdDiff = Math.round((spdW / totW) * bstDiff);
+        double speDiff = Math.round((speW / totW) * bstDiff);
+
+        hp = (int) Math.min(255, Math.max(1, evolvesFrom.hp + hpDiff));
+        attack = (int) Math.min(255, Math.max(1, evolvesFrom.attack + atkDiff));
+        defense = (int) Math.min(255, Math.max(1, evolvesFrom.defense + defDiff));
+        speed = (int) Math.min(255, Math.max(1, evolvesFrom.speed + speDiff));
+        spatk = (int) Math.min(255, Math.max(1, evolvesFrom.spatk + spaDiff));
+        spdef = (int) Math.min(255, Math.max(1, evolvesFrom.spdef + spdDiff));
+    }
+
     protected int bst() {
         return hp + attack + defense + spatk + spdef + speed;
     }

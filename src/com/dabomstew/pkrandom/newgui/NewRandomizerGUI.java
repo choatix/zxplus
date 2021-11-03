@@ -292,6 +292,7 @@ public class NewRandomizerGUI {
     private JRadioButton puRandomRadioButton;
     private JCheckBox puBanBadItemsCheckBox;
     private JCheckBox miscForceChallengeModeCheckBox;
+    private JCheckBox pbsAssignEvoStatsRandomlyCheckBox;
 
     private static JFrame frame;
 
@@ -396,6 +397,8 @@ public class NewRandomizerGUI {
         pbsUnchangedRadioButton.addActionListener(e -> enableOrDisableSubControls());
         pbsShuffleRadioButton.addActionListener(e -> enableOrDisableSubControls());
         pbsRandomRadioButton.addActionListener(e -> enableOrDisableSubControls());
+        pbsFollowMegaEvosCheckBox.addActionListener(e -> enableOrDisableSubControls());
+        pbsFollowEvolutionsCheckBox.addActionListener(e -> enableOrDisableSubControls());
         pbsStandardizeEXPCurvesCheckBox.addActionListener(e -> enableOrDisableSubControls());
         paUnchangedRadioButton.addActionListener(e -> enableOrDisableSubControls());
         paRandomRadioButton.addActionListener(e -> enableOrDisableSubControls());
@@ -1303,6 +1306,7 @@ public class NewRandomizerGUI {
         }
         pbsEXPCurveComboBox.setSelectedIndex(index);
         pbsFollowMegaEvosCheckBox.setSelected(settings.isBaseStatsFollowMegaEvolutions());
+        pbsAssignEvoStatsRandomlyCheckBox.setSelected(settings.isAssignEvoStatsRandomly());
 
         paUnchangedRadioButton.setSelected(settings.getAbilitiesMod() == Settings.AbilitiesMod.UNCHANGED);
         paRandomRadioButton.setSelected(settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOMIZE);
@@ -1545,6 +1549,7 @@ public class NewRandomizerGUI {
         ExpCurve[] expCurves = getEXPCurvesForGeneration(romHandler.generationOfPokemon());
         settings.setSelectedEXPCurve(expCurves[pbsEXPCurveComboBox.getSelectedIndex()]);
         settings.setBaseStatsFollowMegaEvolutions(pbsFollowMegaEvosCheckBox.isSelected() && pbsFollowMegaEvosCheckBox.isVisible());
+        settings.setAssignEvoStatsRandomly(pbsAssignEvoStatsRandomlyCheckBox.isSelected() && pbsAssignEvoStatsRandomlyCheckBox.isVisible());
 
         settings.setAbilitiesMod(paUnchangedRadioButton.isSelected(), paRandomRadioButton.isSelected());
         settings.setAllowWonderGuard(paAllowWonderGuardCheckBox.isSelected());
@@ -1872,6 +1877,9 @@ public class NewRandomizerGUI {
         pbsUpdateComboBox.setEnabled(false);
         pbsUpdateComboBox.setSelectedIndex(0);
         pbsUpdateComboBox.setModel(new DefaultComboBoxModel<>(new String[] { "--" }));
+        pbsAssignEvoStatsRandomlyCheckBox.setVisible(true);
+        pbsAssignEvoStatsRandomlyCheckBox.setEnabled(false);
+        pbsAssignEvoStatsRandomlyCheckBox.setSelected(false);
         ptUnchangedRadioButton.setVisible(true);
         ptUnchangedRadioButton.setEnabled(false);
         ptUnchangedRadioButton.setSelected(false);
@@ -2843,6 +2851,18 @@ public class NewRandomizerGUI {
         } else {
             pbsFollowEvolutionsCheckBox.setEnabled(true);
             pbsFollowMegaEvosCheckBox.setEnabled(true);
+        }
+
+        if (pbsRandomRadioButton.isSelected()) {
+            if (pbsFollowEvolutionsCheckBox.isSelected() || pbsFollowMegaEvosCheckBox.isSelected()) {
+                pbsAssignEvoStatsRandomlyCheckBox.setEnabled(true);
+            } else {
+                pbsAssignEvoStatsRandomlyCheckBox.setEnabled(false);
+                pbsAssignEvoStatsRandomlyCheckBox.setSelected(false);
+            }
+        } else {
+            pbsAssignEvoStatsRandomlyCheckBox.setEnabled(false);
+            pbsAssignEvoStatsRandomlyCheckBox.setSelected(false);
         }
 
         if (pbsStandardizeEXPCurvesCheckBox.isSelected()) {

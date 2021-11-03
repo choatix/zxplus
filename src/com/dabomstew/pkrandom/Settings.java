@@ -76,6 +76,7 @@ public class Settings {
     private BaseStatisticsMod baseStatisticsMod = BaseStatisticsMod.UNCHANGED;
     private boolean baseStatsFollowEvolutions;
     private boolean baseStatsFollowMegaEvolutions;
+    private boolean assignEvoStatsRandomly;
     private boolean updateBaseStats;
     private int updateBaseStatsToGeneration;
     private boolean standardizeEXPCurves;
@@ -365,7 +366,7 @@ public class Settings {
         // 1: pokemon base stats & abilities
         out.write(makeByteSelected(baseStatsFollowEvolutions, baseStatisticsMod == BaseStatisticsMod.RANDOM,
                 baseStatisticsMod == BaseStatisticsMod.SHUFFLE, baseStatisticsMod == BaseStatisticsMod.UNCHANGED,
-                standardizeEXPCurves, updateBaseStats, baseStatsFollowMegaEvolutions));
+                standardizeEXPCurves, updateBaseStats, baseStatsFollowMegaEvolutions, assignEvoStatsRandomly));
 
         // 2: pokemon types & more general options
         out.write(makeByteSelected(typesMod == TypesMod.RANDOM_FOLLOW_EVOLUTIONS,
@@ -614,6 +615,7 @@ public class Settings {
         settings.setBaseStatsFollowEvolutions(restoreState(data[1], 0));
         settings.setUpdateBaseStats(restoreState(data[1], 5));
         settings.setBaseStatsFollowMegaEvolutions(restoreState(data[1],6));
+        settings.setAssignEvoStatsRandomly(restoreState(data[1],7));
 
         settings.setTypesMod(restoreEnum(TypesMod.class, data[2], 2, // UNCHANGED
                 0, // RANDOM_FOLLOW_EVOLUTIONS
@@ -1140,6 +1142,15 @@ public class Settings {
     public void setBaseStatsFollowMegaEvolutions(boolean baseStatsFollowMegaEvolutions) {
         this.baseStatsFollowMegaEvolutions = baseStatsFollowMegaEvolutions;
     }
+
+    public boolean isAssignEvoStatsRandomly() {
+        return assignEvoStatsRandomly;
+    }
+
+    public void setAssignEvoStatsRandomly(boolean assignEvoStatsRandomly) {
+        this.assignEvoStatsRandomly = assignEvoStatsRandomly;
+    }
+
 
     public boolean isStandardizeEXPCurves() {
         return standardizeEXPCurves;
