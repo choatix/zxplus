@@ -32,29 +32,39 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.dabomstew.pkrandom.pokemon.Evolution;
-import com.dabomstew.pkrandom.pokemon.MegaEvolution;
 import com.dabomstew.pkrandom.pokemon.MoveLearnt;
 import com.dabomstew.pkrandom.pokemon.Pokemon;
 import com.dabomstew.pkrandom.romhandlers.RomHandler;
 
 public class RomFunctions {
 
-    public static Set<Pokemon> getBasicOrNoCopyPokemon(RomHandler baseRom, boolean dontCopySplitEvos) {
+    public static Set<Pokemon> getBasicPokemon(RomHandler baseRom) {
         List<Pokemon> allPokes = baseRom.getPokemonInclFormes();
-        Set<Pokemon> dontCopyPokes = new TreeSet<>();
+        Set<Pokemon> basicPokes = new TreeSet<>();
         for (Pokemon pkmn : allPokes) {
             if (pkmn != null) {
                 if (pkmn.evolutionsTo.size() < 1) {
-                    dontCopyPokes.add(pkmn);
-                } else if (dontCopySplitEvos) {
+                    basicPokes.add(pkmn);
+                }
+            }
+        }
+        return basicPokes;
+    }
+
+    public static Set<Pokemon> getSplitEvolutions(RomHandler baseRom) {
+        List<Pokemon> allPokes = baseRom.getPokemonInclFormes();
+        Set<Pokemon> splitEvos = new TreeSet<>();
+        for (Pokemon pkmn : allPokes) {
+            if (pkmn != null) {
+                if (pkmn.evolutionsTo.size() > 0) {
                     Evolution onlyEvo = pkmn.evolutionsTo.get(0);
                     if (!onlyEvo.carryStats) {
-                        dontCopyPokes.add(pkmn);
+                        splitEvos.add(pkmn);
                     }
                 }
             }
         }
-        return dontCopyPokes;
+        return splitEvos;
     }
 
     public static Set<Pokemon> getMiddleEvolutions(RomHandler baseRom, boolean includeSplitEvos) {

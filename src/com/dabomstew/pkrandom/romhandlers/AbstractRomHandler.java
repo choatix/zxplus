@@ -256,11 +256,15 @@ public abstract class AbstractRomHandler implements RomHandler {
         if (evolutionSanity) {
             if (assignEvoStatsRandomly) {
                 copyUpEvolutionsHelper(pk -> pk.randomizeStatsWithinBST(AbstractRomHandler.this.random),
-                        (evFrom, evTo, toMonIsFinalEvo) -> evTo.assignNewStatsForEvolution(evFrom, this.random)
+                        (evFrom, evTo, toMonIsFinalEvo) -> evTo.assignNewStatsForEvolution(evFrom, this.random),
+                        (evFrom, evTo, toMonIsFinalEvo) -> evTo.assignNewStatsForEvolution(evFrom, this.random),
+                        true
                 );
             } else {
                 copyUpEvolutionsHelper(pk -> pk.randomizeStatsWithinBST(AbstractRomHandler.this.random),
-                        (evFrom, evTo, toMonIsFinalEvo) -> evTo.copyRandomizedStatsUpEvolution(evFrom)
+                        (evFrom, evTo, toMonIsFinalEvo) -> evTo.copyRandomizedStatsUpEvolution(evFrom),
+                        (evFrom, evTo, toMonIsFinalEvo) -> evTo.assignNewStatsForEvolution(evFrom, this.random),
+                        true
                 );
             }
         } else {
@@ -282,8 +286,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         if (megaEvolutionSanity) {
             List<MegaEvolution> allMegaEvos = getMegaEvolutions();
             for (MegaEvolution megaEvo: allMegaEvos) {
-                if (megaEvo.from.megaEvolutionsFrom.size() > 1) continue;
-                if (assignEvoStatsRandomly) {
+                if (megaEvo.from.megaEvolutionsFrom.size() > 1 || assignEvoStatsRandomly) {
                     megaEvo.to.assignNewStatsForEvolution(megaEvo.from, this.random);
                 } else {
                     megaEvo.to.copyRandomizedStatsUpEvolution(megaEvo.from);
@@ -3609,7 +3612,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     pk, compat.get(pk), tmHMs, requiredEarlyOn, preferSameType),
             (evFrom, evTo, toMonIsFinalEvo) ->  copyPokemonMoveCompatibilityUpEvolutions(
                     evFrom, evTo, compat.get(evFrom), compat.get(evTo), tmHMs, preferSameType
-            ), false);
+            ), null, true);
         }
         else {
             for (Map.Entry<Pokemon, boolean[]> compatEntry : compat.entrySet()) {
@@ -3730,7 +3733,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             for (int i = 1; i < toCompat.length; i++) {
                 toCompat[i] |= fromCompat[i];
             }
-        }), false);
+        }), null, true);
         this.setTMHMCompatibility(compat);
     }
 
@@ -3877,7 +3880,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     pk, compat.get(pk), mts, priorityTutors, preferSameType),
                     (evFrom, evTo, toMonIsFinalEvo) ->  copyPokemonMoveCompatibilityUpEvolutions(
                             evFrom, evTo, compat.get(evFrom), compat.get(evTo), mts, preferSameType
-                    ), false);
+                    ), null, true);
         }
         else {
             for (Map.Entry<Pokemon, boolean[]> compatEntry : compat.entrySet()) {
@@ -3941,7 +3944,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             for (int i = 1; i < toCompat.length; i++) {
                 toCompat[i] |= fromCompat[i];
             }
-        }), false);
+        }), null, true);
         this.setMoveTutorCompatibility(compat);
     }
 
@@ -5268,11 +5271,11 @@ public abstract class AbstractRomHandler implements RomHandler {
      *            Method to run on all base or no-copy Pokemon
      * @param epAction
      *            Method to run on all evolved Pokemon with a linear chain of
-     * @param dontCopySplitEvos
+     * @param copySplitEvos
      *            If true, treat split evolutions the same way as base Pokemon
      */
     private void copyUpEvolutionsHelper(BasePokemonAction bpAction, EvolvedPokemonAction epAction,
-                                        boolean dontCopySplitEvos) {
+                                        EvolvedPokemonAction splitAction, boolean copySplitEvos) {
         List<Pokemon> allPokes = this.getPokemonInclFormes();
         for (Pokemon pk : allPokes) {
             if (pk != null) {
@@ -5281,12 +5284,20 @@ public abstract class AbstractRomHandler implements RomHandler {
         }
 
         // Get evolution data.
-        Set<Pokemon> dontCopyPokes = RomFunctions.getBasicOrNoCopyPokemon(this, dontCopySplitEvos);
-        Set<Pokemon> middleEvos = RomFunctions.getMiddleEvolutions(this, !dontCopySplitEvos);
+        Set<Pokemon> basicPokes = RomFunctions.getBasicPokemon(this);
+        Set<Pokemon> splitEvos = RomFunctions.getSplitEvolutions(this);
+        Set<Pokemon> middleEvos = RomFunctions.getMiddleEvolutions(this, copySplitEvos);
 
-        for (Pokemon pk : dontCopyPokes) {
+        for (Pokemon pk : basicPokes) {
             bpAction.applyTo(pk);
             pk.temporaryFlag = true;
+        }
+
+        if (!copySplitEvos) {
+            for (Pokemon pk : splitEvos) {
+                bpAction.applyTo(pk);
+                pk.temporaryFlag = true;
+            }
         }
 
         // go "up" evolutions looking for pre-evos to do first
@@ -5306,11 +5317,20 @@ public abstract class AbstractRomHandler implements RomHandler {
                 // Now "ev" is set to an evolution from a Pokemon that has had
                 // the base action done on it to one that hasn't.
                 // Do the evolution action for everything left on the stack.
-                epAction.applyTo(ev.from, ev.to, !middleEvos.contains(ev.to));
+
+                if (copySplitEvos && splitAction != null && splitEvos.contains(ev.to)) {
+                    splitAction.applyTo(ev.from, ev.to, !middleEvos.contains(ev.to));
+                } else {
+                    epAction.applyTo(ev.from, ev.to, !middleEvos.contains(ev.to));
+                }
                 ev.to.temporaryFlag = true;
                 while (!currentStack.isEmpty()) {
                     ev = currentStack.pop();
-                    epAction.applyTo(ev.from, ev.to, !middleEvos.contains(ev.to));
+                    if (copySplitEvos && splitAction != null && splitEvos.contains(pk)) {
+                        splitAction.applyTo(ev.from, ev.to, !middleEvos.contains(ev.to));
+                    } else {
+                        epAction.applyTo(ev.from, ev.to, !middleEvos.contains(ev.to));
+                    }
                     ev.to.temporaryFlag = true;
                 }
 
@@ -5319,7 +5339,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     private void copyUpEvolutionsHelper(BasePokemonAction bpAction, EvolvedPokemonAction epAction) {
-        copyUpEvolutionsHelper(bpAction, epAction, true);
+        copyUpEvolutionsHelper(bpAction, epAction, null, false);
     }
 
     private boolean checkForUnusedMove(List<Move> potentialList, List<Integer> alreadyUsed) {
