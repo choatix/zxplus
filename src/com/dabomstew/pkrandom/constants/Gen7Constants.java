@@ -41,7 +41,7 @@ public class Gen7Constants {
     private static final int pokemonCountSM = 802, pokemonCountUSUM = 807;
     private static final int formeCountSM = 158, formeCountUSUM = 168;
     private static final int moveCountSM = 719, moveCountUSUM = 728;
-    private static final int highestAbilityIndexSM = 232, highestAbilityIndexUSUM = 233;
+    private static final int highestAbilityIndexSM = Abilities.prismArmor, highestAbilityIndexUSUM = Abilities.neuroforce;
 
     public static final int bsHPOffset = 0, bsAttackOffset = 1, bsDefenseOffset = 2, bsSpeedOffset = 3,
             bsSpAtkOffset = 4, bsSpDefOffset = 5, bsPrimaryTypeOffset = 6, bsSecondaryTypeOffset = 7,
@@ -53,8 +53,6 @@ public class Gen7Constants {
     public static final int bsSize = 0x54;
 
     public static final int evolutionMethodCount = 42;
-
-    public static final int sunStoneIndex = 80, moonStoneIndex = 81, waterStoneIndex = 84, duskStoneIndex = 108, luckyEggIndex = 0xE7;
 
     private static List<Integer> speciesWithAlolanForms = Arrays.asList(
             Species.rattata, Species.raticate, Species.raichu, Species.sandshrew, Species.sandslash, Species.vulpix,
@@ -90,7 +88,7 @@ public class Gen7Constants {
 
     private static final String tmDataPrefixSM = "034003410342034303",  tmDataPrefixUSUM = "03BC03BD03BE03BF03";
     public static final int tmCount = 100, tmBlockOneCount = 92, tmBlockTwoCount = 3, tmBlockThreeCount = 5,
-            tmBlockOneOffset = 328, tmBlockTwoOffset = 618, tmBlockThreeOffset = 690;
+            tmBlockOneOffset = Items.tm01, tmBlockTwoOffset = Items.tm93, tmBlockThreeOffset = Items.tm96;
     public static final String itemPalettesPrefix = "070000000000000000010100";
 
     public static final int shopItemsOffsetSM = 0x50A8;
@@ -110,31 +108,34 @@ public class Gen7Constants {
             8, 9, 10, 11, 14, 15, 17, 20, 21, 22, 23, 24, 25, 26, 27
     );
 
-    public static final List<Integer> evolutionItems = Arrays.asList(80,81,82,83,84,85,107,108,109,
-            110,221,226,227,233,235,252,321,322,323,324,325,326,327,537,646,647,849);
+    public static final List<Integer> evolutionItems = Arrays.asList(Items.sunStone, Items.moonStone, Items.fireStone,
+            Items.thunderStone, Items.waterStone, Items.leafStone, Items.shinyStone, Items.duskStone, Items.dawnStone,
+            Items.ovalStone, Items.kingsRock, Items.deepSeaTooth, Items.deepSeaScale, Items.metalCoat, Items.dragonScale,
+            Items.upgrade, Items.protector, Items.electirizer, Items.magmarizer, Items.dubiousDisc, Items.reaperCloth,
+            Items.razorClaw, Items.razorFang, Items.prismScale, Items.whippedDream, Items.sachet, Items.iceStone);
 
     private static final List<Boolean> relevantEncounterFilesSM = setupRelevantEncounterFiles(Type_SM);
     private static final List<Boolean> relevantEncounterFilesUSUM = setupRelevantEncounterFiles(Type_USUM);
 
     public static final List<Integer> heldZCrystals = Arrays.asList(
-            0x308, // Normal
-            0x30E, // Fighting
-            0x311, // Flying
-            0x30F, // Poison
-            0x310, // Ground
-            0x314, // Rock
-            0x313, // Bug
-            0x315, // Ghost
-            0x318, // Steel
-            0x309, // Fire
-            0x30A, // Water
-            0x30C, // Grass
-            0x30B, // Electric
-            0x312, // Psychic
-            0x30D, // Ice
-            0x316, // Dragon
-            0x317, // Dark
-            0x319  // Fairy
+            Items.normaliumZHeld, // Normal
+            Items.fightiniumZHeld, // Fighting
+            Items.flyiniumZHeld, // Flying
+            Items.poisoniumZHeld, // Poison
+            Items.groundiumZHeld, // Ground
+            Items.rockiumZHeld, // Rock
+            Items.buginiumZHeld, // Bug
+            Items.ghostiumZHeld, // Ghost
+            Items.steeliumZHeld, // Steel
+            Items.firiumZHeld, // Fire
+            Items.wateriumZHeld, // Water
+            Items.grassiumZHeld, // Grass
+            Items.electriumZHeld, // Electric
+            Items.psychiumZHeld, // Psychic
+            Items.iciumZHeld, // Ice
+            Items.dragoniumZHeld, // Dragon
+            Items.darkiniumZHeld, // Dark
+            Items.fairiumZHeld  // Fairy
     );
 
     public static final Map<Integer,List<Integer>> abilityVariations = setupAbilityVariations();
@@ -189,20 +190,11 @@ public class Gen7Constants {
         }
     }
 
-    // https://bulbapedia.bulbagarden.net/wiki/List_of_items_by_index_number_(Generation_VII)
-    // Held items we randomize from Gen 7 are a superset of the held items from Gen 6. Thus, we list only the
-    // new ones here.
-    // New consumable held items.
-    public static final int adrenalineOrb = 0x34e, electricSeed = 0x371, psychicSeed = 0x372,
-            mistySeed = 0x373, grassySeed = 0x374;
-    // New non-consumable held items with in-battle NPC effect (not specific to one pokemon family or one move)
-    public static final int terrainExtender = 0x36F, protectivePads = 0x370;
-
     public static final List<Integer> consumableHeldItems = setupAllConsumableItems();
 
     private static List<Integer> setupAllConsumableItems() {
         List<Integer> list = new ArrayList<>(Gen6Constants.consumableHeldItems);
-        list.addAll(Arrays.asList(adrenalineOrb, electricSeed, psychicSeed, mistySeed, grassySeed));
+        list.addAll(Arrays.asList(Items.adrenalineOrb, Items.electricSeed, Items.psychicSeed, Items.mistySeed, Items.grassySeed));
         return list;
     }
 
@@ -212,8 +204,8 @@ public class Gen7Constants {
         // We intentionally do not include Z Crystals in this list. Adding Z-Crystals to random trainers should
         // probably require its own setting if desired.
         List<Integer> list = new ArrayList<>(Gen6Constants.allHeldItems);
-        list.addAll(Arrays.asList(adrenalineOrb, electricSeed, psychicSeed, mistySeed, grassySeed));
-        list.addAll(Arrays.asList(terrainExtender, protectivePads));
+        list.addAll(Arrays.asList(Items.adrenalineOrb, Items.electricSeed, Items.psychicSeed, Items.mistySeed, Items.grassySeed));
+        list.addAll(Arrays.asList(Items.terrainExtender, Items.protectivePads));
         return list;
     }
 
@@ -222,8 +214,8 @@ public class Gen7Constants {
     private static List<Integer> initializeGeneralPurposeConsumableItems() {
         List<Integer> list = new ArrayList<>(Gen6Constants.generalPurposeConsumableItems);
         // These berries are worth the risk of causing confusion because they heal for half max HP.
-        list.addAll(Arrays.asList(Gen4Constants.figyBerry, Gen4Constants.wikiBerry, Gen4Constants.magoBerry,
-                Gen4Constants.aguavBerry, Gen4Constants.iapapaBerry, adrenalineOrb));
+        list.addAll(Arrays.asList(Items.figyBerry, Items.wikiBerry, Items.magoBerry,
+                Items.aguavBerry, Items.iapapaBerry, Items.adrenalineOrb));
         return Collections.unmodifiableList(list);
     }
 
@@ -231,7 +223,7 @@ public class Gen7Constants {
 
     private static List<Integer> initializeGeneralPurposeItems() {
         List<Integer> list = new ArrayList<>(Gen6Constants.generalPurposeItems);
-        list.addAll(Arrays.asList(protectivePads));
+        list.addAll(Arrays.asList(Items.protectivePads));
         return Collections.unmodifiableList(list);
     }
 
@@ -239,21 +231,21 @@ public class Gen7Constants {
 
     private static Map<Integer, List<Integer>> initializeMoveBoostingItems() {
         Map<Integer, List<Integer>> map = new HashMap<>(Gen6Constants.moveBoostingItems);
-        map.put(Moves.electricTerrain, Arrays.asList(terrainExtender));
-        map.put(Moves.grassyTerrain, Arrays.asList(terrainExtender));
-        map.put(Moves.mistyTerrain, Arrays.asList(terrainExtender));
-        map.put(Moves.psychicTerrain, Arrays.asList(terrainExtender));
-        map.put(Moves.strengthSap, Arrays.asList(Gen4Constants.bigRoot));
+        map.put(Moves.electricTerrain, Arrays.asList(Items.terrainExtender));
+        map.put(Moves.grassyTerrain, Arrays.asList(Items.terrainExtender));
+        map.put(Moves.mistyTerrain, Arrays.asList(Items.terrainExtender));
+        map.put(Moves.psychicTerrain, Arrays.asList(Items.terrainExtender));
+        map.put(Moves.strengthSap, Arrays.asList(Items.bigRoot));
         return Collections.unmodifiableMap(map);
     }
     public static final Map<Integer, List<Integer>> abilityBoostingItems = initializeAbilityBoostingItems();
 
     private static Map<Integer, List<Integer>> initializeAbilityBoostingItems() {
         Map<Integer, List<Integer>> map = new HashMap<>(Gen6Constants.abilityBoostingItems);
-        map.put(Abilities.electricSurge, Arrays.asList(terrainExtender));
-        map.put(Abilities.grassySurge, Arrays.asList(terrainExtender));
-        map.put(Abilities.mistySurge, Arrays.asList(terrainExtender));
-        map.put(Abilities.psychicSurge, Arrays.asList(terrainExtender));
+        map.put(Abilities.electricSurge, Arrays.asList(Items.terrainExtender));
+        map.put(Abilities.grassySurge, Arrays.asList(Items.terrainExtender));
+        map.put(Abilities.mistySurge, Arrays.asList(Items.terrainExtender));
+        map.put(Abilities.psychicSurge, Arrays.asList(Items.terrainExtender));
         return Collections.unmodifiableMap(map);
     }
 
@@ -261,10 +253,10 @@ public class Gen7Constants {
 
     private static Map<Integer, Integer> initializeConsumableAbilityBoostingItems() {
         Map<Integer, Integer> map = new HashMap<>();
-        map.put(Abilities.electricSurge, electricSeed);
-        map.put(Abilities.grassySurge, grassySeed);
-        map.put(Abilities.mistySurge, mistySeed);
-        map.put(Abilities.psychicSurge, psychicSeed);
+        map.put(Abilities.electricSurge, Items.electricSeed);
+        map.put(Abilities.grassySurge, Items.grassySeed);
+        map.put(Abilities.mistySurge, Items.mistySeed);
+        map.put(Abilities.psychicSurge, Items.psychicSeed);
         return Collections.unmodifiableMap(map);
     }
 
@@ -276,9 +268,9 @@ public class Gen7Constants {
 
     public static boolean isZCrystal(int itemIndex) {
         // From https://bulbapedia.bulbagarden.net/wiki/List_of_items_by_index_number_(Generation_VII)
-        return (itemIndex >= 0x308 && itemIndex <= 0x31A) ||
-                (itemIndex >= 0x31E && itemIndex <= 0x344) ||
-                (itemIndex >= 0x399 && itemIndex <= 0x3a4);
+        return (itemIndex >= Items.normaliumZHeld && itemIndex <= Items.pikaniumZHeld) ||
+                (itemIndex >= Items.decidiumZHeld && itemIndex <= Items.pikashuniumZBag) ||
+                (itemIndex >= Items.solganiumZBag && itemIndex <= Items.kommoniumZBag);
 
     }
 
@@ -727,109 +719,113 @@ public class Gen7Constants {
     }
 
     private static void setupAllowedItems() {
-        allowedItemsSM = new ItemList(920);
+        allowedItemsSM = new ItemList(Items.fairyMemory);
         // Key items + version exclusives
-        allowedItemsSM.banRange(428, 76);
-        allowedItemsSM.banRange(505,32);
-        allowedItemsSM.banRange(621, 18);
-        allowedItemsSM.banSingles(216, 574, 578, 579, 616, 617);
+        allowedItemsSM.banRange(Items.explorerKit, 76);
+        allowedItemsSM.banRange(Items.dataCard01, 32);
+        allowedItemsSM.banRange(Items.xtransceiverMale, 18);
+        allowedItemsSM.banSingles(Items.expShare, Items.libertyPass, Items.propCase, Items.dragonSkull,
+                Items.lightStone, Items.darkStone);
         // Unknown blank items or version exclusives
-        allowedItemsSM.banRange(113, 3);
-        allowedItemsSM.banRange(120, 14);
-        // TMs & HMs - tms cant be held in gen5
-        allowedItemsSM.tmRange(328, 92);
-        allowedItemsSM.tmRange(618, 3);
-        allowedItemsSM.banRange(328, 100);
-        allowedItemsSM.banRange(618, 3);
+        allowedItemsSM.banRange(Items.tea, 3);
+        allowedItemsSM.banRange(Items.unused120, 14);
+        // TMs & HMs - tms cant be held in gen7
+        allowedItemsSM.tmRange(Items.tm01, 92);
+        allowedItemsSM.tmRange(Items.tm93, 3);
+        allowedItemsSM.banRange(Items.tm01, 100);
+        allowedItemsSM.banRange(Items.tm93, 3);
         // Battle Launcher exclusives
-        allowedItemsSM.banRange(592, 24);
+        allowedItemsSM.banRange(Items.direHit2, 24);
 
         // Key items (Gen 6)
-        allowedItemsSM.banRange(641,3);
-        allowedItemsSM.banSingles(651, 689);
-        allowedItemsSM.banRange(695,4);
-        allowedItemsSM.banRange(700,4);
-        allowedItemsSM.banRange(705,3);
-        allowedItemsSM.banRange(712,3);
-        allowedItemsSM.banRange(716,2);
+        allowedItemsSM.banRange(Items.holoCasterMale,3);
+        allowedItemsSM.banSingles(Items.pokeFlute, Items.sprinklotad);
+        allowedItemsSM.banRange(Items.powerPlantPass,4);
+        allowedItemsSM.banRange(Items.elevatorKey,4);
+        allowedItemsSM.banRange(Items.lensCase,3);
+        allowedItemsSM.banRange(Items.lookerTicket,3);
+        allowedItemsSM.banRange(Items.megaCharm,2);
 
         // TMs (Gen 6)
-        allowedItemsSM.tmRange(690,5);
-        allowedItemsSM.banRange(690,5);
+        allowedItemsSM.tmRange(Items.tm96,5);
+        allowedItemsSM.banRange(Items.tm96,5);
 
         // Key items and an HM
-        allowedItemsSM.banRange(718,34);
-        allowedItemsSM.banRange(765,2);
-        allowedItemsSM.banRange(771,5);
+        allowedItemsSM.banRange(Items.machBike,34);
+        allowedItemsSM.banRange(Items.prisonBottle,2);
+        allowedItemsSM.banRange(Items.meteoriteThirdForm,5);
 
         // Z-Crystals
-        allowedItemsSM.banRange(776,19);
-        allowedItemsSM.banRange(798,39);
+        allowedItemsSM.banRange(Items.normaliumZHeld,19);
+        allowedItemsSM.banRange(Items.decidiumZHeld,39);
 
         // Key Items (Gen 7)
-        allowedItemsSM.banSingles(797, 845, 847, 850, 857, 858, 860);
-        allowedItemsSM.banRange(841,3);
+        allowedItemsSM.banSingles(Items.zRing, Items.sparklingStone, Items.zygardeCube, Items.ridePager,
+                Items.sunFlute, Items.moonFlute, Items.enigmaticCard);
+        allowedItemsSM.banRange(Items.forageBag,3);
 
         // Unused
-        allowedItemsSM.banSingles(848, 859);
-        allowedItemsSM.banRange(837,4);
-        allowedItemsSM.banRange(861,18);
-        allowedItemsSM.banRange(885,19);
+        allowedItemsSM.banSingles(Items.unused848, Items.unused859);
+        allowedItemsSM.banRange(Items.unused837,4);
+        allowedItemsSM.banRange(Items.silverRazzBerry,18);
+        allowedItemsSM.banRange(Items.stretchySpring,19);
 
-        allowedItemsUSUM = allowedItemsSM.copy(959);
+        allowedItemsUSUM = allowedItemsSM.copy(Items.rotoCatch);
 
         // Z-Crystals
-        allowedItemsUSUM.banRange(921,12);
+        allowedItemsUSUM.banRange(Items.solganiumZBag,12);
 
         // Key Items
-        allowedItemsUSUM.banRange(933,16);
+        allowedItemsUSUM.banRange(Items.zPowerRing,16);
 
         // ROTO LOTO
-        allowedItemsUSUM.banRange(949,11);
+        allowedItemsUSUM.banRange(Items.rotoHatch,11);
 
         // non-bad items
         // ban specific pokemon hold items, berries, apricorns, mail
         nonBadItems = allowedItemsSM.copy();
 
-        nonBadItems.banSingles(0x6F, 0x70, 0xE1, 0xEC, 0x9B, 0x112, 0x23F, 0x2BB, 0x2C0, 0x34C);
-        nonBadItems.banRange(0x5F, 4); // mulch
-        nonBadItems.banRange(0x87, 2); // orbs
-        nonBadItems.banRange(0x89, 12); // mails
-        nonBadItems.banRange(0x9F, 25); // berries without useful battle effects
-        nonBadItems.banRange(0x100, 4); // pokemon specific
-        nonBadItems.banRange(0x104, 5); // contest scarves
-        nonBadItems.banRange(0x28C,4); // more mulch
-        nonBadItems.banRange(0x290, 30); // Mega Stones, part 1
-        nonBadItems.banRange(0x2F0, 13); // Mega Stones, part 2
-        nonBadItems.banRange(0x2FF, 4); // Mega Stones, part 3
-        nonBadItems.banRange(0x388,17); // Memories
-        nonBadItems.banRange(0x248,7); // relic items
+        nonBadItems.banSingles(Items.oddKeystone, Items.griseousOrb, Items.soulDew, Items.lightBall,
+                Items.oranBerry, Items.quickPowder, Items.passOrb, Items.discountCoupon, Items.strangeSouvenir,
+                Items.festivalTicket);
+        nonBadItems.banRange(Items.growthMulch, 4); // mulch
+        nonBadItems.banRange(Items.adamantOrb, 2); // orbs
+        nonBadItems.banRange(Items.mail1, 12); // mails
+        nonBadItems.banRange(Items.figyBerry, 25); // berries without useful battle effects
+        nonBadItems.banRange(Items.luckyPunch, 4); // pokemon specific
+        nonBadItems.banRange(Items.redScarf, 5); // contest scarves
+        nonBadItems.banRange(Items.richMulch,4); // more mulch
+        nonBadItems.banRange(Items.gengarite, 30); // Mega Stones, part 1
+        nonBadItems.banRange(Items.swampertite, 13); // Mega Stones, part 2
+        nonBadItems.banRange(Items.cameruptite, 4); // Mega Stones, part 3
+        nonBadItems.banRange(Items.fightingMemory,17); // Memories
+        nonBadItems.banRange(Items.relicCopper,7); // relic items
 
         regularShopItemsSM = new ArrayList<>();
 
-        regularShopItemsSM.addAll(IntStream.rangeClosed(2,4).boxed().collect(Collectors.toList()));
-        regularShopItemsSM.addAll(IntStream.rangeClosed(0x11,0x1C).boxed().collect(Collectors.toList()));
-        regularShopItemsSM.addAll(IntStream.rangeClosed(0x4C,0x4F).boxed().collect(Collectors.toList()));
-        regularShopItemsSM.add(0x5E); // Honey
-        regularShopItemsSM.add(0x34E); // Adrenaline Orb
+        regularShopItemsSM.addAll(IntStream.rangeClosed(Items.ultraBall, Items.pokeBall).boxed().collect(Collectors.toList()));
+        regularShopItemsSM.addAll(IntStream.rangeClosed(Items.potion, Items.revive).boxed().collect(Collectors.toList()));
+        regularShopItemsSM.addAll(IntStream.rangeClosed(Items.superRepel, Items.repel).boxed().collect(Collectors.toList()));
+        regularShopItemsSM.add(Items.honey);
+        regularShopItemsSM.add(Items.adrenalineOrb);
 
         regularShopItemsUSUM = new ArrayList<>(regularShopItemsSM);
-        regularShopItemsUSUM.add(0x241); // Poke Toy
+        regularShopItemsUSUM.add(Items.pokeToy);
 
         opShopItems = new ArrayList<>();
 
         // "Money items" etc
-        opShopItems.add(0x2A);
-        opShopItems.add(0x2B);
-        opShopItems.add(0x32);
-        opShopItems.add(0x36);
-        opShopItems.addAll(IntStream.rangeClosed(0x41,0x47).boxed().collect(Collectors.toList()));
-        opShopItems.addAll(IntStream.rangeClosed(0x56,0x5C).boxed().collect(Collectors.toList()));
-        opShopItems.add(0x6A);
-        opShopItems.addAll(IntStream.rangeClosed(0xCE,0xD4).boxed().collect(Collectors.toList()));
-        opShopItems.add(0xE7);
-        opShopItems.add(0x23B);
-        opShopItems.addAll(IntStream.rangeClosed(0x244,0x24F).boxed().collect(Collectors.toList()));
+        opShopItems.add(Items.lavaCookie);
+        opShopItems.add(Items.berryJuice);
+        opShopItems.add(Items.rareCandy);
+        opShopItems.add(Items.oldGateau);
+        opShopItems.addAll(IntStream.rangeClosed(Items.blueFlute, Items.shoalShell).boxed().collect(Collectors.toList()));
+        opShopItems.addAll(IntStream.rangeClosed(Items.tinyMushroom, Items.nugget).boxed().collect(Collectors.toList()));
+        opShopItems.add(Items.rareBone);
+        opShopItems.addAll(IntStream.rangeClosed(Items.lansatBerry, Items.rowapBerry).boxed().collect(Collectors.toList()));
+        opShopItems.add(Items.luckyEgg);
+        opShopItems.add(Items.prettyFeather);
+        opShopItems.addAll(IntStream.rangeClosed(Items.balmMushroom, Items.casteliacone).boxed().collect(Collectors.toList()));
     }
 
     public static ItemList getAllowedItems(int romType) {
@@ -1057,964 +1053,964 @@ public class Gen7Constants {
 
     public static final Map<Integer,Integer> balancedItemPrices = Stream.of(new Integer[][] {
             // Skip item index 0. All prices divided by 10
-            {1, 300}, // Master Ball
-            {2, 80}, // Ultra Ball
-            {3, 60}, // Great Ball
-            {4, 20}, // Poké Ball
-            {5, 50}, // Safari Ball
-            {6, 100}, // Net Ball
-            {7, 100}, // Dive Ball
-            {8, 100}, // Nest Ball
-            {9, 100}, // Repeat Ball
-            {10, 100}, // Timer Ball
-            {11, 100}, // Luxury Ball
-            {12, 20}, // Premier Ball
-            {13, 100}, // Dusk Ball
-            {14, 30}, // Heal Ball
-            {15, 100}, // Quick Ball
-            {16, 20}, // Cherish Ball
-            {17, 20}, // Potion
-            {18, 20}, // Antidote
-            {19, 30}, // Burn Heal
-            {20, 10}, // Ice Heal
-            {21, 10}, // Awakening
-            {22, 30}, // Parlyz Heal
-            {23, 300}, // Full Restore
-            {24, 250}, // Max Potion
-            {25, 150}, // Hyper Potion
-            {26, 70}, // Super Potion
-            {27, 40}, // Full Heal
-            {28, 200}, // Revive
-            {29, 400}, // Max Revive
-            {30, 20}, // Fresh Water
-            {31, 30}, // Soda Pop
-            {32, 40}, // Lemonade
-            {33, 60}, // Moomoo Milk
-            {34, 50}, // EnergyPowder
-            {35, 120}, // Energy Root
-            {36, 30}, // Heal Powder
-            {37, 280}, // Revival Herb
-            {38, 300}, // Ether
-            {39, 450}, // Max Ether
-            {40, 1500}, // Elixir
-            {41, 1800}, // Max Elixir
-            {42, 35}, // Lava Cookie
-            {43, 20}, // Berry Juice
-            {44, 500}, // Sacred Ash
-            {45, 1000}, // HP Up
-            {46, 1000}, // Protein
-            {47, 1000}, // Iron
-            {48, 1000}, // Carbos
-            {49, 1000}, // Calcium
-            {50, 1000}, // Rare Candy
-            {51, 1000}, // PP Up
-            {52, 1000}, // Zinc
-            {53, 2500}, // PP Max
-            {54, 35}, // Old Gateau
-            {55, 150}, // Guard Spec.
-            {56, 100}, // Dire Hit
-            {57, 100}, // X Attack
-            {58, 200}, // X Defend
-            {59, 100}, // X Speed
-            {60, 100}, // X Accuracy
-            {61, 100}, // X Special
-            {62, 200}, // X Sp. Def
-            {63, 10}, // Poké Doll
-            {64, 10}, // Fluffy Tail
-            {65, 2}, // Blue Flute
-            {66, 2}, // Yellow Flute
-            {67, 2}, // Red Flute
-            {68, 2}, // Black Flute
-            {69, 2}, // White Flute
-            {70, 2}, // Shoal Salt
-            {71, 2}, // Shoal Shell
-            {72, 100}, // Red Shard
-            {73, 100}, // Blue Shard
-            {74, 100}, // Yellow Shard
-            {75, 100}, // Green Shard
-            {76, 70}, // Super Repel
-            {77, 90}, // Max Repel
-            {78, 100}, // Escape Rope
-            {79, 40}, // Repel
-            {80, 300}, // Sun Stone
-            {81, 300}, // Moon Stone
-            {82, 300}, // Fire Stone
-            {83, 300}, // Thunderstone
-            {84, 300}, // Water Stone
-            {85, 300}, // Leaf Stone
-            {86, 50}, // TinyMushroom
-            {87, 500}, // Big Mushroom
-            {88, 200}, // Pearl
-            {89, 800}, // Big Pearl
-            {90, 300}, // Stardust
-            {91, 1200}, // Star Piece
-            {92, 1000}, // Nugget
-            {93, 500}, // Heart Scale
-            {94, 30}, // Honey
-            {95, 20}, // Growth Mulch
-            {96, 20}, // Damp Mulch
-            {97, 20}, // Stable Mulch
-            {98, 20}, // Gooey Mulch
-            {99, 700}, // Root Fossil
-            {100, 700}, // Claw Fossil
-            {101, 700}, // Helix Fossil
-            {102, 700}, // Dome Fossil
-            {103, 1000}, // Old Amber
-            {104, 700}, // Armor Fossil
-            {105, 700}, // Skull Fossil
-            {106, 500}, // Rare Bone
-            {107, 300}, // Shiny Stone
-            {108, 300}, // Dusk Stone
-            {109, 300}, // Dawn Stone
-            {110, 200}, // Oval Stone
-            {111, 210}, // Odd Keystone
-            {112, 1000}, // Griseous Orb
-            {113, 0}, // unknown
-            {114, 0}, // unknown
-            {115, 0}, // unknown
-            {116, 100}, // Douse Drive
-            {117, 100}, // Shock Drive
-            {118, 100}, // Burn Drive
-            {119, 100}, // Chill Drive
-            {120, 0}, // unknown
-            {121, 0}, // unknown
-            {122, 0}, // unknown
-            {123, 0}, // unknown
-            {124, 0}, // unknown
-            {125, 0}, // unknown
-            {126, 0}, // unknown
-            {127, 0}, // unknown
-            {128, 0}, // unknown
-            {129, 0}, // unknown
-            {130, 0}, // unknown
-            {131, 0}, // unknown
-            {132, 0}, // unknown
-            {133, 0}, // unknown
-            {134, 15}, // Sweet Heart
-            {135, 1000}, // Adamant Orb
-            {136, 1000}, // Lustrous Orb
-            {137, 5}, // Greet Mail
-            {138, 5}, // Favored Mail
-            {139, 5}, // RSVP Mail
-            {140, 5}, // Thanks Mail
-            {141, 5}, // Inquiry Mail
-            {142, 5}, // Like Mail
-            {143, 5}, // Reply Mail
-            {144, 5}, // BridgeMail S
-            {145, 5}, // BridgeMail D
-            {146, 5}, // BridgeMail T
-            {147, 5}, // BridgeMail V
-            {148, 5}, // BridgeMail M
-            {149, 20}, // Cheri Berry
-            {150, 25}, // Chesto Berry
-            {151, 10}, // Pecha Berry
-            {152, 25}, // Rawst Berry
-            {153, 25}, // Aspear Berry
-            {154, 300}, // Leppa Berry
-            {155, 5}, // Oran Berry
-            {156, 20}, // Persim Berry
-            {157, 50}, // Lum Berry
-            {158, 50}, // Sitrus Berry
-            {159, 10}, // Figy Berry
-            {160, 10}, // Wiki Berry
-            {161, 10}, // Mago Berry
-            {162, 10}, // Aguav Berry
-            {163, 10}, // Iapapa Berry
-            {164, 50}, // Razz Berry
-            {165, 50}, // Bluk Berry
-            {166, 50}, // Nanab Berry
-            {167, 50}, // Wepear Berry
-            {168, 50}, // Pinap Berry
-            {169, 50}, // Pomeg Berry
-            {170, 50}, // Kelpsy Berry
-            {171, 50}, // Qualot Berry
-            {172, 50}, // Hondew Berry
-            {173, 50}, // Grepa Berry
-            {174, 50}, // Tamato Berry
-            {175, 50}, // Cornn Berry
-            {176, 50}, // Magost Berry
-            {177, 50}, // Rabuta Berry
-            {178, 50}, // Nomel Berry
-            {179, 50}, // Spelon Berry
-            {180, 50}, // Pamtre Berry
-            {181, 50}, // Watmel Berry
-            {182, 50}, // Durin Berry
-            {183, 50}, // Belue Berry
-            {184, 100}, // Occa Berry
-            {185, 100}, // Passho Berry
-            {186, 100}, // Wacan Berry
-            {187, 100}, // Rindo Berry
-            {188, 100}, // Yache Berry
-            {189, 100}, // Chople Berry
-            {190, 100}, // Kebia Berry
-            {191, 100}, // Shuca Berry
-            {192, 100}, // Coba Berry
-            {193, 100}, // Payapa Berry
-            {194, 100}, // Tanga Berry
-            {195, 100}, // Charti Berry
-            {196, 100}, // Kasib Berry
-            {197, 100}, // Haban Berry
-            {198, 100}, // Colbur Berry
-            {199, 100}, // Babiri Berry
-            {200, 100}, // Chilan Berry
-            {201, 100}, // Liechi Berry
-            {202, 100}, // Ganlon Berry
-            {203, 100}, // Salac Berry
-            {204, 100}, // Petaya Berry
-            {205, 100}, // Apicot Berry
-            {206, 100}, // Lansat Berry
-            {207, 100}, // Starf Berry
-            {208, 100}, // Enigma Berry
-            {209, 100}, // Micle Berry
-            {210, 100}, // Custap Berry
-            {211, 100}, // Jaboca Berry
-            {212, 100}, // Rowap Berry
-            {213, 400}, // BrightPowder
-            {214, 400}, // White Herb
-            {215, 300}, // Macho Brace
-            {216, 0}, // Exp. Share
-            {217, 450}, // Quick Claw
-            {218, 100}, // Soothe Bell
-            {219, 100}, // Mental Herb
-            {220, 1000}, // Choice Band
-            {221, 500}, // King's Rock
-            {222, 200}, // SilverPowder
-            {223, 1500}, // Amulet Coin
-            {224, 100}, // Cleanse Tag
-            {225, 20}, // Soul Dew
-            {226, 300}, // DeepSeaTooth
-            {227, 300}, // DeepSeaScale
-            {228, 400}, // Smoke Ball
-            {229, 300}, // Everstone
-            {230, 300}, // Focus Band
-            {231, 1000}, // Lucky Egg
-            {232, 500}, // Scope Lens
-            {233, 300}, // Metal Coat
-            {234, 1000}, // Leftovers
-            {235, 300}, // Dragon Scale
-            {236, 100}, // Light Ball
-            {237, 200}, // Soft Sand
-            {238, 200}, // Hard Stone
-            {239, 200}, // Miracle Seed
-            {240, 200}, // BlackGlasses
-            {241, 200}, // Black Belt
-            {242, 200}, // Magnet
-            {243, 200}, // Mystic Water
-            {244, 200}, // Sharp Beak
-            {245, 200}, // Poison Barb
-            {246, 200}, // NeverMeltIce
-            {247, 200}, // Spell Tag
-            {248, 200}, // TwistedSpoon
-            {249, 200}, // Charcoal
-            {250, 200}, // Dragon Fang
-            {251, 200}, // Silk Scarf
-            {252, 300}, // Up-Grade
-            {253, 600}, // Shell Bell
-            {254, 200}, // Sea Incense
-            {255, 300}, // Lax Incense
-            {256, 100}, // Lucky Punch
-            {257, 100}, // Metal Powder
-            {258, 100}, // Thick Club
-            {259, 100}, // Stick
-            {260, 10}, // Red Scarf
-            {261, 10}, // Blue Scarf
-            {262, 10}, // Pink Scarf
-            {263, 10}, // Green Scarf
-            {264, 10}, // Yellow Scarf
-            {265, 150}, // Wide Lens
-            {266, 200}, // Muscle Band
-            {267, 200}, // Wise Glasses
-            {268, 600}, // Expert Belt
-            {269, 150}, // Light Clay
-            {270, 1000}, // Life Orb
-            {271, 100}, // Power Herb
-            {272, 150}, // Toxic Orb
-            {273, 150}, // Flame Orb
-            {274, 100}, // Quick Powder
-            {275, 200}, // Focus Sash
-            {276, 150}, // Zoom Lens
-            {277, 300}, // Metronome
-            {278, 100}, // Iron Ball
-            {279, 100}, // Lagging Tail
-            {280, 150}, // Destiny Knot
-            {281, 500}, // Black Sludge
-            {282, 20}, // Icy Rock
-            {283, 20}, // Smooth Rock
-            {284, 20}, // Heat Rock
-            {285, 20}, // Damp Rock
-            {286, 150}, // Grip Claw
-            {287, 1000}, // Choice Scarf
-            {288, 150}, // Sticky Barb
-            {289, 300}, // Power Bracer
-            {290, 300}, // Power Belt
-            {291, 300}, // Power Lens
-            {292, 300}, // Power Band
-            {293, 300}, // Power Anklet
-            {294, 300}, // Power Weight
-            {295, 50}, // Shed Shell
-            {296, 150}, // Big Root
-            {297, 1000}, // Choice Specs
-            {298, 200}, // Flame Plate
-            {299, 200}, // Splash Plate
-            {300, 200}, // Zap Plate
-            {301, 200}, // Meadow Plate
-            {302, 200}, // Icicle Plate
-            {303, 200}, // Fist Plate
-            {304, 200}, // Toxic Plate
-            {305, 200}, // Earth Plate
-            {306, 200}, // Sky Plate
-            {307, 200}, // Mind Plate
-            {308, 200}, // Insect Plate
-            {309, 200}, // Stone Plate
-            {310, 200}, // Spooky Plate
-            {311, 200}, // Draco Plate
-            {312, 200}, // Dread Plate
-            {313, 200}, // Iron Plate
-            {314, 200}, // Odd Incense
-            {315, 200}, // Rock Incense
-            {316, 100}, // Full Incense
-            {317, 200}, // Wave Incense
-            {318, 200}, // Rose Incense
-            {319, 1500}, // Luck Incense
-            {320, 100}, // Pure Incense
-            {321, 300}, // Protector
-            {322, 300}, // Electirizer
-            {323, 300}, // Magmarizer
-            {324, 300}, // Dubious Disc
-            {325, 300}, // Reaper Cloth
-            {326, 500}, // Razor Claw
-            {327, 500}, // Razor Fang
-            {328, 1000}, // TM01 Work Up
-            {329, 1000}, // TM02 Dragon Claw
-            {330, 1000}, // TM03 Psyshock
-            {331, 1000}, // TM04 Calm Mind
-            {332, 1000}, // TM05 Roar
-            {333, 1000}, // TM06 Toxic
-            {334, 2000}, // TM07 Hail
-            {335, 1000}, // TM08 Bulk Up
-            {336, 1000}, // TM09 Venoshock
-            {337, 1000}, // TM10 Hidden Power
-            {338, 2000}, // TM11 Sunny Day
-            {339, 1000}, // TM12 Taunt
-            {340, 1000}, // TM13 Ice Beam
-            {341, 2000}, // TM14 Blizzard
-            {342, 2000}, // TM15 Hyper Beam
-            {343, 1000}, // TM16 Light Screen
-            {344, 1000}, // TM17 Protect
-            {345, 2000}, // TM18 Rain Dance
-            {346, 1000}, // TM19 Roost
-            {347, 1000}, // TM20 Safeguard
-            {348, 1000}, // TM21 Frustration
-            {349, 1000}, // TM22 Solar Beam
-            {350, 1000}, // TM23 Smack Down
-            {351, 1000}, // TM24 Thunderbolt
-            {352, 2000}, // TM25 Thunder
-            {353, 1000}, // TM26 Earthquake
-            {354, 1000}, // TM27 Return
-            {355, 2000}, // TM28 Leech Life
-            {356, 1000}, // TM29 Psychic
-            {357, 1000}, // TM30 Shadow Ball
-            {358, 1000}, // TM31 Brick Break
-            {359, 1000}, // TM32 Double Team
-            {360, 1000}, // TM33 Reflect
-            {361, 1000}, // TM34 Sludge Wave
-            {362, 1000}, // TM35 Flamethrower
-            {363, 1000}, // TM36 Sludge Bomb
-            {364, 2000}, // TM37 Sandstorm
-            {365, 2000}, // TM38 Fire Blast
-            {366, 1000}, // TM39 Rock Tomb
-            {367, 1000}, // TM40 Aerial Ace
-            {368, 1000}, // TM41 Torment
-            {369, 1000}, // TM42 Facade
-            {370, 1000}, // TM43 Flame Charge
-            {371, 1000}, // TM44 Rest
-            {372, 1000}, // TM45 Attract
-            {373, 1000}, // TM46 Thief
-            {374, 1000}, // TM47 Low Sweep
-            {375, 1000}, // TM48 Round
-            {376, 1000}, // TM49 Echoed Voice
-            {377, 2000}, // TM50 Overheat
-            {378, 1000}, // TM51 Steel Wing
-            {379, 2000}, // TM52 Focus Blast
-            {380, 1000}, // TM53 Energy Ball
-            {381, 1000}, // TM54 False Swipe
-            {382, 1000}, // TM55 Scald
-            {383, 1000}, // TM56 Fling
-            {384, 1000}, // TM57 Charge Beam
-            {385, 1000}, // TM58 Sky Drop
-            {386, 2000}, // TM59 Brutal Swing
-            {387, 1000}, // TM60 Quash
-            {388, 1000}, // TM61 Will-O-Wisp
-            {389, 1000}, // TM62 Acrobatics
-            {390, 1000}, // TM63 Embargo
-            {391, 1000}, // TM64 Explosion
-            {392, 1000}, // TM65 Shadow Claw
-            {393, 1000}, // TM66 Payback
-            {394, 1000}, // TM67 Smart Strike
-            {395, 2000}, // TM68 Giga Impact
-            {396, 1000}, // TM69 Rock Polish
-            {397, 2000}, // TM70 Aurora Veil
-            {398, 2000}, // TM71 Stone Edge
-            {399, 1000}, // TM72 Volt Switch
-            {400, 500}, // TM73 Thunder Wave
-            {401, 1000}, // TM74 Gyro Ball
-            {402, 1000}, // TM75 Swords Dance
-            {403, 1000}, // TM76 Fly
-            {404, 1000}, // TM77 Psych Up
-            {405, 1000}, // TM78 Bulldoze
-            {406, 1000}, // TM79 Frost Breath
-            {407, 1000}, // TM80 Rock Slide
-            {408, 1000}, // TM81 X-Scissor
-            {409, 1000}, // TM82 Dragon Tail
-            {410, 1000}, // TM83 Infestation
-            {411, 1000}, // TM84 Poison Jab
-            {412, 1000}, // TM85 Dream Eater
-            {413, 1000}, // TM86 Grass Knot
-            {414, 1000}, // TM87 Swagger
-            {415, 1000}, // TM88 Sleep Talk
-            {416, 1000}, // TM89 U-turn
-            {417, 1000}, // TM90 Substitute
-            {418, 1000}, // TM91 Flash Cannon
-            {419, 1000}, // TM92 Trick Room
-            {420, 0}, // HM01
-            {421, 0}, // HM02
-            {422, 0}, // HM03
-            {423, 0}, // HM04
-            {424, 0}, // HM05
-            {425, 0}, // HM06
-            {426, 0}, // unknown
-            {427, 0}, // unknown
-            {428, 0}, // Explorer Kit
-            {429, 0}, // Loot Sack
-            {430, 0}, // Rule Book
-            {431, 0}, // Poké Radar
-            {432, 0}, // Point Card
-            {433, 0}, // Journal
-            {434, 0}, // Seal Case
-            {435, 0}, // Fashion Case
-            {436, 0}, // Seal Bag
-            {437, 0}, // Pal Pad
-            {438, 0}, // Works Key
-            {439, 0}, // Old Charm
-            {440, 0}, // Galactic Key
-            {441, 0}, // Red Chain
-            {442, 0}, // Town Map
-            {443, 0}, // Vs. Seeker
-            {444, 0}, // Coin Case
-            {445, 0}, // Old Rod
-            {446, 0}, // Good Rod
-            {447, 0}, // Super Rod
-            {448, 0}, // Sprayduck
-            {449, 0}, // Poffin Case
-            {450, 0}, // Bicycle
-            {451, 0}, // Suite Key
-            {452, 0}, // Oak's Letter
-            {453, 0}, // Lunar Wing
-            {454, 0}, // Member Card
-            {455, 0}, // Azure Flute
-            {456, 0}, // S.S. Ticket
-            {457, 0}, // Contest Pass
-            {458, 0}, // Magma Stone
-            {459, 0}, // Parcel
-            {460, 0}, // Coupon 1
-            {461, 0}, // Coupon 2
-            {462, 0}, // Coupon 3
-            {463, 0}, // Storage Key
-            {464, 0}, // SecretPotion
-            {465, 0}, // Vs. Recorder
-            {466, 0}, // Gracidea
-            {467, 0}, // Secret Key
-            {468, 0}, // Apricorn Box
-            {469, 0}, // Unown Report
-            {470, 0}, // Berry Pots
-            {471, 0}, // Dowsing MCHN
-            {472, 0}, // Blue Card
-            {473, 0}, // SlowpokeTail
-            {474, 0}, // Clear Bell
-            {475, 0}, // Card Key
-            {476, 0}, // Basement Key
-            {477, 0}, // SquirtBottle
-            {478, 0}, // Red Scale
-            {479, 0}, // Lost Item
-            {480, 0}, // Pass
-            {481, 0}, // Machine Part
-            {482, 0}, // Silver Wing
-            {483, 0}, // Rainbow Wing
-            {484, 0}, // Mystery Egg
-            {485, 2}, // Red Apricorn
-            {486, 2}, // Blu Apricorn
-            {487, 2}, // Ylw Apricorn
-            {488, 2}, // Grn Apricorn
-            {489, 2}, // Pnk Apricorn
-            {490, 2}, // Wht Apricorn
-            {491, 2}, // Blk Apricorn
-            {492, 30}, // Fast Ball
-            {493, 30}, // Level Ball
-            {494, 30}, // Lure Ball
-            {495, 30}, // Heavy Ball
-            {496, 30}, // Love Ball
-            {497, 30}, // Friend Ball
-            {498, 30}, // Moon Ball
-            {499, 30}, // Sport Ball
-            {500, 0}, // Park Ball
-            {501, 0}, // Photo Album
-            {502, 0}, // GB Sounds
-            {503, 0}, // Tidal Bell
-            {504, 35}, // RageCandyBar
-            {505, 0}, // Data Card 01
-            {506, 0}, // Data Card 02
-            {507, 0}, // Data Card 03
-            {508, 0}, // Data Card 04
-            {509, 0}, // Data Card 05
-            {510, 0}, // Data Card 06
-            {511, 0}, // Data Card 07
-            {512, 0}, // Data Card 08
-            {513, 0}, // Data Card 09
-            {514, 0}, // Data Card 10
-            {515, 0}, // Data Card 11
-            {516, 0}, // Data Card 12
-            {517, 0}, // Data Card 13
-            {518, 0}, // Data Card 14
-            {519, 0}, // Data Card 15
-            {520, 0}, // Data Card 16
-            {521, 0}, // Data Card 17
-            {522, 0}, // Data Card 18
-            {523, 0}, // Data Card 19
-            {524, 0}, // Data Card 20
-            {525, 0}, // Data Card 21
-            {526, 0}, // Data Card 22
-            {527, 0}, // Data Card 23
-            {528, 0}, // Data Card 24
-            {529, 0}, // Data Card 25
-            {530, 0}, // Data Card 26
-            {531, 0}, // Data Card 27
-            {532, 0}, // Jade Orb
-            {533, 0}, // Lock Capsule
-            {534, 0}, // Red Orb
-            {535, 0}, // Blue Orb
-            {536, 0}, // Enigma Stone
-            {537, 300}, // Prism Scale
-            {538, 1000}, // Eviolite
-            {539, 100}, // Float Stone
-            {540, 600}, // Rocky Helmet
-            {541, 100}, // Air Balloon
-            {542, 100}, // Red Card
-            {543, 100}, // Ring Target
-            {544, 200}, // Binding Band
-            {545, 100}, // Absorb Bulb
-            {546, 100}, // Cell Battery
-            {547, 100}, // Eject Button
-            {548, 100}, // Fire Gem
-            {549, 100}, // Water Gem
-            {550, 100}, // Electric Gem
-            {551, 100}, // Grass Gem
-            {552, 100}, // Ice Gem
-            {553, 100}, // Fighting Gem
-            {554, 100}, // Poison Gem
-            {555, 100}, // Ground Gem
-            {556, 100}, // Flying Gem
-            {557, 100}, // Psychic Gem
-            {558, 100}, // Bug Gem
-            {559, 100}, // Rock Gem
-            {560, 100}, // Ghost Gem
-            {561, 100}, // Dragon Gem
-            {562, 100}, // Dark Gem
-            {563, 100}, // Steel Gem
-            {564, 100}, // Normal Gem
-            {565, 30}, // Health Wing
-            {566, 30}, // Muscle Wing
-            {567, 30}, // Resist Wing
-            {568, 30}, // Genius Wing
-            {569, 30}, // Clever Wing
-            {570, 30}, // Swift Wing
-            {571, 100}, // Pretty Wing
-            {572, 700}, // Cover Fossil
-            {573, 700}, // Plume Fossil
-            {574, 0}, // Liberty Pass
-            {575, 20}, // Pass Orb
-            {576, 100}, // Dream Ball
-            {577, 10}, // Poké Toy
-            {578, 0}, // Prop Case
-            {579, 0}, // Dragon Skull
-            {580, 1500}, // BalmMushroom
-            {581, 4000}, // Big Nugget
-            {582, 3000}, // Pearl String
-            {583, 6000}, // Comet Shard
-            {584, 0}, // Relic Copper
-            {585, 0}, // Relic Silver
-            {586, 0}, // Relic Gold
-            {587, 0}, // Relic Vase
-            {588, 0}, // Relic Band
-            {589, 0}, // Relic Statue
-            {590, 0}, // Relic Crown
-            {591, 35}, // Casteliacone
-            {592, 0}, // Dire Hit 2
-            {593, 0}, // X Speed 2
-            {594, 0}, // X Special 2
-            {595, 0}, // X Sp. Def 2
-            {596, 0}, // X Defend 2
-            {597, 0}, // X Attack 2
-            {598, 0}, // X Accuracy 2
-            {599, 0}, // X Speed 3
-            {600, 0}, // X Special 3
-            {601, 0}, // X Sp. Def 3
-            {602, 0}, // X Defend 3
-            {603, 0}, // X Attack 3
-            {604, 0}, // X Accuracy 3
-            {605, 0}, // X Speed 6
-            {606, 0}, // X Special 6
-            {607, 0}, // X Sp. Def 6
-            {608, 0}, // X Defend 6
-            {609, 0}, // X Attack 6
-            {610, 0}, // X Accuracy 6
-            {611, 0}, // Ability Urge
-            {612, 0}, // Item Drop
-            {613, 0}, // Item Urge
-            {614, 0}, // Reset Urge
-            {615, 0}, // Dire Hit 3
-            {616, 0}, // Light Stone
-            {617, 0}, // Dark Stone
-            {618, 2000}, // TM93 Wild Charge
-            {619, 2000}, // TM94 Surf
-            {620, 1000}, // TM95 Snarl
-            {621, 0}, // Xtransceiver
-            {622, 0}, // God Stone
-            {623, 0}, // Gram 1
-            {624, 0}, // Gram 2
-            {625, 0}, // Gram 3
-            {626, 0}, // Xtransceiver
-            {627, 0}, // Medal Box
-            {628, 0}, // DNA Splicers
-            {629, 0}, // DNA Splicers
-            {630, 0}, // Permit
-            {631, 0}, // Oval Charm
-            {632, 0}, // Shiny Charm
-            {633, 0}, // Plasma Card
-            {634, 0}, // Grubby Hanky
-            {635, 0}, // Colress MCHN
-            {636, 0}, // Dropped Item
-            {637, 0}, // Dropped Item
-            {638, 0}, // Reveal Glass
-            {639, 200}, // Weakness Policy
-            {640, 600}, // Assault Vest
-            {641, 0}, // Holo Caster
-            {642, 0}, // Prof’s Letter
-            {643, 0}, // Roller Skates
-            {644,200}, // Pixie Plate
-            {645,500}, // Ability Capsule
-            {646,300}, // Whipped Dream
-            {647,300}, // Sachet
-            {648,20}, // Luminous Moss
-            {649,20}, // Snowball
-            {650,300}, // Safety Goggles
-            {651, 0}, // Poké Flute
-            {652, 20}, // Rich Mulch
-            {653, 20}, // Surprise Mulch
-            {654, 20}, // Boost Mulch
-            {655, 20}, // Amaze Mulch
-            {656, 1000}, // Gengarite
-            {657, 1000}, // Gardevoirite
-            {658, 1000}, // Ampharosite
-            {659, 1000}, // Venusaurite
-            {660, 1000}, // Charizardite X
-            {661, 1000}, // Blastoisinite
-            {662, 2000}, // Mewtwonite X
-            {663, 2000}, // Mewtwonite Y
-            {664, 1000}, // Blazikenite
-            {665, 500}, // Medichamite
-            {666, 1000}, // Houndoominite
-            {667, 1000}, // Aggronite
-            {668, 500}, // Banettite
-            {669, 2000}, // Tyranitarite
-            {670, 1000}, // Scizorite
-            {671, 1000}, // Pinsirite
-            {672, 1000}, // Aerodactylite
-            {673, 1000}, // Lucarionite
-            {674, 500}, // Abomasite
-            {675, 500}, // Kangaskhanite
-            {676, 1000}, // Gyaradosite
-            {677, 500}, // Absolite
-            {678, 1000}, // Charizardite Y
-            {679, 1000}, // Alakazite
-            {680, 1000}, // Heracronite
-            {681, 300}, // Mawilite
-            {682, 500}, // Manectite
-            {683, 2000}, // Garchompite
-            {684, 2000}, // Latiasite
-            {685, 2000}, // Latiosite
-            {686, 100}, // Roseli Berry
-            {687, 100}, // Kee Berry
-            {688, 100}, // Maranga Berry
-            {689, 0}, // Sprinklotad
-            {690, 1000}, // TM96 Nature Power
-            {691, 1000}, // TM97 Dark Pulse
-            {692, 2000}, // TM98 Waterfall
-            {693, 1000}, // TM99 Dazzling Gleam
-            {694, 500}, // TM100 Confide
-            {695, 0}, // Power Plant Pass
-            {696, 0}, // Mega Ring
-            {697, 0}, // Intriguing Stone
-            {698, 0}, // Common Stone
-            {699, 2}, // Discount Coupon
-            {700, 0}, // Elevator Key
-            {701, 0}, // TMV Pass
-            {702, 0}, // Honor of Kalos
-            {703, 0}, // Adventure Rules
-            {704, 300}, // Strange Souvenir
-            {705, 0}, // Lens Case
-            {706, 0}, // Travel Trunk
-            {707, 0}, // Travel Trunk
-            {708, 35}, // Lumiose Galette
-            {709, 35}, // Shalour Sable
-            {710, 700}, // Jaw Fossil
-            {711, 700}, // Sail Fossil
-            {712, 0}, // Looker Ticket
-            {713, 0}, // Bike
-            {714, 0}, // Holo Caster
-            {715, 100}, // Fairy Gem
-            {716, 0}, // Mega Charm
-            {717, 0}, // Mega Glove
-            {718, 0}, // Mach Bike
-            {719, 0}, // Acro Bike
-            {720, 0}, // Wailmer Pail
-            {721, 0}, // Devon Parts
-            {722, 0}, // Soot Sack
-            {723, 0}, // Basement Key
-            {724, 0}, // Pokéblock Kit
-            {725, 0}, // Letter
-            {726, 0}, // Eon Ticket
-            {727, 0}, // Scanner
-            {728, 0}, // Go-Goggles
-            {729, 0}, // Meteorite
-            {730, 0}, // Key to Room 1
-            {731, 0}, // Key to Room 2
-            {732, 0}, // Key to Room 4
-            {733, 0}, // Key to Room 6
-            {734, 0}, // Storage Key
-            {735, 0}, // Devon Scope
-            {736, 0}, // S.S. Ticket
-            {737, 0}, // HM07
-            {738, 0}, // Devon Scuba Gear
-            {739, 0}, // Contest Costume
-            {740, 0}, // Contest Costume
-            {741, 0}, // Magma Suit
-            {742, 0}, // Aqua Suit
-            {743, 0}, // Pair of Tickets
-            {744, 0}, // Mega Bracelet
-            {745, 0}, // Mega Pendant
-            {746, 0}, // Mega Glasses
-            {747, 0}, // Mega Anchor
-            {748, 0}, // Mega Stickpin
-            {749, 0}, // Mega Tiara
-            {750, 0}, // Mega Anklet
-            {751, 0}, // Meteorite
-            {752, 1000}, // Swampertite
-            {753, 1000}, // Sceptilite
-            {754, 300}, // Sablenite
-            {755, 500}, // Altarianite
-            {756, 1000}, // Galladite
-            {757, 500}, // Audinite
-            {758, 2000}, // Metagrossite
-            {759, 500}, // Sharpedonite
-            {760, 500}, // Slowbronite
-            {761, 1000}, // Steelixite
-            {762, 500}, // Pidgeotite
-            {763, 500}, // Glalitite
-            {764, 2000}, // Diancite
-            {765, 0}, // Prison Bottle
-            {766, 0}, // Mega Cuff
-            {767, 500}, // Cameruptite
-            {768, 500}, // Lopunnite
-            {769, 2000}, // Salamencite
-            {770, 300}, // Beedrillite
-            {771, 0}, // Meteorite
-            {772, 0}, // Meteorite
-            {773, 0}, // Key Stone
-            {774, 0}, // Meteorite Shard
-            {775, 0}, // Eon Flute
-            {776, 0}, // Normalium Z
-            {777, 0}, // Firium Z
-            {778, 0}, // Waterium Z
-            {779, 0}, // Electrium Z
-            {780, 0}, // Grassium Z
-            {781, 0}, // Icium Z
-            {782, 0}, // Fightnium Z
-            {783, 0}, // Poisonium Z
-            {784, 0}, // Groundium Z
-            {785, 0}, // Flynium Z
-            {786, 0}, // Psychium Z
-            {787, 0}, // Bugnium Z
-            {788, 0}, // Rockium Z
-            {789, 0}, // Ghostium Z
-            {790, 0}, // Dragonium Z
-            {791, 0}, // Darknium Z
-            {792, 0}, // Steelium Z
-            {793, 0}, // Fairium Z
-            {794, 0}, // Pikanium Z
-            {795, 500}, // Bottle Cap
-            {796, 1000}, // Gold Bottle Cap
-            {797, 0}, // Z-Ring
-            {798, 0}, // Decidium Z
-            {799, 0}, // Incinium Z
-            {800, 0}, // Primarium Z
-            {801, 0}, // Tapunium Z
-            {802, 0}, // Marshadium Z
-            {803, 0}, // Aloraichium Z
-            {804, 0}, // Snorlium Z
-            {805, 0}, // Eevium Z
-            {806, 0}, // Mewnium Z
-            {807, 0}, // Normalium Z
-            {808, 0}, // Firium Z
-            {809, 0}, // Waterium Z
-            {810, 0}, // Electrium Z
-            {811, 0}, // Grassium Z
-            {812, 0}, // Icium Z
-            {813, 0}, // Fightnium Z
-            {814, 0}, // Poisonium Z
-            {815, 0}, // Groundium Z
-            {816, 0}, // Flynium Z
-            {817, 0}, // Psychium Z
-            {818, 0}, // Bugnium Z
-            {819, 0}, // Rockium Z
-            {820, 0}, // Ghostium Z
-            {821, 0}, // Dragonium Z
-            {822, 0}, // Darknium Z
-            {823, 0}, // Steelium Z
-            {824, 0}, // Fairium Z
-            {825, 0}, // Pikanium Z
-            {826, 0}, // Decidium Z
-            {827, 0}, // Incinium Z
-            {828, 0}, // Primarium Z
-            {829, 0}, // Tapunium Z
-            {830, 0}, // Marshadium Z
-            {831, 0}, // Aloraichium Z
-            {832, 0}, // Snorlium Z
-            {833, 0}, // Eevium Z
-            {834, 0}, // Mewnium Z
-            {835, 0}, // Pikashunium Z
-            {836, 0}, // Pikashunium Z
-            {837, 0}, // ???
-            {838, 0}, // ???
-            {839, 0}, // ???
-            {840, 0}, // ???
-            {841, 0}, // Forage Bag
-            {842, 0}, // Fishing Rod
-            {843, 0}, // Professor's Mask
-            {844, 1}, // Festival Ticket
-            {845, 0}, // Sparkling Stone
-            {846, 30}, // Adrenaline Orb
-            {847, 0}, // Zygarde Cube
-            {848, 0}, // ???
-            {849, 300}, // Ice Stone
-            {850, 0}, // Ride Pager
-            {851, 30}, // Beast Ball
-            {852, 35}, // Big Malasada
-            {853, 30}, // Red Nectar
-            {854, 30}, // Yellow Nectar
-            {855, 30}, // Pink Nectar
-            {856, 30}, // Purple Nectar
-            {857, 0}, // Sun Flute
-            {858, 0}, // Moon Flute
-            {859, 0}, // ???
-            {860, 0}, // Enigmatic Card
-            {861, 0}, // ???
-            {862, 0}, // ???
-            {863, 0}, // ???
-            {864, 0}, // ???
-            {865, 0}, // ???
-            {866, 0}, // ???
-            {867, 0}, // ???
-            {868, 0}, // ???
-            {869, 0}, // ???
-            {870, 0}, // ???
-            {871, 0}, // ???
-            {872, 0}, // ???
-            {873, 0}, // ???
-            {874, 0}, // ???
-            {875, 0}, // ???
-            {876, 0}, // ???
-            {877, 0}, // ???
-            {878, 0}, // ???
-            {879, 400}, // Terrain Extender
-            {880, 300}, // Protective Pads
-            {881, 100}, // Electric Seed
-            {882, 100}, // Psychic Seed
-            {883, 100}, // Misty Seed
-            {884, 100}, // Grassy Seed
-            {885, 0}, // ???
-            {886, 0}, // ???
-            {887, 0}, // ???
-            {888, 0}, // ???
-            {889, 0}, // ???
-            {890, 0}, // ???
-            {891, 0}, // ???
-            {892, 0}, // ???
-            {893, 0}, // ???
-            {894, 0}, // ???
-            {895, 0}, // ???
-            {896, 0}, // ???
-            {897, 0}, // ???
-            {898, 0}, // ???
-            {899, 0}, // ???
-            {900, 0}, // ???
-            {901, 0}, // ???
-            {902, 0}, // ???
-            {903, 0}, // ???
-            {904, 100}, // Fighting Memory
-            {905, 100}, // Flying Memory
-            {906, 100}, // Poison Memory
-            {907, 100}, // Ground Memory
-            {908, 100}, // Rock Memory
-            {909, 100}, // Bug Memory
-            {910, 100}, // Ghost Memory
-            {911, 100}, // Steel Memory
-            {912, 100}, // Fire Memory
-            {913, 100}, // Water Memory
-            {914, 100}, // Grass Memory
-            {915, 100}, // Electric Memory
-            {916, 100}, // Psychic Memory
-            {917, 100}, // Ice Memory
-            {918, 100}, // Dragon Memory
-            {919, 100}, // Dark Memory
-            {920, 100}, // Fairy Memory
-            {921, 0}, // Solganium Z
-            {922, 0}, // Lunalium Z
-            {923, 0}, // Ultranecrozium Z
-            {924, 0}, // Mimikium Z
-            {925, 0}, // Lycanium Z
-            {926, 0}, // Kommonium Z
-            {927, 0}, // Solganium Z
-            {928, 0}, // Lunalium Z
-            {929, 0}, // Ultranecrozium Z
-            {930, 0}, // Mimikium Z
-            {931, 0}, // Lycanium Z
-            {932, 0}, // Kommonium Z
-            {933, 0}, // Z-Power Ring
-            {934, 0}, // Pink Petal
-            {935, 0}, // Orange Petal
-            {936, 0}, // Blue Petal
-            {937, 0}, // Red Petal
-            {938, 0}, // Green Petal
-            {939, 0}, // Yellow Petal
-            {940, 0}, // Purple Petal
-            {941, 0}, // Rainbow Flower
-            {942, 0}, // Surge Badge
-            {943, 0}, // N-Solarizer
-            {944, 0}, // N-Lunarizer
-            {945, 0}, // N-Solarizer
-            {946, 0}, // N-Lunarizer
-            {947, 0}, // Ilima's Normalium Z
-            {948, 0}, // Left Poké Ball
-            {949, 0}, // Roto Hatch
-            {950, 0}, // Roto Bargain
-            {951, 0}, // Roto Prize Money
-            {952, 0}, // Roto Exp. Points
-            {953, 0}, // Roto Friendship
-            {954, 0}, // Roto Encounter
-            {955, 0}, // Roto Stealth
-            {956, 0}, // Roto HP Restore
-            {957, 0}, // Roto PP Restore
-            {958, 0}, // Roto Boost
-            {959, 0} // Roto Catch
+            {Items.masterBall, 300},
+            {Items.ultraBall, 80},
+            {Items.greatBall, 60},
+            {Items.pokeBall, 20},
+            {Items.safariBall, 50},
+            {Items.netBall, 100},
+            {Items.diveBall, 100},
+            {Items.nestBall, 100},
+            {Items.repeatBall, 100},
+            {Items.timerBall, 100},
+            {Items.luxuryBall, 100},
+            {Items.premierBall, 20},
+            {Items.duskBall, 100},
+            {Items.healBall, 30},
+            {Items.quickBall, 100},
+            {Items.cherishBall, 20},
+            {Items.potion, 20},
+            {Items.antidote, 20},
+            {Items.burnHeal, 30},
+            {Items.iceHeal, 10},
+            {Items.awakening, 10},
+            {Items.paralyzeHeal, 30},
+            {Items.fullRestore, 300},
+            {Items.maxPotion, 250},
+            {Items.hyperPotion, 150},
+            {Items.superPotion, 70},
+            {Items.fullHeal, 40},
+            {Items.revive, 200},
+            {Items.maxRevive, 400},
+            {Items.freshWater, 20},
+            {Items.sodaPop, 30},
+            {Items.lemonade, 40},
+            {Items.moomooMilk, 60},
+            {Items.energyPowder, 50},
+            {Items.energyRoot, 120},
+            {Items.healPowder, 30},
+            {Items.revivalHerb, 280},
+            {Items.ether, 300},
+            {Items.maxEther, 450},
+            {Items.elixir, 1500},
+            {Items.maxElixir, 1800},
+            {Items.lavaCookie, 35},
+            {Items.berryJuice, 20},
+            {Items.sacredAsh, 500},
+            {Items.hpUp, 1000},
+            {Items.protein, 1000},
+            {Items.iron, 1000},
+            {Items.carbos, 1000},
+            {Items.calcium, 1000},
+            {Items.rareCandy, 1000},
+            {Items.ppUp, 1000},
+            {Items.zinc, 1000},
+            {Items.ppMax, 2500},
+            {Items.oldGateau, 35},
+            {Items.guardSpec, 150},
+            {Items.direHit, 100},
+            {Items.xAttack, 100},
+            {Items.xDefense, 200},
+            {Items.xSpeed, 100},
+            {Items.xAccuracy, 100},
+            {Items.xSpAtk, 100},
+            {Items.xSpDef, 200},
+            {Items.pokeDoll, 10},
+            {Items.fluffyTail, 10},
+            {Items.blueFlute, 2},
+            {Items.yellowFlute, 2},
+            {Items.redFlute, 2},
+            {Items.blackFlute, 2},
+            {Items.whiteFlute, 2},
+            {Items.shoalSalt, 2},
+            {Items.shoalShell, 2},
+            {Items.redShard, 100},
+            {Items.blueShard, 100},
+            {Items.yellowShard, 100},
+            {Items.greenShard, 100},
+            {Items.superRepel, 70},
+            {Items.maxRepel, 90},
+            {Items.escapeRope, 100},
+            {Items.repel, 40},
+            {Items.sunStone, 300},
+            {Items.moonStone, 300},
+            {Items.fireStone, 300},
+            {Items.thunderStone, 300},
+            {Items.waterStone, 300},
+            {Items.leafStone, 300},
+            {Items.tinyMushroom, 50},
+            {Items.bigMushroom, 500},
+            {Items.pearl, 200},
+            {Items.bigPearl, 800},
+            {Items.stardust, 300},
+            {Items.starPiece, 1200},
+            {Items.nugget, 1000},
+            {Items.heartScale, 500},
+            {Items.honey, 30},
+            {Items.growthMulch, 20},
+            {Items.dampMulch, 20},
+            {Items.stableMulch, 20},
+            {Items.gooeyMulch, 20},
+            {Items.rootFossil, 700},
+            {Items.clawFossil, 700},
+            {Items.helixFossil, 700},
+            {Items.domeFossil, 700},
+            {Items.oldAmber, 1000},
+            {Items.armorFossil, 700},
+            {Items.skullFossil, 700},
+            {Items.rareBone, 500},
+            {Items.shinyStone, 300},
+            {Items.duskStone, 300},
+            {Items.dawnStone, 300},
+            {Items.ovalStone, 200},
+            {Items.oddKeystone, 210},
+            {Items.griseousOrb, 1000},
+            {Items.tea, 0}, // unused in Gen 7
+            {Items.unused114, 0},
+            {Items.autograph, 0},
+            {Items.douseDrive, 100},
+            {Items.shockDrive, 100},
+            {Items.burnDrive, 100},
+            {Items.chillDrive, 100},
+            {Items.unused120, 0},
+            {Items.pokemonBox, 0}, // unused in Gen 7
+            {Items.medicinePocket, 0}, // unused in Gen 7
+            {Items.tmCase, 0}, // unused in Gen 7
+            {Items.candyJar, 0}, // unused in Gen 7
+            {Items.powerUpPocket, 0}, // unused in Gen 7
+            {Items.clothingTrunk, 0}, // unused in Gen 7
+            {Items.catchingPocket, 0}, // unused in Gen 7
+            {Items.battlePocket, 0}, // unused in Gen 7
+            {Items.unused129, 0},
+            {Items.unused130, 0},
+            {Items.unused131, 0},
+            {Items.unused132, 0},
+            {Items.unused133, 0},
+            {Items.sweetHeart, 15},
+            {Items.adamantOrb, 1000},
+            {Items.lustrousOrb, 1000},
+            {Items.mail1, 5},
+            {Items.mail2, 5},
+            {Items.mail3, 5},
+            {Items.mail4, 5},
+            {Items.mail5, 5},
+            {Items.mail6, 5},
+            {Items.mail7, 5},
+            {Items.mail8, 5},
+            {Items.mail9, 5},
+            {Items.mail10, 5},
+            {Items.mail11, 5},
+            {Items.mail12, 5},
+            {Items.cheriBerry, 20},
+            {Items.chestoBerry, 25},
+            {Items.pechaBerry, 10},
+            {Items.rawstBerry, 25},
+            {Items.aspearBerry, 25},
+            {Items.leppaBerry, 300},
+            {Items.oranBerry, 5},
+            {Items.persimBerry, 20},
+            {Items.lumBerry, 50},
+            {Items.sitrusBerry, 50},
+            {Items.figyBerry, 10},
+            {Items.wikiBerry, 10},
+            {Items.magoBerry, 10},
+            {Items.aguavBerry, 10},
+            {Items.iapapaBerry, 10},
+            {Items.razzBerry, 50},
+            {Items.blukBerry, 50},
+            {Items.nanabBerry, 50},
+            {Items.wepearBerry, 50},
+            {Items.pinapBerry, 50},
+            {Items.pomegBerry, 50},
+            {Items.kelpsyBerry, 50},
+            {Items.qualotBerry, 50},
+            {Items.hondewBerry, 50},
+            {Items.grepaBerry, 50},
+            {Items.tamatoBerry, 50},
+            {Items.cornnBerry, 50},
+            {Items.magostBerry, 50},
+            {Items.rabutaBerry, 50},
+            {Items.nomelBerry, 50},
+            {Items.spelonBerry, 50},
+            {Items.pamtreBerry, 50},
+            {Items.watmelBerry, 50},
+            {Items.durinBerry, 50},
+            {Items.belueBerry, 50},
+            {Items.occaBerry, 100},
+            {Items.passhoBerry, 100},
+            {Items.wacanBerry, 100},
+            {Items.rindoBerry, 100},
+            {Items.yacheBerry, 100},
+            {Items.chopleBerry, 100},
+            {Items.kebiaBerry, 100},
+            {Items.shucaBerry, 100},
+            {Items.cobaBerry, 100},
+            {Items.payapaBerry, 100},
+            {Items.tangaBerry, 100},
+            {Items.chartiBerry, 100},
+            {Items.kasibBerry, 100},
+            {Items.habanBerry, 100},
+            {Items.colburBerry, 100},
+            {Items.babiriBerry, 100},
+            {Items.chilanBerry, 100},
+            {Items.liechiBerry, 100},
+            {Items.ganlonBerry, 100},
+            {Items.salacBerry, 100},
+            {Items.petayaBerry, 100},
+            {Items.apicotBerry, 100},
+            {Items.lansatBerry, 100},
+            {Items.starfBerry, 100},
+            {Items.enigmaBerry, 100},
+            {Items.micleBerry, 100},
+            {Items.custapBerry, 100},
+            {Items.jabocaBerry, 100},
+            {Items.rowapBerry, 100},
+            {Items.brightPowder, 400},
+            {Items.whiteHerb, 400},
+            {Items.machoBrace, 300},
+            {Items.expShare, 0},
+            {Items.quickClaw, 450},
+            {Items.sootheBell, 100},
+            {Items.mentalHerb, 100},
+            {Items.choiceBand, 1000},
+            {Items.kingsRock, 500},
+            {Items.silverPowder, 200},
+            {Items.amuletCoin, 1500},
+            {Items.cleanseTag, 100},
+            {Items.soulDew, 20},
+            {Items.deepSeaTooth, 300},
+            {Items.deepSeaScale, 300},
+            {Items.smokeBall, 400},
+            {Items.everstone, 300},
+            {Items.focusBand, 300},
+            {Items.luckyEgg, 1000},
+            {Items.scopeLens, 500},
+            {Items.metalCoat, 300},
+            {Items.leftovers, 1000},
+            {Items.dragonScale, 300},
+            {Items.lightBall, 100},
+            {Items.softSand, 200},
+            {Items.hardStone, 200},
+            {Items.miracleSeed, 200},
+            {Items.blackGlasses, 200},
+            {Items.blackBelt, 200},
+            {Items.magnet, 200},
+            {Items.mysticWater, 200},
+            {Items.sharpBeak, 200},
+            {Items.poisonBarb, 200},
+            {Items.neverMeltIce, 200},
+            {Items.spellTag, 200},
+            {Items.twistedSpoon, 200},
+            {Items.charcoal, 200},
+            {Items.dragonFang, 200},
+            {Items.silkScarf, 200},
+            {Items.upgrade, 300},
+            {Items.shellBell, 600},
+            {Items.seaIncense, 200},
+            {Items.laxIncense, 300},
+            {Items.luckyPunch, 100},
+            {Items.metalPowder, 100},
+            {Items.thickClub, 100},
+            {Items.leek, 100},
+            {Items.redScarf, 10},
+            {Items.blueScarf, 10},
+            {Items.pinkScarf, 10},
+            {Items.greenScarf, 10},
+            {Items.yellowScarf, 10},
+            {Items.wideLens, 150},
+            {Items.muscleBand, 200},
+            {Items.wiseGlasses, 200},
+            {Items.expertBelt, 600},
+            {Items.lightClay, 150},
+            {Items.lifeOrb, 1000},
+            {Items.powerHerb, 100},
+            {Items.toxicOrb, 150},
+            {Items.flameOrb, 150},
+            {Items.quickPowder, 100},
+            {Items.focusSash, 200},
+            {Items.zoomLens, 150},
+            {Items.metronome, 300},
+            {Items.ironBall, 100},
+            {Items.laggingTail, 100},
+            {Items.destinyKnot, 150},
+            {Items.blackSludge, 500},
+            {Items.icyRock, 20},
+            {Items.smoothRock, 20},
+            {Items.heatRock, 20},
+            {Items.dampRock, 20},
+            {Items.gripClaw, 150},
+            {Items.choiceScarf, 1000},
+            {Items.stickyBarb, 150},
+            {Items.powerBracer, 300},
+            {Items.powerBelt, 300},
+            {Items.powerLens, 300},
+            {Items.powerBand, 300},
+            {Items.powerAnklet, 300},
+            {Items.powerWeight, 300},
+            {Items.shedShell, 50},
+            {Items.bigRoot, 150},
+            {Items.choiceSpecs, 1000},
+            {Items.flamePlate, 200},
+            {Items.splashPlate, 200},
+            {Items.zapPlate, 200},
+            {Items.meadowPlate, 200},
+            {Items.iciclePlate, 200},
+            {Items.fistPlate, 200},
+            {Items.toxicPlate, 200},
+            {Items.earthPlate, 200},
+            {Items.skyPlate, 200},
+            {Items.mindPlate, 200},
+            {Items.insectPlate, 200},
+            {Items.stonePlate, 200},
+            {Items.spookyPlate, 200},
+            {Items.dracoPlate, 200},
+            {Items.dreadPlate, 200},
+            {Items.ironPlate, 200},
+            {Items.oddIncense, 200},
+            {Items.rockIncense, 200},
+            {Items.fullIncense, 100},
+            {Items.waveIncense, 200},
+            {Items.roseIncense, 200},
+            {Items.luckIncense, 1500},
+            {Items.pureIncense, 100},
+            {Items.protector, 300},
+            {Items.electirizer, 300},
+            {Items.magmarizer, 300},
+            {Items.dubiousDisc, 300},
+            {Items.reaperCloth, 300},
+            {Items.razorClaw, 500},
+            {Items.razorFang, 500},
+            {Items.tm01, 1000},
+            {Items.tm02, 1000},
+            {Items.tm03, 1000},
+            {Items.tm04, 1000},
+            {Items.tm05, 1000},
+            {Items.tm06, 1000},
+            {Items.tm07, 2000},
+            {Items.tm08, 1000},
+            {Items.tm09, 1000},
+            {Items.tm10, 1000},
+            {Items.tm11, 2000},
+            {Items.tm12, 1000},
+            {Items.tm13, 1000},
+            {Items.tm14, 2000},
+            {Items.tm15, 2000},
+            {Items.tm16, 1000},
+            {Items.tm17, 1000},
+            {Items.tm18, 2000},
+            {Items.tm19, 1000},
+            {Items.tm20, 1000},
+            {Items.tm21, 1000},
+            {Items.tm22, 1000},
+            {Items.tm23, 1000},
+            {Items.tm24, 1000},
+            {Items.tm25, 2000},
+            {Items.tm26, 1000},
+            {Items.tm27, 1000},
+            {Items.tm28, 2000},
+            {Items.tm29, 1000},
+            {Items.tm30, 1000},
+            {Items.tm31, 1000},
+            {Items.tm32, 1000},
+            {Items.tm33, 1000},
+            {Items.tm34, 1000},
+            {Items.tm35, 1000},
+            {Items.tm36, 1000},
+            {Items.tm37, 2000},
+            {Items.tm38, 2000},
+            {Items.tm39, 1000},
+            {Items.tm40, 1000},
+            {Items.tm41, 1000},
+            {Items.tm42, 1000},
+            {Items.tm43, 1000},
+            {Items.tm44, 1000},
+            {Items.tm45, 1000},
+            {Items.tm46, 1000},
+            {Items.tm47, 1000},
+            {Items.tm48, 1000},
+            {Items.tm49, 1000},
+            {Items.tm50, 2000},
+            {Items.tm51, 1000},
+            {Items.tm52, 2000},
+            {Items.tm53, 1000},
+            {Items.tm54, 1000},
+            {Items.tm55, 1000},
+            {Items.tm56, 1000},
+            {Items.tm57, 1000},
+            {Items.tm58, 1000},
+            {Items.tm59, 2000},
+            {Items.tm60, 1000},
+            {Items.tm61, 1000},
+            {Items.tm62, 1000},
+            {Items.tm63, 1000},
+            {Items.tm64, 1000},
+            {Items.tm65, 1000},
+            {Items.tm66, 1000},
+            {Items.tm67, 1000},
+            {Items.tm68, 2000},
+            {Items.tm69, 1000},
+            {Items.tm70, 2000},
+            {Items.tm71, 2000},
+            {Items.tm72, 1000},
+            {Items.tm73, 500},
+            {Items.tm74, 1000},
+            {Items.tm75, 1000},
+            {Items.tm76, 1000},
+            {Items.tm77, 1000},
+            {Items.tm78, 1000},
+            {Items.tm79, 1000},
+            {Items.tm80, 1000},
+            {Items.tm81, 1000},
+            {Items.tm82, 1000},
+            {Items.tm83, 1000},
+            {Items.tm84, 1000},
+            {Items.tm85, 1000},
+            {Items.tm86, 1000},
+            {Items.tm87, 1000},
+            {Items.tm88, 1000},
+            {Items.tm89, 1000},
+            {Items.tm90, 1000},
+            {Items.tm91, 1000},
+            {Items.tm92, 1000},
+            {Items.hm01, 0},
+            {Items.hm02, 0},
+            {Items.hm03, 0},
+            {Items.hm04, 0},
+            {Items.hm05, 0},
+            {Items.hm06, 0},
+            {Items.hm07, 0}, // unused in Gen 7
+            {Items.hm08, 0}, // unused in Gen 7
+            {Items.explorerKit, 0},
+            {Items.lootSack, 0},
+            {Items.ruleBook, 0},
+            {Items.pokeRadar, 0},
+            {Items.pointCard, 0},
+            {Items.journal, 0},
+            {Items.sealCase, 0},
+            {Items.fashionCase, 0},
+            {Items.sealBag, 0},
+            {Items.palPad, 0},
+            {Items.worksKey, 0},
+            {Items.oldCharm, 0},
+            {Items.galacticKey, 0},
+            {Items.redChain, 0},
+            {Items.townMap, 0},
+            {Items.vsSeeker, 0},
+            {Items.coinCase, 0},
+            {Items.oldRod, 0},
+            {Items.goodRod, 0},
+            {Items.superRod, 0},
+            {Items.sprayduck, 0},
+            {Items.poffinCase, 0},
+            {Items.bike, 0},
+            {Items.suiteKey, 0},
+            {Items.oaksLetter, 0},
+            {Items.lunarWing, 0},
+            {Items.memberCard, 0},
+            {Items.azureFlute, 0},
+            {Items.ssTicketJohto, 0},
+            {Items.contestPass, 0},
+            {Items.magmaStone, 0},
+            {Items.parcelSinnoh, 0},
+            {Items.coupon1, 0},
+            {Items.coupon2, 0},
+            {Items.coupon3, 0},
+            {Items.storageKeySinnoh, 0},
+            {Items.secretPotion, 0},
+            {Items.vsRecorder, 0},
+            {Items.gracidea, 0},
+            {Items.secretKeySinnoh, 0},
+            {Items.apricornBox, 0},
+            {Items.unownReport, 0},
+            {Items.berryPots, 0},
+            {Items.dowsingMachine, 0},
+            {Items.blueCard, 0},
+            {Items.slowpokeTail, 0},
+            {Items.clearBell, 0},
+            {Items.cardKeyJohto, 0},
+            {Items.basementKeyJohto, 0},
+            {Items.squirtBottle, 0},
+            {Items.redScale, 0},
+            {Items.lostItem, 0},
+            {Items.pass, 0},
+            {Items.machinePart, 0},
+            {Items.silverWing, 0},
+            {Items.rainbowWing, 0},
+            {Items.mysteryEgg, 0},
+            {Items.redApricorn, 2},
+            {Items.blueApricorn, 2},
+            {Items.yellowApricorn, 2},
+            {Items.greenApricorn, 2},
+            {Items.pinkApricorn, 2},
+            {Items.whiteApricorn, 2},
+            {Items.blackApricorn, 2},
+            {Items.fastBall, 30},
+            {Items.levelBall, 30},
+            {Items.lureBall, 30},
+            {Items.heavyBall, 30},
+            {Items.loveBall, 30},
+            {Items.friendBall, 30},
+            {Items.moonBall, 30},
+            {Items.sportBall, 30},
+            {Items.parkBall, 0},
+            {Items.photoAlbum, 0},
+            {Items.gbSounds, 0},
+            {Items.tidalBell, 0},
+            {Items.rageCandyBar, 35},
+            {Items.dataCard01, 0},
+            {Items.dataCard02, 0},
+            {Items.dataCard03, 0},
+            {Items.dataCard04, 0},
+            {Items.dataCard05, 0},
+            {Items.dataCard06, 0},
+            {Items.dataCard07, 0},
+            {Items.dataCard08, 0},
+            {Items.dataCard09, 0},
+            {Items.dataCard10, 0},
+            {Items.dataCard11, 0},
+            {Items.dataCard12, 0},
+            {Items.dataCard13, 0},
+            {Items.dataCard14, 0},
+            {Items.dataCard15, 0},
+            {Items.dataCard16, 0},
+            {Items.dataCard17, 0},
+            {Items.dataCard18, 0},
+            {Items.dataCard19, 0},
+            {Items.dataCard20, 0},
+            {Items.dataCard21, 0},
+            {Items.dataCard22, 0},
+            {Items.dataCard23, 0},
+            {Items.dataCard24, 0},
+            {Items.dataCard25, 0},
+            {Items.dataCard26, 0},
+            {Items.dataCard27, 0},
+            {Items.jadeOrb, 0},
+            {Items.lockCapsule, 0},
+            {Items.redOrb, 0},
+            {Items.blueOrb, 0},
+            {Items.enigmaStone, 0},
+            {Items.prismScale, 300},
+            {Items.eviolite, 1000},
+            {Items.floatStone, 100},
+            {Items.rockyHelmet, 600},
+            {Items.airBalloon, 100},
+            {Items.redCard, 100},
+            {Items.ringTarget, 100},
+            {Items.bindingBand, 200},
+            {Items.absorbBulb, 100},
+            {Items.cellBattery, 100},
+            {Items.ejectButton, 100},
+            {Items.fireGem, 100},
+            {Items.waterGem, 100},
+            {Items.electricGem, 100},
+            {Items.grassGem, 100},
+            {Items.iceGem, 100},
+            {Items.fightingGem, 100},
+            {Items.poisonGem, 100},
+            {Items.groundGem, 100},
+            {Items.flyingGem, 100},
+            {Items.psychicGem, 100},
+            {Items.bugGem, 100},
+            {Items.rockGem, 100},
+            {Items.ghostGem, 100},
+            {Items.dragonGem, 100},
+            {Items.darkGem, 100},
+            {Items.steelGem, 100},
+            {Items.normalGem, 100},
+            {Items.healthFeather, 30},
+            {Items.muscleFeather, 30},
+            {Items.resistFeather, 30},
+            {Items.geniusFeather, 30},
+            {Items.cleverFeather, 30},
+            {Items.swiftFeather, 30},
+            {Items.prettyFeather, 100},
+            {Items.coverFossil, 700},
+            {Items.plumeFossil, 700},
+            {Items.libertyPass, 0},
+            {Items.passOrb, 20},
+            {Items.dreamBall, 100},
+            {Items.pokeToy, 10},
+            {Items.propCase, 0},
+            {Items.dragonSkull, 0},
+            {Items.balmMushroom, 1500},
+            {Items.bigNugget, 4000},
+            {Items.pearlString, 3000},
+            {Items.cometShard, 6000},
+            {Items.relicCopper, 0},
+            {Items.relicSilver, 0},
+            {Items.relicGold, 0},
+            {Items.relicVase, 0},
+            {Items.relicBand, 0},
+            {Items.relicStatue, 0},
+            {Items.relicCrown, 0},
+            {Items.casteliacone, 35},
+            {Items.direHit2, 0},
+            {Items.xSpeed2, 0},
+            {Items.xSpAtk2, 0},
+            {Items.xSpDef2, 0},
+            {Items.xDefense2, 0},
+            {Items.xAttack2, 0},
+            {Items.xAccuracy2, 0},
+            {Items.xSpeed3, 0},
+            {Items.xSpAtk3, 0},
+            {Items.xSpDef3, 0},
+            {Items.xDefense3, 0},
+            {Items.xAttack3, 0},
+            {Items.xAccuracy3, 0},
+            {Items.xSpeed6, 0},
+            {Items.xSpAtk6, 0},
+            {Items.xSpDef6, 0},
+            {Items.xDefense6, 0},
+            {Items.xAttack6, 0},
+            {Items.xAccuracy6, 0},
+            {Items.abilityUrge, 0},
+            {Items.itemDrop, 0},
+            {Items.itemUrge, 0},
+            {Items.resetUrge, 0},
+            {Items.direHit3, 0},
+            {Items.lightStone, 0},
+            {Items.darkStone, 0},
+            {Items.tm93, 2000},
+            {Items.tm94, 2000},
+            {Items.tm95, 1000},
+            {Items.xtransceiverMale, 0},
+            {Items.unused622, 0},
+            {Items.gram1, 0},
+            {Items.gram2, 0},
+            {Items.gram3, 0},
+            {Items.xtransceiverFemale, 0},
+            {Items.medalBox, 0},
+            {Items.dNASplicersFuse, 0},
+            {Items.dNASplicersSeparate, 0},
+            {Items.permit, 0},
+            {Items.ovalCharm, 0},
+            {Items.shinyCharm, 0},
+            {Items.plasmaCard, 0},
+            {Items.grubbyHanky, 0},
+            {Items.colressMachine, 0},
+            {Items.droppedItemCurtis, 0},
+            {Items.droppedItemYancy, 0},
+            {Items.revealGlass, 0},
+            {Items.weaknessPolicy, 200},
+            {Items.assaultVest, 600},
+            {Items.holoCasterMale, 0},
+            {Items.profsLetter, 0},
+            {Items.rollerSkates, 0},
+            {Items.pixiePlate, 200},
+            {Items.abilityCapsule, 500},
+            {Items.whippedDream, 300},
+            {Items.sachet, 300},
+            {Items.luminousMoss, 20},
+            {Items.snowball, 20},
+            {Items.safetyGoggles, 300},
+            {Items.pokeFlute, 0},
+            {Items.richMulch, 20},
+            {Items.surpriseMulch, 20},
+            {Items.boostMulch, 20},
+            {Items.amazeMulch, 20},
+            {Items.gengarite, 1000},
+            {Items.gardevoirite, 1000},
+            {Items.ampharosite, 1000},
+            {Items.venusaurite, 1000},
+            {Items.charizarditeX, 1000},
+            {Items.blastoisinite, 1000},
+            {Items.mewtwoniteX, 2000},
+            {Items.mewtwoniteY, 2000},
+            {Items.blazikenite, 1000},
+            {Items.medichamite, 500},
+            {Items.houndoominite, 1000},
+            {Items.aggronite, 1000},
+            {Items.banettite, 500},
+            {Items.tyranitarite, 2000},
+            {Items.scizorite, 1000},
+            {Items.pinsirite, 1000},
+            {Items.aerodactylite, 1000},
+            {Items.lucarionite, 1000},
+            {Items.abomasite, 500},
+            {Items.kangaskhanite, 500},
+            {Items.gyaradosite, 1000},
+            {Items.absolite, 500},
+            {Items.charizarditeY, 1000},
+            {Items.alakazite, 1000},
+            {Items.heracronite, 1000},
+            {Items.mawilite, 300},
+            {Items.manectite, 500},
+            {Items.garchompite, 2000},
+            {Items.latiasite, 2000},
+            {Items.latiosite, 2000},
+            {Items.roseliBerry, 100},
+            {Items.keeBerry, 100},
+            {Items.marangaBerry, 100},
+            {Items.sprinklotad, 0},
+            {Items.tm96, 1000},
+            {Items.tm97, 1000},
+            {Items.tm98, 2000},
+            {Items.tm99, 1000},
+            {Items.tm100, 500},
+            {Items.powerPlantPass, 0},
+            {Items.megaRing, 0},
+            {Items.intriguingStone, 0},
+            {Items.commonStone, 0},
+            {Items.discountCoupon, 2},
+            {Items.elevatorKey, 0},
+            {Items.tmvPass, 0},
+            {Items.honorofKalos, 0},
+            {Items.adventureGuide, 0},
+            {Items.strangeSouvenir, 300},
+            {Items.lensCase, 0},
+            {Items.makeupBag, 0},
+            {Items.travelTrunk, 0},
+            {Items.lumioseGalette, 35},
+            {Items.shalourSable, 35},
+            {Items.jawFossil, 700},
+            {Items.sailFossil, 700},
+            {Items.lookerTicket, 0},
+            {Items.bikeYellow, 0},
+            {Items.holoCasterFemale, 0},
+            {Items.fairyGem, 100},
+            {Items.megaCharm, 0},
+            {Items.megaGlove, 0},
+            {Items.machBike, 0},
+            {Items.acroBike, 0},
+            {Items.wailmerPail, 0},
+            {Items.devonParts, 0},
+            {Items.sootSack, 0},
+            {Items.basementKeyHoenn, 0},
+            {Items.pokeblockKit, 0},
+            {Items.letter, 0},
+            {Items.eonTicket, 0},
+            {Items.scanner, 0},
+            {Items.goGoggles, 0},
+            {Items.meteoriteFirstForm, 0},
+            {Items.keytoRoom1, 0},
+            {Items.keytoRoom2, 0},
+            {Items.keytoRoom4, 0},
+            {Items.keytoRoom6, 0},
+            {Items.storageKeyHoenn, 0},
+            {Items.devonScope, 0},
+            {Items.ssTicketHoenn, 0},
+            {Items.hm07ORAS, 0},
+            {Items.devonScubaGear, 0},
+            {Items.contestCostumeMale, 0},
+            {Items.contestCostumeFemale, 0},
+            {Items.magmaSuit, 0},
+            {Items.aquaSuit, 0},
+            {Items.pairOfTickets, 0},
+            {Items.megaBracelet, 0},
+            {Items.megaPendant, 0},
+            {Items.megaGlasses, 0},
+            {Items.megaAnchor, 0},
+            {Items.megaStickpin, 0},
+            {Items.megaTiara, 0},
+            {Items.megaAnklet, 0},
+            {Items.meteoriteSecondForm, 0},
+            {Items.swampertite, 1000},
+            {Items.sceptilite, 1000},
+            {Items.sablenite, 300},
+            {Items.altarianite, 500},
+            {Items.galladite, 1000},
+            {Items.audinite, 500},
+            {Items.metagrossite, 2000},
+            {Items.sharpedonite, 500},
+            {Items.slowbronite, 500},
+            {Items.steelixite, 1000},
+            {Items.pidgeotite, 500},
+            {Items.glalitite, 500},
+            {Items.diancite, 2000},
+            {Items.prisonBottle, 0},
+            {Items.megaCuff, 0},
+            {Items.cameruptite, 500},
+            {Items.lopunnite, 500},
+            {Items.salamencite, 2000},
+            {Items.beedrillite, 300},
+            {Items.meteoriteThirdForm, 0},
+            {Items.meteoriteFinalForm, 0},
+            {Items.keyStone, 0},
+            {Items.meteoriteShard, 0},
+            {Items.eonFlute, 0},
+            {Items.normaliumZHeld, 0},
+            {Items.firiumZHeld, 0},
+            {Items.wateriumZHeld, 0},
+            {Items.electriumZHeld, 0},
+            {Items.grassiumZHeld, 0},
+            {Items.iciumZHeld, 0},
+            {Items.fightiniumZHeld, 0},
+            {Items.poisoniumZHeld, 0},
+            {Items.groundiumZHeld, 0},
+            {Items.flyiniumZHeld, 0},
+            {Items.psychiumZHeld, 0},
+            {Items.buginiumZHeld, 0},
+            {Items.rockiumZHeld, 0},
+            {Items.ghostiumZHeld, 0},
+            {Items.dragoniumZHeld, 0},
+            {Items.darkiniumZHeld, 0},
+            {Items.steeliumZHeld, 0},
+            {Items.fairiumZHeld, 0},
+            {Items.pikaniumZHeld, 0},
+            {Items.bottleCap, 500},
+            {Items.goldBottleCap, 1000},
+            {Items.zRing, 0},
+            {Items.decidiumZHeld, 0},
+            {Items.inciniumZHeld, 0},
+            {Items.primariumZHeld, 0},
+            {Items.tapuniumZHeld, 0},
+            {Items.marshadiumZHeld, 0},
+            {Items.aloraichiumZHeld, 0},
+            {Items.snorliumZHeld, 0},
+            {Items.eeviumZHeld, 0},
+            {Items.mewniumZHeld, 0},
+            {Items.normaliumZBag, 0},
+            {Items.firiumZBag, 0},
+            {Items.wateriumZBag, 0},
+            {Items.electriumZBag, 0},
+            {Items.grassiumZBag, 0},
+            {Items.iciumZBag, 0},
+            {Items.fightiniumZBag, 0},
+            {Items.poisoniumZBag, 0},
+            {Items.groundiumZBag, 0},
+            {Items.flyiniumZBag, 0},
+            {Items.psychiumZBag, 0},
+            {Items.buginiumZBag, 0},
+            {Items.rockiumZBag, 0},
+            {Items.ghostiumZBag, 0},
+            {Items.dragoniumZBag, 0},
+            {Items.darkiniumZBag, 0},
+            {Items.steeliumZBag, 0},
+            {Items.fairiumZBag, 0},
+            {Items.pikaniumZBag, 0},
+            {Items.decidiumZBag, 0},
+            {Items.inciniumZBag, 0},
+            {Items.primariumZBag, 0},
+            {Items.tapuniumZBag, 0},
+            {Items.marshadiumZBag, 0},
+            {Items.aloraichiumZBag, 0},
+            {Items.snorliumZBag, 0},
+            {Items.eeviumZBag, 0},
+            {Items.mewniumZBag, 0},
+            {Items.pikashuniumZHeld, 0},
+            {Items.pikashuniumZBag, 0},
+            {Items.unused837, 0},
+            {Items.unused838, 0},
+            {Items.unused839, 0},
+            {Items.unused840, 0},
+            {Items.forageBag, 0},
+            {Items.fishingRod, 0},
+            {Items.professorsMask, 0},
+            {Items.festivalTicket, 1},
+            {Items.sparklingStone, 0},
+            {Items.adrenalineOrb, 30},
+            {Items.zygardeCube, 0},
+            {Items.unused848, 0},
+            {Items.iceStone, 300},
+            {Items.ridePager, 0},
+            {Items.beastBall, 30},
+            {Items.bigMalasada, 35},
+            {Items.redNectar, 30},
+            {Items.yellowNectar, 30},
+            {Items.pinkNectar, 30},
+            {Items.purpleNectar, 30},
+            {Items.sunFlute, 0},
+            {Items.moonFlute, 0},
+            {Items.unused859, 0},
+            {Items.enigmaticCard, 0},
+            {Items.silverRazzBerry, 0}, // unused in Gen 7
+            {Items.goldenRazzBerry, 0}, // unused in Gen 7
+            {Items.silverNanabBerry, 0}, // unused in Gen 7
+            {Items.goldenNanabBerry, 0}, // unused in Gen 7
+            {Items.silverPinapBerry, 0}, // unused in Gen 7
+            {Items.goldenPinapBerry, 0}, // unused in Gen 7
+            {Items.unused867, 0},
+            {Items.unused868, 0},
+            {Items.unused869, 0},
+            {Items.unused870, 0},
+            {Items.unused871, 0},
+            {Items.secretKeyKanto, 0}, // unused in Gen 7
+            {Items.ssTicketKanto, 0}, // unused in Gen 7
+            {Items.silphScope, 0}, // unused in Gen 7
+            {Items.parcelKanto, 0}, // unused in Gen 7
+            {Items.cardKeyKanto, 0}, // unused in Gen 7
+            {Items.goldTeeth, 0}, // unused in Gen 7
+            {Items.liftKey, 0}, // unused in Gen 7
+            {Items.terrainExtender, 400},
+            {Items.protectivePads, 300},
+            {Items.electricSeed, 100},
+            {Items.psychicSeed, 100},
+            {Items.mistySeed, 100},
+            {Items.grassySeed, 100},
+            {Items.stretchySpring, 0}, // unused in Gen 7
+            {Items.chalkyStone, 0}, // unused in Gen 7
+            {Items.marble, 0}, // unused in Gen 7
+            {Items.loneEarring, 0}, // unused in Gen 7
+            {Items.beachGlass, 0}, // unused in Gen 7
+            {Items.goldLeaf, 0}, // unused in Gen 7
+            {Items.silverLeaf, 0}, // unused in Gen 7
+            {Items.polishedMudBall, 0}, // unused in Gen 7
+            {Items.tropicalShell, 0}, // unused in Gen 7
+            {Items.leafLetterPikachu, 0}, // unused in Gen 7
+            {Items.leafLetterEevee, 0}, // unused in Gen 7
+            {Items.smallBouquet, 0}, // unused in Gen 7
+            {Items.unused897, 0},
+            {Items.unused898, 0},
+            {Items.unused899, 0},
+            {Items.lure, 0}, // unused in Gen 7
+            {Items.superLure, 0}, // unused in Gen 7
+            {Items.maxLure, 0}, // unused in Gen 7
+            {Items.pewterCrunchies, 0}, // unused in Gen 7
+            {Items.fightingMemory, 100},
+            {Items.flyingMemory, 100},
+            {Items.poisonMemory, 100},
+            {Items.groundMemory, 100},
+            {Items.rockMemory, 100},
+            {Items.bugMemory, 100},
+            {Items.ghostMemory, 100},
+            {Items.steelMemory, 100},
+            {Items.fireMemory, 100},
+            {Items.waterMemory, 100},
+            {Items.grassMemory, 100},
+            {Items.electricMemory, 100},
+            {Items.psychicMemory, 100},
+            {Items.iceMemory, 100},
+            {Items.dragonMemory, 100},
+            {Items.darkMemory, 100},
+            {Items.fairyMemory, 100},
+            {Items.solganiumZBag, 0},
+            {Items.lunaliumZBag, 0},
+            {Items.ultranecroziumZBag, 0},
+            {Items.mimikiumZHeld, 0},
+            {Items.lycaniumZHeld, 0},
+            {Items.kommoniumZHeld, 0},
+            {Items.solganiumZHeld, 0},
+            {Items.lunaliumZHeld, 0},
+            {Items.ultranecroziumZHeld, 0},
+            {Items.mimikiumZBag, 0},
+            {Items.lycaniumZBag, 0},
+            {Items.kommoniumZBag, 0},
+            {Items.zPowerRing, 0},
+            {Items.pinkPetal, 0},
+            {Items.orangePetal, 0},
+            {Items.bluePetal, 0},
+            {Items.redPetal, 0},
+            {Items.greenPetal, 0},
+            {Items.yellowPetal, 0},
+            {Items.purplePetal, 0},
+            {Items.rainbowFlower, 0},
+            {Items.surgeBadge, 0},
+            {Items.nSolarizerFuse, 0},
+            {Items.nLunarizerFuse, 0},
+            {Items.nSolarizerSeparate, 0},
+            {Items.nLunarizerSeparate, 0},
+            {Items.ilimaNormaliumZ, 0},
+            {Items.leftPokeBall, 0},
+            {Items.rotoHatch, 0},
+            {Items.rotoBargain, 0},
+            {Items.rotoPrizeMoney, 0},
+            {Items.rotoExpPoints, 0},
+            {Items.rotoFriendship, 0},
+            {Items.rotoEncounter, 0},
+            {Items.rotoStealth, 0},
+            {Items.rotoHPRestore, 0},
+            {Items.rotoPPRestore, 0},
+            {Items.rotoBoost, 0},
+            {Items.rotoCatch, 0},
     }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
 }

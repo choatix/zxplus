@@ -3739,16 +3739,14 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                         if (evo.type == EvolutionType.LEVEL_MOSS_ROCK) {
                             // Replace w/ leaf stone
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen4Constants.leafStoneIndex; // leaf
-                                                                          // stone
+                            evo.extraInfo = Items.leafStone;
                             addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                         }
                         // icy rock (glaceon)
                         if (evo.type == EvolutionType.LEVEL_ICY_ROCK) {
                             // Replace w/ dawn stone
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen4Constants.dawnStoneIndex; // dawn
-                                                                          // stone
+                            evo.extraInfo = Items.dawnStone;
                             addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                         }
                     }
@@ -3787,8 +3785,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                             // So we can't do Level up w/ Held Item for him
                             // Put Water Stone instead
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen4Constants.waterStoneIndex; // water
-                                                                           // stone
+                            evo.extraInfo = Items.waterStone;
                             addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                         } else {
                             addEvoUpdateHeldItem(impossibleEvolutionUpdates, evo, itemNames.get(item));
@@ -3844,7 +3841,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                             // We can't set Eevee to evolve into Espeon with happiness at night because that's how
                             // Umbreon works in the original game. Instead, make Eevee: == sun stone => Espeon
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen4Constants.sunStoneIndex;
+                            evo.extraInfo = Items.sunStone;
                             addEvoUpdateStone(timeBasedEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                         } else {
                             // Add an extra evo for Happiness at Night
@@ -3858,7 +3855,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                             // We can't set Eevee to evolve into Umbreon with happiness at day because that's how
                             // Espeon works in the original game. Instead, make Eevee: == moon stone => Umbreon
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen4Constants.moonStoneIndex;
+                            evo.extraInfo = Items.moonStone;
                             addEvoUpdateStone(timeBasedEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                         } else {
                             // Add an extra evo for Happiness at Day
@@ -4702,8 +4699,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         } else if (tweak == MiscTweak.FASTEST_TEXT) {
             applyFastestText();
         } else if (tweak == MiscTweak.BAN_LUCKY_EGG) {
-            allowedItems.banSingles(Gen4Constants.luckyEggIndex);
-            nonBadItems.banSingles(Gen4Constants.luckyEggIndex);
+            allowedItems.banSingles(Items.luckyEgg);
+            nonBadItems.banSingles(Items.luckyEgg);
         } else if (tweak == MiscTweak.NATIONAL_DEX_AT_START) {
             patchForNationalDex();
         } else if (tweak == MiscTweak.RUN_WITHOUT_RUNNING_SHOES) {
@@ -5103,19 +5100,19 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 continue;
             }
             if (move.category == MoveCategory.PHYSICAL) {
-                items.add(Gen4Constants.liechiBerry);
+                items.add(Items.liechiBerry);
                 if (!consumableOnly) {
                     items.addAll(Gen4Constants.typeBoostingItems.get(move.type));
-                    items.add(Gen4Constants.choiceBand);
-                    items.add(Gen4Constants.muscleBand);
+                    items.add(Items.choiceBand);
+                    items.add(Items.muscleBand);
                 }
             }
             if (move.category == MoveCategory.SPECIAL) {
-                items.add(Gen4Constants.petayaBerry);
+                items.add(Items.petayaBerry);
                 if (!consumableOnly) {
                     items.addAll(Gen4Constants.typeBoostingItems.get(move.type));
-                    items.add(Gen4Constants.wiseGlasses);
-                    items.add(Gen4Constants.choiceSpecs);
+                    items.add(Items.wiseGlasses);
+                    items.add(Items.choiceSpecs);
                 }
             }
             if (!consumableOnly && Gen4Constants.moveBoostingItems.containsKey(moveIdx)) {
@@ -5134,12 +5131,12 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             }
         }
         if (byType.get(Type.NORMAL) == Effectiveness.NEUTRAL) {
-            items.add(Gen4Constants.chilanBerry);
+            items.add(Items.chilanBerry);
         }
 
         int ability = this.getAbilityForTrainerPokemon(tp);
         if (ability == Abilities.levitate) {
-            items.removeAll(Arrays.asList(Gen4Constants.shucaBerry));
+            items.removeAll(Arrays.asList(Items.shucaBerry));
         }
 
         if (!consumableOnly) {
@@ -5147,7 +5144,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 items.addAll(Gen4Constants.abilityBoostingItems.get(ability));
             }
             if (tp.pokemon.primaryType == Type.POISON || tp.pokemon.secondaryType == Type.POISON) {
-                items.add(Gen4Constants.blackSludge);
+                items.add(Items.blackSludge);
             }
             List<Integer> speciesItems = Gen4Constants.speciesBoostingItems.get(tp.pokemon.number);
             if (speciesItems != null) {

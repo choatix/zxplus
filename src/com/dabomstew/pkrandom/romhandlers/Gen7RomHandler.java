@@ -2035,8 +2035,8 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             applyFastestText();
         }
         if (tweak == MiscTweak.BAN_LUCKY_EGG) {
-            allowedItems.banSingles(Gen7Constants.luckyEggIndex);
-            nonBadItems.banSingles(Gen7Constants.luckyEggIndex);
+            allowedItems.banSingles(Items.luckyEgg);
+            nonBadItems.banSingles(Items.luckyEgg);
         }
         if (tweak == MiscTweak.SOS_BATTLES_FOR_ALL) {
             positiveCallRates();
@@ -2372,8 +2372,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                             // So we can't do Level up w/ Held Item for him
                             // Put Water Stone instead
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen7Constants.waterStoneIndex; // water
-                            // stone
+                            evo.extraInfo = Items.waterStone;
                             addEvoUpdateStone(impossibleEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                         } else {
                             addEvoUpdateHeldItem(impossibleEvolutionUpdates, evo, itemNames.get(item));
@@ -2460,7 +2459,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                             // We can't set Eevee to evolve into Espeon with happiness at night because that's how
                             // Umbreon works in the original game. Instead, make Eevee: == sun stone => Espeon
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen7Constants.sunStoneIndex;
+                            evo.extraInfo = Items.sunStone;
                             addEvoUpdateStone(timeBasedEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                         } else {
                             // Add an extra evo for Happiness at Night
@@ -2475,7 +2474,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                             // We can't set Eevee to evolve into Umbreon with happiness at day because that's how
                             // Espeon works in the original game. Instead, make Eevee: == moon stone => Umbreon
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen7Constants.moonStoneIndex;
+                            evo.extraInfo = Items.moonStone;
                             addEvoUpdateStone(timeBasedEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                         } else {
                             // Add an extra evo for Happiness at Day
@@ -2512,7 +2511,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                             // We can't set Rockruff to evolve into Lycanroc-Midday with level at night because that's how
                             // Lycanroc-Midnight works in the original game. Instead, make Rockruff: == sun stone => Lycanroc-Midday
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen7Constants.sunStoneIndex;
+                            evo.extraInfo = Items.sunStone;
                             addEvoUpdateStone(timeBasedEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                         } else {
                             addEvoUpdateLevel(timeBasedEvolutionUpdates, evo);
@@ -2523,7 +2522,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                             // We can't set Rockruff to evolve into Lycanroc-Midnight with level at night because that's how
                             // Lycanroc-Midday works in the original game. Instead, make Rockruff: == moon stone => Lycanroc-Midnight
                             evo.type = EvolutionType.STONE;
-                            evo.extraInfo = Gen7Constants.moonStoneIndex;
+                            evo.extraInfo = Items.moonStone;
                             addEvoUpdateStone(timeBasedEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                         } else {
                             addEvoUpdateLevel(timeBasedEvolutionUpdates, evo);
@@ -2534,7 +2533,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                         // times because the other Lycanroc formes work like that in the original game. Instead, make
                         // Rockruff: == dusk stone => Lycanroc-Dusk
                         evo.type = EvolutionType.STONE;
-                        evo.extraInfo = Gen7Constants.duskStoneIndex;
+                        evo.extraInfo = Items.duskStone;
                         addEvoUpdateStone(timeBasedEvolutionUpdates, evo, itemNames.get(evo.extraInfo));
                     }
                 }
@@ -3279,22 +3278,22 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             }
             if (move.category == MoveCategory.PHYSICAL) {
                 numDamagingMoves++;
-                items.add(Gen4Constants.liechiBerry);
+                items.add(Items.liechiBerry);
                 items.add(Gen7Constants.consumableTypeBoostingItems.get(move.type));
                 if (!consumableOnly) {
                     items.addAll(Gen7Constants.typeBoostingItems.get(move.type));
-                    items.add(Gen4Constants.choiceBand);
-                    items.add(Gen4Constants.muscleBand);
+                    items.add(Items.choiceBand);
+                    items.add(Items.muscleBand);
                 }
             }
             if (move.category == MoveCategory.SPECIAL) {
                 numDamagingMoves++;
-                items.add(Gen4Constants.petayaBerry);
+                items.add(Items.petayaBerry);
                 items.add(Gen7Constants.consumableTypeBoostingItems.get(move.type));
                 if (!consumableOnly) {
                     items.addAll(Gen7Constants.typeBoostingItems.get(move.type));
-                    items.add(Gen4Constants.wiseGlasses);
-                    items.add(Gen4Constants.choiceSpecs);
+                    items.add(Items.wiseGlasses);
+                    items.add(Items.choiceSpecs);
                 }
             }
             if (!consumableOnly && Gen7Constants.moveBoostingItems.containsKey(moveIdx)) {
@@ -3302,7 +3301,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             }
         }
         if (numDamagingMoves >= 2) {
-            items.add(Gen6Constants.assaultVest);
+            items.add(Items.assaultVest);
         }
         Map<Type, Effectiveness> byType = Effectiveness.against(tp.pokemon.primaryType, tp.pokemon.secondaryType, 7);
         for(Map.Entry<Type, Effectiveness> entry : byType.entrySet()) {
@@ -3316,14 +3315,14 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             }
         }
         if (byType.get(Type.NORMAL) == Effectiveness.NEUTRAL) {
-            items.add(Gen4Constants.chilanBerry);
+            items.add(Items.chilanBerry);
         }
 
         int ability = this.getAbilityForTrainerPokemon(tp);
         if (ability == Abilities.levitate) {
-            items.removeAll(Arrays.asList(Gen4Constants.shucaBerry));
+            items.removeAll(Arrays.asList(Items.shucaBerry));
         } else if (byType.get(Type.GROUND) == Effectiveness.DOUBLE || byType.get(Type.GROUND) == Effectiveness.QUADRUPLE) {
-            items.add(Gen5Constants.airBalloon);
+            items.add(Items.airBalloon);
         }
         if (Gen7Constants.consumableAbilityBoostingItems.containsKey(ability)) {
             items.add(Gen7Constants.consumableAbilityBoostingItems.get(ability));
@@ -3334,7 +3333,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                 items.addAll(Gen7Constants.abilityBoostingItems.get(ability));
             }
             if (tp.pokemon.primaryType == Type.POISON || tp.pokemon.secondaryType == Type.POISON) {
-                items.add(Gen4Constants.blackSludge);
+                items.add(Items.blackSludge);
             }
             List<Integer> speciesItems = Gen7Constants.speciesBoostingItems.get(tp.pokemon.number);
             if (speciesItems != null) {
@@ -3345,7 +3344,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             if (!tp.pokemon.evolutionsFrom.isEmpty() && tp.level >= 20) {
                 // eviolite can be too good for early game, so we gate it behind a minimum level.
                 // We go with the same level as the option for "No early wonder guard".
-                items.add(Gen5Constants.eviolite);
+                items.add(Items.eviolite);
             }
         }
         return items;

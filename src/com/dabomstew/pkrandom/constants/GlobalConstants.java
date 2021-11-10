@@ -183,7 +183,8 @@ public class GlobalConstants {
 
     /* @formatter:on */
 
-    public static final List<Integer> xItems = Arrays.asList(55, 56, 57, 58, 59, 60, 61, 62);
+    public static final List<Integer> xItems = Arrays.asList(Items.guardSpec, Items.direHit, Items.xAttack,
+            Items.xDefense, Items.xSpeed, Items.xAccuracy, Items.xSpAtk, Items.xSpDef);
 
     public static final List<Integer> battleTrappingAbilities = Arrays.asList(Abilities.shadowTag, Abilities.magnetPull,
             Abilities.arenaTrap);
