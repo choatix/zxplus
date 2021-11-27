@@ -80,6 +80,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         private List<StaticPokemon> roamingPokemon = new ArrayList<>();
         private List<TMOrMTTextEntry> tmmtTexts = new ArrayList<>();
         private Map<String, String> codeTweaks = new HashMap<String, String>();
+        private long expectedCRC32 = -1;
 
         public RomEntry() {
 
@@ -99,6 +100,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             this.roamingPokemon.addAll(toCopy.roamingPokemon);
             this.tmmtTexts.addAll(toCopy.tmmtTexts);
             this.codeTweaks.putAll(toCopy.codeTweaks);
+            this.expectedCRC32 = toCopy.expectedCRC32;
         }
 
         private int getValue(String key) {
@@ -210,6 +212,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                         } else if (r[0].equals("CopyStaticPokemon")) {
                             int csp = parseRIInt(r[1]);
                             current.copyStaticPokemon = (csp > 0);
+                        } else if (r[0].equals("CRC32")) {
+                            current.expectedCRC32 = parseRIILong("0x" + r[1]);
                         } else if (r[0].endsWith("Tweak")) {
                             current.codeTweaks.put(r[0], r[1]);
                         } else if (r[0].equals("CopyFrom")) {
@@ -272,6 +276,21 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         }
         try {
             return Integer.parseInt(off, radix);
+        } catch (NumberFormatException ex) {
+            System.err.println("invalid base " + radix + "number " + off);
+            return 0;
+        }
+    }
+
+    private static long parseRIILong(String off) {
+        int radix = 10;
+        off = off.trim().toLowerCase();
+        if (off.startsWith("0x") || off.startsWith("&h")) {
+            radix = 16;
+            off = off.substring(2);
+        }
+        try {
+            return Long.parseLong(off, radix);
         } catch (NumberFormatException ex) {
             System.err.println("invalid base " + radix + "number " + off);
             return 0;
@@ -344,6 +363,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     private String[] pokeNames;
     private ItemList allowedItems, nonBadItems;
     private int pickupItemsTableOffset;
+    private long actualCRC32;
 
     @Override
     public boolean detectRom(byte[] rom) {
@@ -463,6 +483,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
         allowedItems = Gen3Constants.allowedItems.copy();
         nonBadItems = Gen3Constants.nonBadItems.copy();
+
+        actualCRC32 = FileFunctions.getCRC32(rom);
     }
 
     private int findPointerPrefixAndSuffix(String prefix, String suffix) {
@@ -662,12 +684,6 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 trainerCount++;
             }
             romEntry.entries.put("TrainerCount", trainerCount);
-
-            // disable static pokemon & move tutor/tm text
-            romEntry.entries.put("StaticPokemonSupport", 0);
-            romEntry.staticPokemon.clear();
-            romEntry.tmmtTexts.clear();
-
         }
 
     }
@@ -2344,7 +2360,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public String getROMName() {
-        return romEntry.name + (this.isRomHack ? " (ROM Hack)" : "");
+        return romEntry.name;
     }
 
     @Override
@@ -3839,8 +3855,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     @Override
-    public boolean isROMHack() {
-        return this.isRomHack;
+    public boolean isRomValid() {
+        return romEntry.expectedCRC32 == actualCRC32;
     }
 
     @Override

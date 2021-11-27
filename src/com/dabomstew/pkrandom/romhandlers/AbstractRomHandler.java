@@ -6346,12 +6346,6 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     @Override
-    public boolean isROMHack() {
-        // override until detection implemented
-        return false;
-    }
-
-    @Override
     public void writeCheckValueToROM(int value) {
         // do nothing
     }

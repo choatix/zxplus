@@ -112,12 +112,6 @@ public abstract class AbstractGBRomHandler extends AbstractRomHandler {
     }
 
     @Override
-    public boolean isRomValid() {
-        // not implemented yet
-        return true;
-    }
-
-    @Override
     public boolean canChangeStaticPokemon() {
         return true;
     }

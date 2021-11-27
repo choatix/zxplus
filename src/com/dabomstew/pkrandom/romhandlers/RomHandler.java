@@ -608,8 +608,6 @@ public interface RomHandler {
 
     BufferedImage getMascotImage();
 
-    boolean isROMHack();
-
     int generationOfPokemon();
 
     void writeCheckValueToROM(int value);
