@@ -74,6 +74,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         private int version, nonJapanese;
         private String extraTableFile;
         private boolean isCrystal;
+        private long expectedCRC32 = -1;
         private int crcInHeader = -1;
         private Map<String, String> codeTweaks = new HashMap<>();
         private List<TMTextEntry> tmTexts = new ArrayList<>();
@@ -153,6 +154,8 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                             current.extraTableFile = r[1];
                         } else if (r[0].equals("CRCInHeader")) {
                             current.crcInHeader = parseRIInt(r[1]);
+                        } else if (r[0].equals("CRC32")) {
+                            current.expectedCRC32 = parseRIILong("0x" + r[1]);
                         } else if (r[0].endsWith("Tweak")) {
                             current.codeTweaks.put(r[0], r[1]);
                         } else if (r[0].equals("CopyFrom")) {
@@ -249,6 +252,21 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         }
     }
 
+    private static long parseRIILong(String off) {
+        int radix = 10;
+        off = off.trim().toLowerCase();
+        if (off.startsWith("0x") || off.startsWith("&h")) {
+            radix = 16;
+            off = off.substring(2);
+        }
+        try {
+            return Long.parseLong(off, radix);
+        } catch (NumberFormatException ex) {
+            System.err.println("invalid base " + radix + "number " + off);
+            return 0;
+        }
+    }
+
     // This ROM's data
     private Pokemon[] pokes;
     private List<Pokemon> pokemonList;
@@ -261,6 +279,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
     private String[] landmarkNames;
     private boolean isVietCrystal;
     private ItemList allowedItems, nonBadItems;
+    private long actualCRC32;
 
     @Override
     public boolean detectRom(byte[] rom) {
@@ -297,6 +316,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         loadItemNames();
         allowedItems = Gen2Constants.allowedItems.copy();
         nonBadItems = Gen2Constants.nonBadItems.copy();
+        actualCRC32 = FileFunctions.getCRC32(rom);
         // VietCrystal: exclude Burn Heal, Calcium, and Elixir
         // crashes your game if used, glitches out your inventory if carried
         if (isVietCrystal) {
@@ -2497,6 +2517,11 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
     public List<Integer> getEarlyRequiredHMMoves() {
         // just cut
         return Gen2Constants.earlyRequiredHMMoves;
+    }
+
+    @Override
+    public boolean isRomValid() {
+        return romEntry.expectedCRC32 == actualCRC32;
     }
 
     @Override
