@@ -30,7 +30,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.zip.CRC32;
 
 import com.dabomstew.pkrandom.*;
 import com.dabomstew.pkrandom.constants.*;
@@ -677,9 +676,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         if (rom.length != Gen3Constants.size16M) {
             return true;
         }
-        CRC32 checksum = new CRC32();
-        checksum.update(rom);
-        long csum = checksum.getValue();
+        long csum = FileFunctions.getCRC32(rom);
         return csum != 3716707868L;
     }
 
