@@ -28,6 +28,7 @@ import com.dabomstew.pkrandom.MiscTweak;
 import com.dabomstew.pkrandom.RomFunctions;
 import com.dabomstew.pkrandom.Settings;
 import com.dabomstew.pkrandom.constants.*;
+import com.dabomstew.pkrandom.ctr.AMX;
 import com.dabomstew.pkrandom.ctr.BFLIM;
 import com.dabomstew.pkrandom.ctr.GARCArchive;
 import com.dabomstew.pkrandom.ctr.Mini;
@@ -36,9 +37,7 @@ import com.dabomstew.pkrandom.pokemon.*;
 import pptxt.N3DSTxtHandler;
 
 import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1300,7 +1299,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         byte[] worldData = zoneDataGarc.getFile(1);
         List<String> locationList = createGoodLocationList();
         ZoneData[] zoneData = getZoneData(zoneDataBytes, worldData, locationList, worlds);
-        encounterGarc = readGARC(romEntry.getString("WildPokemon"), Gen7Constants.getRelevantEncounterFiles(romEntry.romType));;
+        encounterGarc = readGARC(romEntry.getString("WildPokemon"), Gen7Constants.getRelevantEncounterFiles(romEntry.romType));
         int fileCount = encounterGarc.files.size();
         int numberOfAreas = fileCount / 11;
         AreaData[] areaData = new AreaData[numberOfAreas];
@@ -1910,6 +1909,9 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                 StaticEncounter se = readStaticEncounter(staticEncountersFile, offset);
                 statics.add(se);
             }
+
+            // Zygarde created via Assembly on Route 16 is hardcoded
+            readAssemblyZygarde(statics);
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
@@ -1949,6 +1951,62 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         }
         for (StaticEncounter encounter : encountersToRemove) {
             statics.remove(encounter);
+        }
+    }
+
+    private void readAssemblyZygarde(List<StaticEncounter> statics) throws IOException {
+        GARCArchive scriptGarc = readGARC(romEntry.getString("Scripts"), true);
+        int[] scriptLevelOffsets = romEntry.arrayEntries.get("ZygardeScriptLevelOffsets");
+        int[] levels = new int[scriptLevelOffsets.length];
+        byte[] zygardeAssemblyScriptBytes = scriptGarc.getFile(Gen7Constants.zygardeAssemblyScriptFile);
+        AMX zygardeAssemblyScript = new AMX(zygardeAssemblyScriptBytes);
+        for (int i = 0; i < scriptLevelOffsets.length; i++) {
+            levels[i] = zygardeAssemblyScript.decData[scriptLevelOffsets[i]];
+        }
+
+        int speciesOffset = find(code, Gen7Constants.zygardeAssemblySpeciesPrefix);
+        int formeOffset = find(code, Gen7Constants.zygardeAssemblyFormePrefix);
+        if (speciesOffset > 0 && formeOffset > 0) {
+            speciesOffset += Gen7Constants.zygardeAssemblySpeciesPrefix.length() / 2; // because it was a prefix
+            formeOffset += Gen7Constants.zygardeAssemblyFormePrefix.length() / 2; // because it was a prefix
+            int species = FileFunctions.read2ByteInt(code, speciesOffset);
+
+            // The original code for this passed in the forme via a parameter, stored that onto
+            // the stack, then did a ldr to put that stack variable into r0 before finally
+            // storing that value in the right place. If we already modified this code, then we
+            // don't care about all of this; we just wrote a "mov r0, #forme" over the ldr instead.
+            // Thus, if the original ldr instruction is still there, assume we haven't touched it.
+            int forme = 0;
+            if (FileFunctions.readFullIntLittleEndian(code, formeOffset) == 0xE59D0040) {
+                // Since we haven't modified the code yet, this is Zygarde. For SM, use 10%,
+                // since you can get it fairly early. For USUM, use 50%, since it's only
+                // obtainable in the postgame.
+                forme = isSM ? 1 : 0;
+            } else {
+                // We have modified the code, so just read the constant forme number we wrote.
+                forme = code[formeOffset];
+            }
+
+            StaticEncounter lowLevelAssembly = new StaticEncounter();
+            Pokemon pokemon = pokes[species];
+            if (forme > pokemon.cosmeticForms && forme != 30 && forme != 31) {
+                int speciesWithForme = absolutePokeNumByBaseForme
+                        .getOrDefault(species, dummyAbsolutePokeNums)
+                        .getOrDefault(forme, 0);
+                pokemon = pokes[speciesWithForme];
+            }
+            lowLevelAssembly.pkmn = pokemon;
+            lowLevelAssembly.forme = forme;
+            lowLevelAssembly.level = levels[0];
+            for (int i = 1; i < levels.length; i++) {
+                StaticEncounter higherLevelAssembly = new StaticEncounter();
+                higherLevelAssembly.pkmn = pokemon;
+                higherLevelAssembly.forme = forme;
+                higherLevelAssembly.level = levels[i];
+                lowLevelAssembly.linkedEncounters.add(higherLevelAssembly);
+            }
+
+            statics.add(lowLevelAssembly);
         }
     }
 
@@ -1997,6 +2055,9 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                 }
             }
 
+            // Zygarde created via Assembly on Route 16 is hardcoded
+            writeAssemblyZygarde(staticIter.next());
+
             writeGARC(romEntry.getString("StaticPokemon"), staticGarc);
             return true;
         } catch (IOException e) {
@@ -2016,6 +2077,38 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         for (Map.Entry<Integer, Integer> entry : romEntry.linkedStaticOffsets.entrySet()) {
             StaticEncounter baseEncounter = statics.get(entry.getKey());
             statics.set(entry.getValue(), baseEncounter.linkedEncounters.get(0));
+        }
+    }
+
+    private void writeAssemblyZygarde(StaticEncounter se) throws IOException {
+        int[] levels = new int[se.linkedEncounters.size() + 1];
+        levels[0] = se.level;
+        for (int i = 0; i < se.linkedEncounters.size(); i++) {
+            levels[i + 1] = se.linkedEncounters.get(i).level;
+        }
+
+        GARCArchive scriptGarc = readGARC(romEntry.getString("Scripts"), true);
+        int[] scriptLevelOffsets = romEntry.arrayEntries.get("ZygardeScriptLevelOffsets");
+        byte[] zygardeAssemblyScriptBytes = scriptGarc.getFile(Gen7Constants.zygardeAssemblyScriptFile);
+        AMX zygardeAssemblyScript = new AMX(zygardeAssemblyScriptBytes);
+        for (int i = 0; i < scriptLevelOffsets.length; i++) {
+            zygardeAssemblyScript.decData[scriptLevelOffsets[i]] = (byte) levels[i];
+        }
+        scriptGarc.setFile(Gen7Constants.zygardeAssemblyScriptFile, zygardeAssemblyScript.getBytes());
+        writeGARC(romEntry.getString("Scripts"), scriptGarc);
+
+        int speciesOffset = find(code, Gen7Constants.zygardeAssemblySpeciesPrefix);
+        int formeOffset = find(code, Gen7Constants.zygardeAssemblyFormePrefix);
+        if (speciesOffset > 0 && formeOffset > 0) {
+            speciesOffset += Gen7Constants.zygardeAssemblySpeciesPrefix.length() / 2; // because it was a prefix
+            formeOffset += Gen7Constants.zygardeAssemblyFormePrefix.length() / 2; // because it was a prefix
+            FileFunctions.write2ByteInt(code, speciesOffset, se.pkmn.getBaseNumber());
+
+            // Just write "mov r0, #forme" to where the game originally loaded the forme.
+            code[formeOffset] = (byte) se.forme;
+            code[formeOffset + 1] = 0x00;
+            code[formeOffset + 2] = (byte) 0xA0;
+            code[formeOffset + 3] = (byte) 0xE3;
         }
     }
 

@@ -173,6 +173,9 @@ public class Gen7Constants {
 
     public static final String miniorWildEncounterPatchPrefix = "032C42E2062052E2";
 
+    public static final int zygardeAssemblyScriptFile = 45;
+    public static final String zygardeAssemblyFormePrefix = "BC21CDE1B801CDE1", zygardeAssemblySpeciesPrefix = "FBEB4CD08DE20400A0E1F08FBDE8";
+
     public static int getPokemonCount(int romType) {
         if (romType == Type_SM) {
             return pokemonCountSM;
