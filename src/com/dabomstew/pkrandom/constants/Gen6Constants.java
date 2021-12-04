@@ -249,6 +249,9 @@ public class Gen6Constants {
     public static final String xyRoamerFreeSpacePostfix = "540095E50220A0E30810A0E1", xyRoamerSpeciesLocator = "9040A0030400000A",
             xyRoamerLevelPrefix = "B020DDE13F3BC1E3";
 
+    public static List<Integer> xyHardcodedTradeOffsets = Arrays.asList(1, 8);
+    public static List<Integer> xyHardcodedTradeTexts = Arrays.asList(129, 349);
+
     public static final List<Integer> consumableHeldItems = setupAllConsumableItems();
 
     private static List<Integer> setupAllConsumableItems() {
