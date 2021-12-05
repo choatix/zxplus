@@ -545,38 +545,77 @@ public class Gen7Constants {
     }
 
     private static List<Integer> actuallyCosmeticFormsSM = Arrays.asList(
-            818, // Cherrim
-            819, // Shellos
-            820, // Gastrodon
-            826, // Keldeo
-            832, 833, 834, 835, 836, 837, 838, 839, 840, // Furfrou
-            871, 872, 873, // Pumpkaboo
-            874, 875, 876, // Gourgeist
-            877, 878, 879, 880, // Floette (Non-Eternal)
-            910, 946, 947, 948, 956, 957, 958, 959, 960, // Totems
-            925, // Battle Bond Greninja
-            928, 929, // Power Construct Zygardes
-            931, 932, 933, 934, 935, 936, 938, 939, 940, 941, 942, 943, // Minior
-            949, // Magearna
-            950, 951, 952, 953, 954, 955 // Pikachu With Funny Hats
+            Species.SMFormes.cherrimCosmetic1,
+            Species.SMFormes.shellosCosmetic1,
+            Species.SMFormes.gastrodonCosmetic1,
+            Species.SMFormes.keldeoCosmetic1,
+            Species.SMFormes.furfrouCosmetic1, Species.SMFormes.furfrouCosmetic2,
+            Species.SMFormes.furfrouCosmetic3, Species.SMFormes.furfrouCosmetic4,
+            Species.SMFormes.furfrouCosmetic5, Species.SMFormes.furfrouCosmetic6,
+            Species.SMFormes.furfrouCosmetic7, Species.SMFormes.furfrouCosmetic8,
+            Species.SMFormes.furfrouCosmetic9,
+            Species.SMFormes.pumpkabooCosmetic1, Species.SMFormes.pumpkabooCosmetic2,
+            Species.SMFormes.pumpkabooCosmetic3,
+            Species.SMFormes.gourgeistCosmetic1, Species.SMFormes.gourgeistCosmetic2,
+            Species.SMFormes.gourgeistCosmetic3,
+            Species.SMFormes.floetteCosmetic1, Species.SMFormes.floetteCosmetic2,
+            Species.SMFormes.floetteCosmetic3, Species.SMFormes.floetteCosmetic4,
+            Species.SMFormes.raticateACosmetic1,
+            Species.SMFormes.mimikyuCosmetic1, Species.SMFormes.mimikyuCosmetic2, Species.SMFormes.mimikyuCosmetic3,
+            Species.SMFormes.gumshoosCosmetic1,
+            Species.SMFormes.vikavoltCosmetic1,
+            Species.SMFormes.lurantisCosmetic1,
+            Species.SMFormes.salazzleCosmetic1,
+            Species.SMFormes.kommoOCosmetic1,
+            Species.SMFormes.greninjaCosmetic1,
+            Species.SMFormes.zygarde10Cosmetic1, Species.SMFormes.zygardeCosmetic1,
+            Species.SMFormes.miniorCosmetic1, Species.SMFormes.miniorCosmetic2, Species.SMFormes.miniorCosmetic3,
+            Species.SMFormes.miniorCosmetic4, Species.SMFormes.miniorCosmetic5, Species.SMFormes.miniorCosmetic6,
+            Species.SMFormes.miniorCCosmetic1, Species.SMFormes.miniorCCosmetic2, Species.SMFormes.miniorCCosmetic3,
+            Species.SMFormes.miniorCCosmetic4, Species.SMFormes.miniorCCosmetic5, Species.SMFormes.miniorCCosmetic6,
+            Species.SMFormes.magearnaCosmetic1,
+            Species.SMFormes.pikachuCosmetic1, Species.SMFormes.pikachuCosmetic2, Species.SMFormes.pikachuCosmetic3,
+            Species.SMFormes.pikachuCosmetic4, Species.SMFormes.pikachuCosmetic5, Species.SMFormes.pikachuCosmetic6 // Pikachu With Funny Hats
     );
 
     private static List<Integer> actuallyCosmeticFormsUSUM = Arrays.asList(
-            823, // Cherrim
-            824, // Shellos
-            825, // Gastrodon
-            831, // Keldeo
-            837, 838, 839, 840, 841, 842, 843, 844, 845, // Furfrou
-            876, 877, 878, // Pumpkaboo
-            879, 880, 881, // Gourgeist
-            882, 883, 884, 885, // Floette (Non-Eternal)
-            916, 931, 953, 954, 955, 964, 965, 966, 967, 968, 972, 973, 974, // Totems
-            932, // Battle Bond Greninja
-            935, 936, // Power Construct Zygardes
-            938, 939, 940, 941, 942, 943, 945, 946, 947, 948, 949, 950, // Minior
-            956, // Magearna
-            957, 958, 959, 960, 961, 962, 963, // Pikachu With Funny Hats
-            975 // Own Tempo Rockruff
+            Species.USUMFormes.cherrimCosmetic1,
+            Species.USUMFormes.shellosCosmetic1,
+            Species.USUMFormes.gastrodonCosmetic1,
+            Species.USUMFormes.keldeoCosmetic1,
+            Species.USUMFormes.furfrouCosmetic1, Species.USUMFormes.furfrouCosmetic2,
+            Species.USUMFormes.furfrouCosmetic3, Species.USUMFormes.furfrouCosmetic4,
+            Species.USUMFormes.furfrouCosmetic5, Species.USUMFormes.furfrouCosmetic6,
+            Species.USUMFormes.furfrouCosmetic7, Species.USUMFormes.furfrouCosmetic8,
+            Species.USUMFormes.furfrouCosmetic9,
+            Species.USUMFormes.pumpkabooCosmetic1, Species.USUMFormes.pumpkabooCosmetic2,
+            Species.USUMFormes.pumpkabooCosmetic3,
+            Species.USUMFormes.gourgeistCosmetic1, Species.USUMFormes.gourgeistCosmetic2,
+            Species.USUMFormes.gourgeistCosmetic3,
+            Species.USUMFormes.floetteCosmetic1, Species.USUMFormes.floetteCosmetic2,
+            Species.USUMFormes.floetteCosmetic3, Species.USUMFormes.floetteCosmetic4,
+            Species.USUMFormes.raticateACosmetic1,
+            Species.USUMFormes.marowakACosmetic1,
+            Species.USUMFormes.mimikyuCosmetic1, Species.USUMFormes.mimikyuCosmetic2, Species.USUMFormes.mimikyuCosmetic3,
+            Species.USUMFormes.gumshoosCosmetic1,
+            Species.USUMFormes.vikavoltCosmetic1,
+            Species.USUMFormes.lurantisCosmetic1,
+            Species.USUMFormes.salazzleCosmetic1,
+            Species.USUMFormes.kommoOCosmetic1,
+            Species.USUMFormes.araquanidCosmetic1,
+            Species.USUMFormes.togedemaruCosmetic1,
+            Species.USUMFormes.ribombeeCosmetic1,
+            Species.USUMFormes.greninjaCosmetic1,
+            Species.USUMFormes.zygarde10Cosmetic1, Species.USUMFormes.zygardeCosmetic1,
+            Species.USUMFormes.miniorCosmetic1, Species.USUMFormes.miniorCosmetic2, Species.USUMFormes.miniorCosmetic3,
+            Species.USUMFormes.miniorCosmetic4, Species.USUMFormes.miniorCosmetic5, Species.USUMFormes.miniorCosmetic6,
+            Species.USUMFormes.miniorCCosmetic1, Species.USUMFormes.miniorCCosmetic2, Species.USUMFormes.miniorCCosmetic3,
+            Species.USUMFormes.miniorCCosmetic4, Species.USUMFormes.miniorCCosmetic5, Species.USUMFormes.miniorCCosmetic6,
+            Species.USUMFormes.magearnaCosmetic1,
+            Species.USUMFormes.pikachuCosmetic1, Species.USUMFormes.pikachuCosmetic2, Species.USUMFormes.pikachuCosmetic3,
+            Species.USUMFormes.pikachuCosmetic4, Species.USUMFormes.pikachuCosmetic5, Species.USUMFormes.pikachuCosmetic6,
+            Species.USUMFormes.pikachuCosmetic7, // Pikachu With Funny Hats
+            Species.USUMFormes.rockruffCosmetic1
     );
 
     public static List<Integer> getActuallyCosmeticForms(int romType) {
@@ -588,11 +627,34 @@ public class Gen7Constants {
     }
 
     private static List<Integer> ignoreFormsSM = Arrays.asList(
-            818, 925, 928, 929, 931, 932, 933, 934, 935, 936, 946, 948
+            Species.SMFormes.cherrimCosmetic1,
+            Species.SMFormes.greninjaCosmetic1,
+            Species.SMFormes.zygarde10Cosmetic1,
+            Species.SMFormes.zygardeCosmetic1,
+            Species.SMFormes.miniorCosmetic1,
+            Species.SMFormes.miniorCosmetic2,
+            Species.SMFormes.miniorCosmetic3,
+            Species.SMFormes.miniorCosmetic4,
+            Species.SMFormes.miniorCosmetic5,
+            Species.SMFormes.miniorCosmetic6,
+            Species.SMFormes.mimikyuCosmetic1,
+            Species.SMFormes.mimikyuCosmetic3
     );
 
     private static List<Integer> ignoreFormsUSUM = Arrays.asList(
-            823, 932, 935, 936, 938, 939, 940, 941, 942, 943, 953, 955, 975
+            Species.USUMFormes.cherrimCosmetic1,
+            Species.USUMFormes.greninjaCosmetic1,
+            Species.USUMFormes.zygarde10Cosmetic1,
+            Species.USUMFormes.zygardeCosmetic1,
+            Species.USUMFormes.miniorCosmetic1,
+            Species.USUMFormes.miniorCosmetic2,
+            Species.USUMFormes.miniorCosmetic3,
+            Species.USUMFormes.miniorCosmetic4,
+            Species.USUMFormes.miniorCosmetic5,
+            Species.USUMFormes.miniorCosmetic6,
+            Species.USUMFormes.mimikyuCosmetic1,
+            Species.USUMFormes.mimikyuCosmetic3,
+            Species.USUMFormes.rockruffCosmetic1
     );
 
     public static List<Integer> getIgnoreForms(int romType) {
@@ -617,14 +679,14 @@ public class Gen7Constants {
     private static Map<Integer,Integer> setupAltFormesWithCosmeticForms(int romType) {
         Map<Integer,Integer> map = new HashMap<>();
         if (romType == Type_SM) {
-            map.put(909,1); // Alolan Raticate: 1 form
-            map.put(927,1);
-            map.put(937,6); // Core Minior: 6 forms
+            map.put(Species.SMFormes.raticateA,1); // 1 form (Totem)
+            map.put(Species.SMFormes.zygarde10,1); // 1 form (Power Construct)
+            map.put(Species.SMFormes.miniorC,6); // 6 forms (colors)
         } else {
-            map.put(915,1); // Alolan Raticate: 1 form
-            map.put(930,1); // Alolan Marowak: 1 form
-            map.put(934,1);
-            map.put(944,6); // Core Minior: 6 forms
+            map.put(Species.USUMFormes.raticateA,1); // 1 form (Totem)
+            map.put(Species.USUMFormes.marowakA,1); // 1 form (Totem)
+            map.put(Species.USUMFormes.zygarde10,1); // 1 form (Power Construct)
+            map.put(Species.USUMFormes.miniorC,6); // 6 forms (colors)
         }
 
         return map;
