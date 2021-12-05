@@ -122,7 +122,7 @@ public class Settings {
 
     // Evolutions
     public enum EvolutionsMod {
-        UNCHANGED, RANDOM
+        UNCHANGED, RANDOM, RANDOM_EVERY_LEVEL
     }
 
     private EvolutionsMod evolutionsMod = EvolutionsMod.UNCHANGED;
@@ -470,7 +470,8 @@ public class Settings {
 
         // 26 evolutions
         out.write(makeByteSelected(evolutionsMod == EvolutionsMod.UNCHANGED, evolutionsMod == EvolutionsMod.RANDOM,
-                evosSimilarStrength, evosSameTyping, evosMaxThreeStages, evosForceChange, evosAllowAltFormes));
+                evosSimilarStrength, evosSameTyping, evosMaxThreeStages, evosForceChange, evosAllowAltFormes,
+                evolutionsMod == EvolutionsMod.RANDOM_EVERY_LEVEL));
         
         // 27 pokemon trainer misc
         out.write(makeByteSelected(trainersUsePokemonOfSimilarStrength, 
@@ -763,7 +764,8 @@ public class Settings {
         settings.setCorrectStaticMusic(restoreState(data[25], 5));
 
         settings.setEvolutionsMod(restoreEnum(EvolutionsMod.class, data[26], 0, // UNCHANGED
-                1 // RANDOM
+                1, // RANDOM
+                7 // RANDOM_EVERY_LEVEL
         ));
         settings.setEvosSimilarStrength(restoreState(data[26], 2));
         settings.setEvosSameTyping(restoreState(data[26], 3));

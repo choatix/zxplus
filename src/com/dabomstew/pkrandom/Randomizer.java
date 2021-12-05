@@ -175,6 +175,9 @@ public class Randomizer {
         if (settings.getEvolutionsMod() == Settings.EvolutionsMod.RANDOM) {
             romHandler.randomizeEvolutions(settings);
             evolutionsChanged = true;
+        } else if (settings.getEvolutionsMod() == Settings.EvolutionsMod.RANDOM_EVERY_LEVEL) {
+            romHandler.randomizeEvolutionsEveryLevel(settings);
+            evolutionsChanged = true;
         }
 
         if (evolutionsChanged) {
