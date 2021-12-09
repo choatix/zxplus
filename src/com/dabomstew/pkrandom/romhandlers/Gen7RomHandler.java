@@ -3061,8 +3061,10 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     @Override
     public void setIngameTrades(List<IngameTrade> trades) {
         try {
+            List<IngameTrade> oldTrades = this.getIngameTrades();
             GARCArchive staticGarc = readGARC(romEntry.getString("StaticPokemon"), true);
             List<String> tradeStrings = getStrings(true, romEntry.getInt("IngameTradesTextOffset"));
+            Map<Integer, List<Integer>> hardcodedTradeTextOffsets = Gen7Constants.getHardcodedTradeTextOffsets(romEntry.romType);
             byte[] tradesFile = staticGarc.files.get(4).get(0);
             int numberOfIngameTrades = tradesFile.length / 0x34;
             for (int i = 0; i < numberOfIngameTrades; i++) {
@@ -3084,11 +3086,31 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                     tradesFile[offset + 6 + iv] = (byte) trade.ivs[iv];
                 }
                 FileFunctions.write2ByteInt(tradesFile, offset + 0x14, trade.item);
+
+                List<Integer> hardcodedTextOffsetsForThisTrade = hardcodedTradeTextOffsets.get(i);
+                if (hardcodedTextOffsetsForThisTrade != null) {
+                    updateHardcodedTradeText(oldTrades.get(i), trade, tradeStrings, hardcodedTextOffsetsForThisTrade);
+                }
             }
             writeGARC(romEntry.getString("StaticPokemon"), staticGarc);
             setStrings(true, romEntry.getInt("IngameTradesTextOffset"), tradeStrings);
         } catch (IOException e) {
             throw new RandomizerIOException(e);
+        }
+    }
+
+    // NOTE: This method is kind of stupid, in that it doesn't try to reflow the text to better fit; it just
+    // blindly replaces the Pokemon's name. However, it seems to work well enough for what we need.
+    private void updateHardcodedTradeText(IngameTrade oldTrade, IngameTrade newTrade, List<String> tradeStrings, List<Integer> hardcodedTextOffsets) {
+        for (int offset : hardcodedTextOffsets) {
+            String hardcodedText = tradeStrings.get(offset);
+            String oldRequestedName = oldTrade.requestedPokemon.name;
+            String oldGivenName = oldTrade.givenPokemon.name;
+            String newRequestedName = newTrade.requestedPokemon.name;
+            String newGivenName = newTrade.givenPokemon.name;
+            hardcodedText = hardcodedText.replace(oldRequestedName, newRequestedName);
+            hardcodedText = hardcodedText.replace(oldGivenName, newGivenName);
+            tradeStrings.set(offset, hardcodedText);
         }
     }
 

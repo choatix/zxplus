@@ -910,6 +910,22 @@ public class Gen7Constants {
         return list;
     }
 
+
+    public static Map<Integer, List<Integer>> getHardcodedTradeTextOffsets(int romType) {
+        Map<Integer, List<Integer>> hardcodedTradeTextOffsets = new HashMap<>();
+        if (romType == Gen7Constants.Type_USUM) {
+            // For some reason, the Route 2 trade is hardcoded in USUM but not in SM
+            hardcodedTradeTextOffsets.put(0, Arrays.asList(20, 21, 22));
+        }
+        hardcodedTradeTextOffsets.put(1, Arrays.asList(26, 28, 30));
+        hardcodedTradeTextOffsets.put(2, Arrays.asList(32, 33, 34, 36));
+        hardcodedTradeTextOffsets.put(3, Arrays.asList(38, 39, 40, 42));
+        hardcodedTradeTextOffsets.put(4, Arrays.asList(44, 45, 46, 48));
+        hardcodedTradeTextOffsets.put(5, Arrays.asList(50, 51, 52, 54));
+        hardcodedTradeTextOffsets.put(6, Arrays.asList(56, 57, 58, 60));
+        return hardcodedTradeTextOffsets;
+    }
+
     public static ItemList allowedItemsSM, allowedItemsUSUM, nonBadItems;
     public static List<Integer> regularShopItemsSM, regularShopItemsUSUM, opShopItems;
 
