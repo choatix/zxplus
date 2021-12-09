@@ -176,6 +176,14 @@ public class Gen5Constants {
         return absolutePokeNumsByBaseForme.getOrDefault(baseForme,dummyAbsolutePokeNums).getOrDefault(formNum,baseForme);
     }
 
+    public static final List<Integer> irregularFormes = Arrays.asList(
+            Species.Gen5Formes.castformF, Species.Gen5Formes.castformW, Species.Gen5Formes.castformI,
+            Species.Gen5Formes.darmanitanZ,
+            Species.Gen5Formes.meloettaP,
+            Species.Gen5Formes.kyuremW,
+            Species.Gen5Formes.kyuremB
+    );
+
     public static final List<Integer> emptyPlaythroughTrainers = Arrays.asList(new Integer[] { });
     
     public static final List<Integer> bw1MainPlaythroughTrainers = Arrays.asList(

@@ -1029,6 +1029,11 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
+    public List<Pokemon> getIrregularFormes() {
+        return new ArrayList<>();
+    }
+
+    @Override
     public boolean hasFunctionalFormes() {
         return false;
     }

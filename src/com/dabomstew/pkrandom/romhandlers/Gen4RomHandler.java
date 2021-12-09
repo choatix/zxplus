@@ -776,6 +776,11 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
+    public List<Pokemon> getIrregularFormes() {
+        return new ArrayList<>();
+    }
+
+    @Override
     public boolean hasFunctionalFormes() {
         return romEntry.romType != Gen4Constants.Type_DP;
     }

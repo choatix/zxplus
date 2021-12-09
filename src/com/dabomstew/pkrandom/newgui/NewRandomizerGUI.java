@@ -293,6 +293,7 @@ public class NewRandomizerGUI {
     private JCheckBox puBanBadItemsCheckBox;
     private JCheckBox miscForceChallengeModeCheckBox;
     private JCheckBox pbsAssignEvoStatsRandomlyCheckBox;
+    private JCheckBox noIrregularAltFormesCheckBox;
 
     private static JFrame frame;
 
@@ -1551,6 +1552,7 @@ public class NewRandomizerGUI {
 
         settings.setLimitPokemon(limitPokemonCheckBox.isSelected() && limitPokemonCheckBox.isVisible());
         settings.setCurrentRestrictions(currentRestrictions);
+        settings.setBanIrregularAltFormes(noIrregularAltFormesCheckBox.isSelected() && noIrregularAltFormesCheckBox.isVisible());
         settings.setRaceMode(raceModeCheckBox.isSelected());
 
         settings.setChangeImpossibleEvolutions(peChangeImpossibleEvosCheckBox.isSelected() && peChangeImpossibleEvosCheckBox.isVisible());
@@ -1837,6 +1839,9 @@ public class NewRandomizerGUI {
         limitPokemonCheckBox.setSelected(false);
         limitPokemonButton.setVisible(true);
         limitPokemonButton.setEnabled(false);
+        noIrregularAltFormesCheckBox.setVisible(true);
+        noIrregularAltFormesCheckBox.setEnabled(false);
+        noIrregularAltFormesCheckBox.setSelected(false);
         raceModeCheckBox.setVisible(true);
         raceModeCheckBox.setEnabled(false);
         raceModeCheckBox.setSelected(false);
@@ -2505,6 +2510,9 @@ public class NewRandomizerGUI {
             limitPokemonCheckBox.setVisible(true);
             limitPokemonCheckBox.setEnabled(true);
             limitPokemonButton.setVisible(true);
+
+            noIrregularAltFormesCheckBox.setVisible(pokemonGeneration >= 4);
+            noIrregularAltFormesCheckBox.setEnabled(pokemonGeneration >= 4);
 
             raceModeCheckBox.setEnabled(true);
 

@@ -98,6 +98,8 @@ public interface RomHandler {
 
     Pokemon getAltFormeOfPokemon(Pokemon pk, int forme);
 
+    List<Pokemon> getIrregularFormes();
+
     // ==================================
     // Methods to set up Gen Restrictions
     // ==================================

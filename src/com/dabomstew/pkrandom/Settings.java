@@ -64,6 +64,7 @@ public class Settings {
     private boolean raceMode;
     private boolean blockBrokenMoves;
     private boolean limitPokemon;
+    private boolean banIrregularAltFormes;
 
     public enum BaseStatisticsMod {
         UNCHANGED, SHUFFLE, RANDOM,
@@ -568,7 +569,8 @@ public class Settings {
 
         // 49 pickup item randomization
         out.write(makeByteSelected(pickupItemsMod == PickupItemsMod.RANDOM,
-                pickupItemsMod == PickupItemsMod.UNCHANGED, banBadRandomPickupItems));
+                pickupItemsMod == PickupItemsMod.UNCHANGED, banBadRandomPickupItems,
+                banIrregularAltFormes));
 
         try {
             byte[] romName = this.romName.getBytes("US-ASCII");
@@ -852,6 +854,7 @@ public class Settings {
                 1, // UNCHANGED
                 0));       // RANDOMIZE
         settings.setBanBadRandomPickupItems(restoreState(data[49], 2));
+        settings.setBanIrregularAltFormes(restoreState(data[49], 3));
 
         int romNameLength = data[LENGTH_OF_SETTINGS_DATA] & 0xFF;
         String romName = new String(data, LENGTH_OF_SETTINGS_DATA + 1, romNameLength, "US-ASCII");
@@ -1095,6 +1098,14 @@ public class Settings {
 
     public void setRaceMode(boolean raceMode) {
         this.raceMode = raceMode;
+    }
+
+    public boolean isBanIrregularAltFormes() {
+        return banIrregularAltFormes;
+    }
+
+    public void setBanIrregularAltFormes(boolean banIrregularAltFormes) {
+        this.banIrregularAltFormes = banIrregularAltFormes;
     }
 
     public boolean doBlockBrokenMoves() {
