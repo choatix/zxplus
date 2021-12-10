@@ -3297,11 +3297,6 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     public String[] getItemNames() {
         return itemNames.toArray(new String[0]);
     }
-
-    @Override
-    public String[] getShopNames() {
-        return shopNames.toArray(new String[0]);
-    }
     
     @Override
     public String abilityName(int number) {
@@ -3752,14 +3747,14 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public Map<Integer, List<Integer>> getShopItems() {
+    public Map<Integer, Shop> getShopItems() {
         int[] tmShops = romEntry.arrayEntries.get("TMShops");
         int[] regularShops = romEntry.arrayEntries.get("RegularShops");
         int[] shopItemOffsets = romEntry.arrayEntries.get("ShopItemOffsets");
         int[] shopItemSizes = romEntry.arrayEntries.get("ShopItemSizes");
         int shopCount = romEntry.getInt("ShopCount");
-        List<Integer> shopItems = new ArrayList<>();    
-        Map<Integer,List<Integer>> shopItemsMap = new TreeMap<>();
+        List<Integer> shopItems = new ArrayList<>();
+        Map<Integer, Shop> shopItemsMap = new TreeMap<>();
 
         try {
             byte[] shopItemOverlay = readOverlay(romEntry.getInt("ShopItemOvlNumber"));
@@ -3790,7 +3785,10 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                             items.add(readWord(shop, j));
                         }
                     }
-                    shopItemsMap.put(i, items);
+                    Shop shop = new Shop();
+                    shop.items = items;
+                    shop.name = shopNames.get(i);
+                    shopItemsMap.put(i, shop);
                 }
             });
             return shopItemsMap;
@@ -3800,7 +3798,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public void setShopItems(Map<Integer, List<Integer>> shopItems) {
+    public void setShopItems(Map<Integer, Shop> shopItems) {
         int[] shopItemOffsets = romEntry.arrayEntries.get("ShopItemOffsets");
         int[] shopItemSizes = romEntry.arrayEntries.get("ShopItemSizes");
         int[] tmShops = romEntry.arrayEntries.get("TMShops");
@@ -3820,7 +3818,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                     if (i == regularShop) badShop = true;
                 }
                 if (!badShop) {
-                    List<Integer> shopContents = shopItems.get(i);
+                    List<Integer> shopContents = shopItems.get(i).items;
                     Iterator<Integer> iterItems = shopContents.iterator();
                     if (romEntry.romType == Gen5Constants.Type_BW) {
                         for (int j = 0; j < shopItemSizes[i]; j++) {

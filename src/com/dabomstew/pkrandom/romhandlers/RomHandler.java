@@ -511,17 +511,15 @@ public interface RomHandler {
     // Special Shops
     // =============
 
-    String[] getShopNames();
-
     boolean hasShopRandomization();
 
     void shuffleShopItems();
 
     void randomizeShopItems(Settings settings);
 
-    Map<Integer, List<Integer>> getShopItems();
+    Map<Integer, Shop> getShopItems();
 
-    void setShopItems(Map<Integer, List<Integer>> shopItems);
+    void setShopItems(Map<Integer, Shop> shopItems);
 
     void setShopPrices();
 

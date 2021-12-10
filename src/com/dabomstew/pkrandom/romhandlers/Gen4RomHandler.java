@@ -2432,11 +2432,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public String[] getShopNames() {
-        return Gen4Constants.getShopNames(romEntry.romType).toArray(new String[0]);
-    }
-
-    @Override
     public List<Integer> getEvolutionItems() {
         return Gen4Constants.evolutionItems;
     }
@@ -3906,13 +3901,14 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public Map<Integer, List<Integer>> getShopItems() {
+    public Map<Integer, Shop> getShopItems() {
+        List<String> shopNames = Gen4Constants.getShopNames(romEntry.romType);
         List<Integer> skipShops =
                 Arrays.stream(romEntry.arrayEntries.get("SkipShops"))
                 .boxed()
                 .collect(Collectors.toList());
         int shopCount = romEntry.getInt("ShopCount");
-        Map<Integer,List<Integer>> shopItemsMap = new TreeMap<>();
+        Map<Integer, Shop> shopItemsMap = new TreeMap<>();
         String shopDataPrefix = romEntry.getString("ShopDataPrefix");
         int offset = find(arm9,shopDataPrefix);
         offset += shopDataPrefix.length() / 2;
@@ -3929,7 +3925,10 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     val = (FileFunctions.read2ByteInt(arm9, offset));
                 }
                 offset += 2;
-                shopItemsMap.put(i,items);
+                Shop shop = new Shop();
+                shop.items = items;
+                shop.name = shopNames.get(i);
+                shopItemsMap.put(i, shop);
             } else {
                 while ((FileFunctions.read2ByteInt(arm9, offset) & 0xFFFF) != 0xFFFF) {
                     offset += 2;
@@ -3941,15 +3940,14 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public void setShopItems(Map<Integer, List<Integer>> shopItems) {
-
+    public void setShopItems(Map<Integer, Shop> shopItems) {
         int shopCount = romEntry.getInt("ShopCount");
         String shopDataPrefix = romEntry.getString("ShopDataPrefix");
         int offset = find(arm9,shopDataPrefix);
         offset += shopDataPrefix.length() / 2;
 
         for (int i = 0; i < shopCount; i++) {
-            List<Integer> thisShopItems = shopItems.get(i);
+            List<Integer> thisShopItems = shopItems.get(i).items;
             if (thisShopItems == null) {
                 while ((FileFunctions.read2ByteInt(arm9, offset) & 0xFFFF) != 0xFFFF) {
                     offset += 2;

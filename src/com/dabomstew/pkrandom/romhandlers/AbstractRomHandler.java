@@ -4834,20 +4834,20 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void shuffleShopItems() {
-        Map<Integer,List<Integer>> currentItems = this.getShopItems();
+        Map<Integer, Shop> currentItems = this.getShopItems();
         if (currentItems == null) return;
         List<Integer> itemList = new ArrayList<>();
-        for (List<Integer> shopList: currentItems.values()) {
-            itemList.addAll(shopList);
+        for (Shop shop: currentItems.values()) {
+            itemList.addAll(shop.items);
         }
         Collections.shuffle(itemList, this.random);
 
         Iterator<Integer> itemListIter = itemList.iterator();
 
-        for (List<Integer> shopList: currentItems.values()) {
-            for (int i = 0; i < shopList.size(); i++) {
-                shopList.remove(i);
-                shopList.add(i,itemListIter.next());
+        for (Shop shop: currentItems.values()) {
+            for (int i = 0; i < shop.items.size(); i++) {
+                shop.items.remove(i);
+                shop.items.add(i, itemListIter.next());
             }
         }
 
@@ -4873,12 +4873,12 @@ public abstract class AbstractRomHandler implements RomHandler {
         if (banOPShopItems) {
             possibleItems.banSingles(this.getOPShopItems().stream().mapToInt(Integer::intValue).toArray());
         }
-        Map<Integer,List<Integer>> currentItems = this.getShopItems();
+        Map<Integer, Shop> currentItems = this.getShopItems();
 
-        int shopItemCount = currentItems.values().stream().mapToInt(List::size).sum();
+        int shopItemCount = currentItems.values().stream().mapToInt(s -> s.items.size()).sum();
 
         List<Integer> newItems = new ArrayList<>();
-        Map<Integer,List<Integer>> newItemsMap = new TreeMap<>();
+        Map<Integer, Shop> newItemsMap = new TreeMap<>();
         int newItem;
         List<Integer> guaranteedItems = new ArrayList<>();
         if (placeEvolutionItems) {
@@ -4920,7 +4920,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             for (int i: nonMainGameShops) {
                 int j = 0;
                 List<Integer> newShopItems = new ArrayList<>();
-                for (Integer ignored: currentItems.get(i)) {
+                for (Integer ignored: currentItems.get(i).items) {
                     Integer item = newItems.get(j);
                     while (guaranteedItems.contains(item)) {
                         j++;
@@ -4929,19 +4929,23 @@ public abstract class AbstractRomHandler implements RomHandler {
                     newShopItems.add(item);
                     newItems.remove(item);
                 }
-                newItemsMap.put(i,newShopItems);
+                Shop shop = new Shop();
+                shop.items = newShopItems;
+                newItemsMap.put(i, shop);
             }
 
             // Place items in main-game shops
             Collections.shuffle(newItems, this.random);
             for (int i: mainGameShops) {
                 List<Integer> newShopItems = new ArrayList<>();
-                for (Integer ignored: currentItems.get(i)) {
+                for (Integer ignored: currentItems.get(i).items) {
                     Integer item = newItems.get(0);
                     newShopItems.add(item);
                     newItems.remove(0);
                 }
-                newItemsMap.put(i,newShopItems);
+                Shop shop = new Shop();
+                shop.items = newShopItems;
+                newItemsMap.put(i, shop);
             }
         } else {
             for (int i = 0; i < shopItemCount; i++) {
@@ -4953,10 +4957,12 @@ public abstract class AbstractRomHandler implements RomHandler {
 
             for (int i: currentItems.keySet()) {
                 List<Integer> newShopItems = new ArrayList<>();
-                for (Integer ignored: currentItems.get(i)) {
+                for (Integer ignored: currentItems.get(i).items) {
                     newShopItems.add(newItemsIter.next());
                 }
-                newItemsMap.put(i,newShopItems);
+                Shop shop = new Shop();
+                shop.items = newShopItems;
+                newItemsMap.put(i, shop);
             }
         }
 

@@ -2791,11 +2791,6 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
-    public String[] getShopNames() {
-        return shopNames.toArray(new String[0]);
-    }
-
-    @Override
     public String abilityName(int number) {
         return abilityNames.get(number);
     }
@@ -3185,12 +3180,12 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
-    public Map<Integer, List<Integer>> getShopItems() {
+    public Map<Integer, Shop> getShopItems() {
         int[] tmShops = romEntry.arrayEntries.get("TMShops");
         int[] regularShops = romEntry.arrayEntries.get("RegularShops");
         int[] shopItemSizes = romEntry.arrayEntries.get("ShopItemSizes");
         int shopCount = romEntry.getInt("ShopCount");
-        Map<Integer,List<Integer>> shopItemsMap = new TreeMap<>();
+        Map<Integer, Shop> shopItemsMap = new TreeMap<>();
         try {
             byte[] shopsCRO = readFile(romEntry.getString("ShopsAndTutors"));
             int offset = Gen7Constants.getShopItemsOffset(romEntry.romType);
@@ -3217,7 +3212,10 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                         items.add(FileFunctions.read2ByteInt(shopsCRO, offset));
                         offset += 2;
                     }
-                    shopItemsMap.put(i, items);
+                    Shop shop = new Shop();
+                    shop.items = items;
+                    shop.name = shopNames.get(i);
+                    shopItemsMap.put(i, shop);
                 }
             }
             return shopItemsMap;
@@ -3227,7 +3225,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
-    public void setShopItems(Map<Integer, List<Integer>> shopItems) {
+    public void setShopItems(Map<Integer, Shop> shopItems) {
         int[] tmShops = romEntry.arrayEntries.get("TMShops");
         int[] regularShops = romEntry.arrayEntries.get("RegularShops");
         int[] shopItemSizes = romEntry.arrayEntries.get("ShopItemSizes");
@@ -3253,7 +3251,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                     }
                 }
                 if (!badShop) {
-                    List<Integer> shopContents = shopItems.get(i);
+                    List<Integer> shopContents = shopItems.get(i).items;
                     Iterator<Integer> iterItems = shopContents.iterator();
                     for (int j = 0; j < shopItemSizes[i]; j++) {
                         Integer item = iterItems.next();

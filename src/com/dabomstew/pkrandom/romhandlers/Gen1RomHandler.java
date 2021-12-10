@@ -774,14 +774,9 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
-    public String[] getShopNames() {
-        return null;
-    }
-    @Override
     public List<Integer> getEvolutionItems() {
         return null;
     }
-    
 
     @Override
     public List<EncounterSet> getEncounters(boolean useTimeOfDay) {
@@ -1637,12 +1632,12 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
-    public Map<Integer, List<Integer>> getShopItems() {
+    public Map<Integer, Shop> getShopItems() {
         return null; // Not implemented
     }
 
     @Override
-    public void setShopItems(Map<Integer, List<Integer>> shopItems) {
+    public void setShopItems(Map<Integer, Shop> shopItems) {
         // Not implemented
     }
 
