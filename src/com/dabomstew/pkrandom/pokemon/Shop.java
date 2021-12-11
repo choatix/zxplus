@@ -29,4 +29,15 @@ import java.util.List;
 public class Shop {
     public List<Integer> items;
     public String name;
+    public boolean isMainGame;
+
+    public Shop() {
+        this.isMainGame = false;
+    }
+
+    public Shop(Shop otherShop) {
+        this.items = otherShop.items;
+        this.name = otherShop.name;
+        this.isMainGame = otherShop.isMainGame;
+    }
 }

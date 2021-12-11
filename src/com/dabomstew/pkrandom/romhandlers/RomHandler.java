@@ -523,8 +523,6 @@ public interface RomHandler {
 
     void setShopPrices();
 
-    List<Integer> getMainGameShops();
-
     // ============
     // Pickup Items
     // ============

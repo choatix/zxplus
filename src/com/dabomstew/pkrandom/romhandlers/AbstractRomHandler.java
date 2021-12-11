@@ -5069,21 +5069,13 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
 
             // Guarantee main-game
-            List<Integer> mainGameShopsTemp = getMainGameShops();
             List<Integer> mainGameShops = new ArrayList<>();
             List<Integer> nonMainGameShops = new ArrayList<>();
             for (int i: currentItems.keySet()) {
-                if (mainGameShopsTemp.contains(i)) {
+                if (currentItems.get(i).isMainGame) {
                     mainGameShops.add(i);
                 } else {
                     nonMainGameShops.add(i);
-                }
-            }
-
-            // Confirms that the main-game shop list gotten from the constants matches the in-game main-game shops
-            for (int i: mainGameShopsTemp) {
-                if (!mainGameShops.contains(i)) {
-                    System.err.println("Discrepancy between main-game shop list in constants and in game: index " + i);
                 }
             }
 
@@ -5092,7 +5084,8 @@ public abstract class AbstractRomHandler implements RomHandler {
             for (int i: nonMainGameShops) {
                 int j = 0;
                 List<Integer> newShopItems = new ArrayList<>();
-                for (Integer ignored: currentItems.get(i).items) {
+                Shop oldShop = currentItems.get(i);
+                for (Integer ignored: oldShop.items) {
                     Integer item = newItems.get(j);
                     while (guaranteedItems.contains(item)) {
                         j++;
@@ -5101,7 +5094,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     newShopItems.add(item);
                     newItems.remove(item);
                 }
-                Shop shop = new Shop();
+                Shop shop = new Shop(oldShop);
                 shop.items = newShopItems;
                 newItemsMap.put(i, shop);
             }
@@ -5110,12 +5103,13 @@ public abstract class AbstractRomHandler implements RomHandler {
             Collections.shuffle(newItems, this.random);
             for (int i: mainGameShops) {
                 List<Integer> newShopItems = new ArrayList<>();
-                for (Integer ignored: currentItems.get(i).items) {
+                Shop oldShop = currentItems.get(i);
+                for (Integer ignored: oldShop.items) {
                     Integer item = newItems.get(0);
                     newShopItems.add(item);
                     newItems.remove(0);
                 }
-                Shop shop = new Shop();
+                Shop shop = new Shop(oldShop);
                 shop.items = newShopItems;
                 newItemsMap.put(i, shop);
             }
@@ -5129,10 +5123,11 @@ public abstract class AbstractRomHandler implements RomHandler {
 
             for (int i: currentItems.keySet()) {
                 List<Integer> newShopItems = new ArrayList<>();
-                for (Integer ignored: currentItems.get(i).items) {
+                Shop oldShop = currentItems.get(i);
+                for (Integer ignored: oldShop.items) {
                     newShopItems.add(newItemsIter.next());
                 }
-                Shop shop = new Shop();
+                Shop shop = new Shop(oldShop);
                 shop.items = newShopItems;
                 newItemsMap.put(i, shop);
             }

@@ -3220,6 +3220,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                     Shop shop = new Shop();
                     shop.items = items;
                     shop.name = shopNames.get(i);
+                    shop.isMainGame = Gen7Constants.getMainGameShops(romEntry.romType).contains(i);
                     shopItemsMap.put(i, shop);
                 }
             }
@@ -3282,11 +3283,6 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
-    }
-
-    @Override
-    public List<Integer> getMainGameShops() {
-        return Gen7Constants.getMainGameShops(romEntry.romType);
     }
 
     @Override

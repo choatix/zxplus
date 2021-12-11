@@ -1610,11 +1610,6 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
-    public List<Integer> getMainGameShops() {
-        return new ArrayList<>();
-    }
-
-    @Override
     public boolean canChangeTrainerText() {
         return romEntry.getValue("CanChangeTrainerText") > 0;
     }

@@ -3904,10 +3904,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     @Override
     public Map<Integer, Shop> getShopItems() {
         List<String> shopNames = Gen4Constants.getShopNames(romEntry.romType);
-        List<Integer> skipShops =
-                Arrays.stream(romEntry.arrayEntries.get("SkipShops"))
-                .boxed()
-                .collect(Collectors.toList());
+        List<Integer> mainGameShops = Arrays.stream(romEntry.arrayEntries.get("MainGameShops")).boxed().collect(Collectors.toList());
+        List<Integer> skipShops = Arrays.stream(romEntry.arrayEntries.get("SkipShops")).boxed().collect(Collectors.toList());
         int shopCount = romEntry.getInt("ShopCount");
         Map<Integer, Shop> shopItemsMap = new TreeMap<>();
         String shopDataPrefix = romEntry.getString("ShopDataPrefix");
@@ -3929,6 +3927,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 Shop shop = new Shop();
                 shop.items = items;
                 shop.name = shopNames.get(i);
+                shop.isMainGame = mainGameShops.contains(i);
                 shopItemsMap.put(i, shop);
             } else {
                 while ((FileFunctions.read2ByteInt(arm9, offset) & 0xFFFF) != 0xFFFF) {
@@ -3988,13 +3987,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
-    }
-
-    @Override
-    public List<Integer> getMainGameShops() {
-        return Arrays.stream(romEntry.arrayEntries.get("MainGameShops"))
-                .boxed()
-                .collect(Collectors.toList());
     }
 
     @Override

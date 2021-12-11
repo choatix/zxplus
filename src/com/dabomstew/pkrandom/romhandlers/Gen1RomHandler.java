@@ -1646,11 +1646,6 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         // Not implemented
     }
 
-    @Override
-    public List<Integer> getMainGameShops() {
-        return new ArrayList<>();
-    }
-
     private List<String> getTrainerClassesForText() {
         int[] offsets = romEntry.arrayEntries.get("TrainerClassNamesOffsets");
         List<String> tcNames = new ArrayList<>();
