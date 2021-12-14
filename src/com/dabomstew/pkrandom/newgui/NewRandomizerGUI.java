@@ -1851,6 +1851,8 @@ public class NewRandomizerGUI {
         raceModeCheckBox.setEnabled(false);
         raceModeCheckBox.setSelected(false);
 
+        currentRestrictions = null;
+
         openROMButton.setVisible(true);
         openROMButton.setEnabled(true);
         openROMButton.setSelected(false);
