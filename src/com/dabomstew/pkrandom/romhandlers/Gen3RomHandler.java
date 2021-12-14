@@ -2800,10 +2800,10 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     public void setShopItems(Map<Integer, Shop> shopItems) {
         int[] shopItemOffsets = romEntry.arrayEntries.get("ShopItemOffsets");
         for (int i = 0; i < shopItemOffsets.length; i++) {
-            List<Integer> thisShopItems = shopItems.get(i).items;
-            if (thisShopItems != null) {
+            Shop thisShop = shopItems.get(i);
+            if (thisShop != null && thisShop.items != null) {
                 int offset = shopItemOffsets[i];
-                Iterator<Integer> iterItems = thisShopItems.iterator();
+                Iterator<Integer> iterItems = thisShop.items.iterator();
                 while (iterItems.hasNext()) {
                     FileFunctions.write2ByteInt(rom, offset, iterItems.next());
                     offset += 2;

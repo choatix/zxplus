@@ -379,7 +379,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     private NARCArchive pokeNarc, moveNarc, stringsNarc, storyTextNarc, scriptNarc, shopNarc;
 
     @Override
-    protected boolean detectNDSRom(String ndsCode) {
+    protected boolean detectNDSRom(String ndsCode, byte version) {
         return detectNDSRomInner(ndsCode);
     }
 
@@ -401,7 +401,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    protected void loadedROM(String romCode) {
+    protected void loadedROM(String romCode, byte version) {
         this.romEntry = entryFor(romCode);
         try {
             arm9 = readARM9();

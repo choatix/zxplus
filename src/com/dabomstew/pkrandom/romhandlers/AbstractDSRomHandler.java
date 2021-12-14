@@ -49,11 +49,11 @@ public abstract class AbstractDSRomHandler extends AbstractRomHandler {
         super(random, logStream);
     }
 
-    protected abstract boolean detectNDSRom(String ndsCode);
+    protected abstract boolean detectNDSRom(String ndsCode, byte version);
 
     @Override
     public boolean loadRom(String filename) {
-        if (!this.detectNDSRom(getROMCodeFromFile(filename))) {
+        if (!this.detectNDSRom(getROMCodeFromFile(filename), getVersionFromFile(filename))) {
             return false;
         }
         // Load inner rom
@@ -63,7 +63,7 @@ public abstract class AbstractDSRomHandler extends AbstractRomHandler {
             throw new RandomizerIOException(e);
         }
         loadedFN = filename;
-        loadedROM(baseRom.getCode());
+        loadedROM(baseRom.getCode(), baseRom.getVersion());
         return true;
     }
 
@@ -80,7 +80,7 @@ public abstract class AbstractDSRomHandler extends AbstractRomHandler {
         return ret;
     }
 
-    protected abstract void loadedROM(String romCode);
+    protected abstract void loadedROM(String romCode, byte version);
 
     protected abstract void savingROM();
 
@@ -166,6 +166,18 @@ public abstract class AbstractDSRomHandler extends AbstractRomHandler {
             byte[] sig = FileFunctions.readFullyIntoBuffer(fis, 4);
             fis.close();
             return new String(sig, "US-ASCII");
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+    }
+
+    protected static byte getVersionFromFile(String filename) {
+        try {
+            FileInputStream fis = new FileInputStream(filename);
+            fis.skip(0x1E);
+            byte[] version = FileFunctions.readFullyIntoBuffer(fis, 1);
+            fis.close();
+            return version[0];
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
