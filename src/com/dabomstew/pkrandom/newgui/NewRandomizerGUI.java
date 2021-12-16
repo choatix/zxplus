@@ -1148,8 +1148,6 @@ public class NewRandomizerGUI {
             baseGameTitleIdChars[7] = 'E';
             String expectedUpdateTitleId = String.valueOf(baseGameTitleIdChars);
             if (actualUpdateTitleId.equals(expectedUpdateTitleId)) {
-                gameUpdates.put(romHandler.getROMCode(), fh.getAbsolutePath());
-                attemptWriteConfig();
                 try {
                     romHandler.loadGameUpdate(fh.getAbsolutePath());
                 } catch (EncryptedROMException ex) {
@@ -1161,6 +1159,8 @@ public class NewRandomizerGUI {
                             String.format(bundle.getString("GUI.unsupportedUpdate"), fh.getName()));
                     return;
                 }
+                gameUpdates.put(romHandler.getROMCode(), fh.getAbsolutePath());
+                attemptWriteConfig();
                 removeGameUpdateMenuItem.setVisible(true);
                 romNameLabel.setText(romHandler.getROMName() + " (" + romHandler.getGameUpdateVersion() + ")");
                 String text = String.format(bundle.getString("GUI.gameUpdateApplied"), romHandler.getROMName());
