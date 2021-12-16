@@ -2780,11 +2780,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             if (!skipShops.contains(i)) {
                 int offset = shopItemOffsets[i];
                 List<Integer> items = new ArrayList<>();
-                int val = FileFunctions.read2ByteInt(rom, offset);
+                int val = FileFunctions.read2ByteIntLittleEndian(rom, offset);
                 while (val != 0x0000) {
                     items.add(val);
                     offset += 2;
-                    val = FileFunctions.read2ByteInt(rom, offset);
+                    val = FileFunctions.read2ByteIntLittleEndian(rom, offset);
                 }
                 Shop shop = new Shop();
                 shop.items = items;
@@ -2805,7 +2805,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 int offset = shopItemOffsets[i];
                 Iterator<Integer> iterItems = thisShop.items.iterator();
                 while (iterItems.hasNext()) {
-                    FileFunctions.write2ByteInt(rom, offset, iterItems.next());
+                    FileFunctions.write2ByteIntLittleEndian(rom, offset, iterItems.next());
                     offset += 2;
                 }
             }
@@ -2820,7 +2820,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         for (int i = 1; i < itemCount; i++) {
             int balancedPrice = Gen3Constants.balancedItemPrices.get(i) * 10;
             int offset = itemDataOffset + (i * entrySize) + 16;
-            FileFunctions.write2ByteInt(rom, offset, balancedPrice);
+            FileFunctions.write2ByteIntLittleEndian(rom, offset, balancedPrice);
         }
     }
 
@@ -2843,7 +2843,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         if (pickupItemsTableOffset > 0) {
             for (int i = 0; i < pickupItemCount; i++) {
                 int itemOffset = pickupItemsTableOffset + (sizeOfPickupEntry * i);
-                int item = FileFunctions.read2ByteInt(rom, itemOffset);
+                int item = FileFunctions.read2ByteIntLittleEndian(rom, itemOffset);
                 PickupItem pickupItem = new PickupItem(item);
                 pickupItems.add(pickupItem);
             }
@@ -2898,7 +2898,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         if (pickupItemsTableOffset > 0) {
             for (int i = 0; i < pickupItems.size(); i++) {
                 int itemOffset = pickupItemsTableOffset + (sizeOfPickupEntry * i);
-                FileFunctions.write2ByteInt(rom, itemOffset, pickupItems.get(i).item);
+                FileFunctions.write2ByteIntLittleEndian(rom, itemOffset, pickupItems.get(i).item);
             }
         }
     }

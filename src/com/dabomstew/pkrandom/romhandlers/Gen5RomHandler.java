@@ -3933,7 +3933,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             if (pickupItemsTableOffset > 0) {
                 for (int i = 0; i < Gen5Constants.numberOfPickupItems; i++) {
                     int itemOffset = pickupItemsTableOffset + (2 * i);
-                    int item = FileFunctions.read2ByteInt(battleOverlay, itemOffset);
+                    int item = FileFunctions.read2ByteIntLittleEndian(battleOverlay, itemOffset);
                     PickupItem pickupItem = new PickupItem(item);
                     pickupItems.add(pickupItem);
                 }
@@ -3968,7 +3968,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 for (int i = 0; i < Gen5Constants.numberOfPickupItems; i++) {
                     int itemOffset = pickupItemsTableOffset + (2 * i);
                     int item = pickupItems.get(i).item;
-                    FileFunctions.write2ByteInt(battleOverlay, itemOffset, item);
+                    FileFunctions.write2ByteIntLittleEndian(battleOverlay, itemOffset, item);
                 }
                 writeOverlay(romEntry.getInt("PickupOvlNumber"), battleOverlay);
             }

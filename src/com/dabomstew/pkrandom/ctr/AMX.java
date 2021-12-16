@@ -27,7 +27,6 @@ import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -87,8 +86,8 @@ public class AMX {
             throw new IOException();
         }
 
-        ptrOffset = FileFunctions.read2ByteInt(encData,8);
-        ptrCount = FileFunctions.read2ByteInt(encData,0xA);
+        ptrOffset = FileFunctions.read2ByteIntLittleEndian(encData,8);
+        ptrCount = FileFunctions.read2ByteIntLittleEndian(encData,0xA);
 
         scriptInstrStart = FileFunctions.readFullIntLittleEndian(encData,0xC);
         scriptMovementStart = FileFunctions.readFullIntLittleEndian(encData,0x10);

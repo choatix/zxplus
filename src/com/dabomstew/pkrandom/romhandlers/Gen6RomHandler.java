@@ -357,8 +357,8 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         }
 
         // Held Items?
-        int item1 = FileFunctions.read2ByteInt(stats, Gen6Constants.bsCommonHeldItemOffset);
-        int item2 = FileFunctions.read2ByteInt(stats, Gen6Constants.bsRareHeldItemOffset);
+        int item1 = FileFunctions.read2ByteIntLittleEndian(stats, Gen6Constants.bsCommonHeldItemOffset);
+        int item2 = FileFunctions.read2ByteIntLittleEndian(stats, Gen6Constants.bsRareHeldItemOffset);
 
         if (item1 == item2) {
             // guaranteed
@@ -370,16 +370,16 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             pkmn.guaranteedHeldItem = 0;
             pkmn.commonHeldItem = item1;
             pkmn.rareHeldItem = item2;
-            pkmn.darkGrassHeldItem = FileFunctions.read2ByteInt(stats, Gen6Constants.bsDarkGrassHeldItemOffset);
+            pkmn.darkGrassHeldItem = FileFunctions.read2ByteIntLittleEndian(stats, Gen6Constants.bsDarkGrassHeldItemOffset);
         }
 
         int formeCount = stats[Gen6Constants.bsFormeCountOffset] & 0xFF;
         if (formeCount > 1) {
             if (!altFormes.keySet().contains(pkmn.number)) {
-                int firstFormeOffset = FileFunctions.read2ByteInt(stats, Gen6Constants.bsFormeOffset);
+                int firstFormeOffset = FileFunctions.read2ByteIntLittleEndian(stats, Gen6Constants.bsFormeOffset);
                 if (firstFormeOffset != 0) {
                     for (int i = 1; i < formeCount; i++) {
-                        altFormes.put(firstFormeOffset + i - 1,new FormeInfo(pkmn.number,i,FileFunctions.read2ByteInt(stats,Gen6Constants.bsFormeSpriteOffset))); // Assumes that formes are in memory in the same order as their numbers
+                        altFormes.put(firstFormeOffset + i - 1,new FormeInfo(pkmn.number,i,FileFunctions.read2ByteIntLittleEndian(stats,Gen6Constants.bsFormeSpriteOffset))); // Assumes that formes are in memory in the same order as their numbers
                         if (Gen6Constants.actuallyCosmeticForms.contains(firstFormeOffset+i-1)) {
                             if (pkmn.number != Species.pikachu && pkmn.number != Species.cherrim) { // No Pikachu/Cherrim
                                 pkmn.cosmeticForms += 1;
@@ -590,6 +590,11 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    protected boolean isGameUpdateSupported(int version) {
+        return version == romEntry.numbers.get("FullyUpdatedVersionNumber");
+    }
+
+    @Override
     protected String getGameVersion() {
         List<String> titleScreenText = getStrings(false, romEntry.getInt("TitleScreenTextOffset"));
         if (titleScreenText.size() > romEntry.getInt("UpdateStringOffset")) {
@@ -642,13 +647,13 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
 
         // Held items
         if (pkmn.guaranteedHeldItem > 0) {
-            FileFunctions.write2ByteInt(stats, Gen6Constants.bsCommonHeldItemOffset, pkmn.guaranteedHeldItem);
-            FileFunctions.write2ByteInt(stats, Gen6Constants.bsRareHeldItemOffset, pkmn.guaranteedHeldItem);
-            FileFunctions.write2ByteInt(stats, Gen6Constants.bsDarkGrassHeldItemOffset, 0);
+            FileFunctions.write2ByteIntLittleEndian(stats, Gen6Constants.bsCommonHeldItemOffset, pkmn.guaranteedHeldItem);
+            FileFunctions.write2ByteIntLittleEndian(stats, Gen6Constants.bsRareHeldItemOffset, pkmn.guaranteedHeldItem);
+            FileFunctions.write2ByteIntLittleEndian(stats, Gen6Constants.bsDarkGrassHeldItemOffset, 0);
         } else {
-            FileFunctions.write2ByteInt(stats, Gen6Constants.bsCommonHeldItemOffset, pkmn.commonHeldItem);
-            FileFunctions.write2ByteInt(stats, Gen6Constants.bsRareHeldItemOffset, pkmn.rareHeldItem);
-            FileFunctions.write2ByteInt(stats, Gen6Constants.bsDarkGrassHeldItemOffset, pkmn.darkGrassHeldItem);
+            FileFunctions.write2ByteIntLittleEndian(stats, Gen6Constants.bsCommonHeldItemOffset, pkmn.commonHeldItem);
+            FileFunctions.write2ByteIntLittleEndian(stats, Gen6Constants.bsRareHeldItemOffset, pkmn.rareHeldItem);
+            FileFunctions.write2ByteIntLittleEndian(stats, Gen6Constants.bsDarkGrassHeldItemOffset, pkmn.darkGrassHeldItem);
         }
 
         if (pkmn.fullName().equals("Meowstic")) {
@@ -916,7 +921,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             for (int i = 0; i < count; i++) {
                 if (!starterIndices.contains(i)) continue;
                 StaticEncounter se = new StaticEncounter();
-                int species = FileFunctions.read2ByteInt(staticCRO,offset+i*size);
+                int species = FileFunctions.read2ByteIntLittleEndian(staticCRO,offset+i*size);
                 Pokemon pokemon = pokes[species];
                 int forme = staticCRO[offset+i*size + 4];
                 if (forme > pokemon.cosmeticForms && forme != 30 && forme != 31) {
@@ -1996,7 +2001,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             int offset = romEntry.getInt("StaticPokemonOffset");
             for (int i = 0; i < count; i++) {
                 StaticEncounter se = new StaticEncounter();
-                int species = FileFunctions.read2ByteInt(staticCRO,offset+i*size);
+                int species = FileFunctions.read2ByteIntLittleEndian(staticCRO,offset+i*size);
                 Pokemon pokemon = pokes[species];
                 int forme = staticCRO[offset+i*size + 2];
                 if (forme > pokemon.cosmeticForms && forme != 30 && forme != 31) {
@@ -2008,7 +2013,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 se.pkmn = pokemon;
                 se.forme = forme;
                 se.level = staticCRO[offset+i*size + 3];
-                short heldItem = (short)FileFunctions.read2ByteInt(staticCRO,offset+i*size + 4);
+                short heldItem = (short)FileFunctions.read2ByteIntLittleEndian(staticCRO,offset+i*size + 4);
                 if (heldItem < 0) {
                     heldItem = 0;
                 }
@@ -2026,7 +2031,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             for (int i = 0; i < count; i++) {
                 if (skipStarters.contains(i)) continue;
                 StaticEncounter se = new StaticEncounter();
-                int species = FileFunctions.read2ByteInt(staticCRO,offset+i*size);
+                int species = FileFunctions.read2ByteIntLittleEndian(staticCRO,offset+i*size);
                 Pokemon pokemon = pokes[species];
                 int forme = staticCRO[offset+i*size + 4];
                 if (forme > pokemon.cosmeticForms && forme != 30 && forme != 31) {
@@ -2044,7 +2049,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 }
                 se.heldItem = heldItem;
                 if (romEntry.romType == Gen6Constants.Type_ORAS) {
-                    int metLocation = FileFunctions.read2ByteInt(staticCRO, offset + i * size + 18);
+                    int metLocation = FileFunctions.read2ByteIntLittleEndian(staticCRO, offset + i * size + 18);
                     if (metLocation == 0xEA64) {
                         se.isEgg = true;
                     }
@@ -2156,7 +2161,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         byte[] data = localScript.decData;
         int[] boxLegendaryScriptOffsets = romEntry.arrayEntries.get("BoxLegendaryScriptOffsets");
         for (int i = 0; i < boxLegendaryScriptOffsets.length; i++) {
-            FileFunctions.write2ByteInt(data, boxLegendaryScriptOffsets[i], boxLegendarySpecies);
+            FileFunctions.write2ByteIntLittleEndian(data, boxLegendaryScriptOffsets[i], boxLegendarySpecies);
         }
         byte[] modifiedScript = localScript.getBytes();
         System.arraycopy(modifiedScript, 0, boxLegendaryRoomData, Gen6Constants.boxLegendaryLocalScriptOffsetXY, modifiedScript.length);
@@ -2266,7 +2271,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         AMX rayquazaAMX = new AMX(scriptGarc.files.get(rayquazaScriptFile).get(0));
         byte[] data = rayquazaAMX.decData;
         for (int i = 0; i < Gen6Constants.rayquazaScriptOffsetsORAS.length; i++) {
-            FileFunctions.write2ByteInt(data, Gen6Constants.rayquazaScriptOffsetsORAS[i], rayquazaEncounterSpecies);
+            FileFunctions.write2ByteIntLittleEndian(data, Gen6Constants.rayquazaScriptOffsetsORAS[i], rayquazaEncounterSpecies);
         }
         scriptGarc.setFile(rayquazaScriptFile, rayquazaAMX.getBytes());
         writeGARC(romEntry.getString("Scripts"), scriptGarc);
@@ -2581,7 +2586,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         if (mtOffset > 0) {
             int val = 0;
             while (val != 0xFFFF) {
-                val = FileFunctions.read2ByteInt(code,mtOffset);
+                val = FileFunctions.read2ByteIntLittleEndian(code,mtOffset);
                 mtOffset += 2;
                 if (val == 0x26E || val == 0xFFFF) continue;
                 mtMoves.add(val);
@@ -2598,16 +2603,16 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         if (mtOffset > 0) {
             mtOffset += Gen6Constants.tutorsShopPrefix.length() / 2; // because it was a prefix
             for (int i = 0; i < Gen6Constants.tutorMoveCount; i++) {
-                FileFunctions.write2ByteInt(code,mtOffset + i*8, moves.get(i));
+                FileFunctions.write2ByteIntLittleEndian(code,mtOffset + i*8, moves.get(i));
             }
         }
 
         mtOffset = getMoveTutorMovesOffset();
         if (mtOffset > 0) {
             for (int move: moves) {
-                int val = FileFunctions.read2ByteInt(code,mtOffset);
+                int val = FileFunctions.read2ByteIntLittleEndian(code,mtOffset);
                 if (val == 0x26E) mtOffset += 2;
-                FileFunctions.write2ByteInt(code,mtOffset,move);
+                FileFunctions.write2ByteIntLittleEndian(code,mtOffset,move);
                 mtOffset += 2;
             }
         }
@@ -3291,7 +3296,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             AMX normalItemAMX = new AMX(scriptGarc.files.get(normalItemsFile).get(0));
             byte[] data = normalItemAMX.decData;
             for (int i = normalItemsOffset; i < data.length; i += 12) {
-                int item = FileFunctions.read2ByteInt(data,i);
+                int item = FileFunctions.read2ByteIntLittleEndian(data,i);
                 fieldItems.add(item);
             }
 
@@ -3302,7 +3307,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 AMX hiddenItemAMX = new AMX(scriptGarc.files.get(hiddenItemsFile).get(0));
                 data = hiddenItemAMX.decData;
                 for (int i = hiddenItemsOffset; i < data.length; i += 12) {
-                    int item = FileFunctions.read2ByteInt(data,i);
+                    int item = FileFunctions.read2ByteIntLittleEndian(data,i);
                     fieldItems.add(item);
                 }
             } else {
@@ -3311,7 +3316,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 if (offsHidden > 0) {
                     offsHidden += hiddenItemsPrefix.length() / 2;
                     for (int i = 0; i < Gen6Constants.hiddenItemCountORAS; i++) {
-                        int item = FileFunctions.read2ByteInt(code, offsHidden + (i * 0xE) + 2);
+                        int item = FileFunctions.read2ByteIntLittleEndian(code, offsHidden + (i * 0xE) + 2);
                         fieldItems.add(item);
                     }
                 }
@@ -3337,7 +3342,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         AMX megaStoneItemEvent = new AMX(megaStoneItemEventBytes);
         for (int i = 0; i < Gen6Constants.megastoneTableLengthORAS; i++) {
             int offset = Gen6Constants.megastoneTableStartingOffsetORAS + (i * Gen6Constants.megastoneTableEntrySizeORAS);
-            int item = FileFunctions.read2ByteInt(megaStoneItemEvent.decData, offset);
+            int item = FileFunctions.read2ByteIntLittleEndian(megaStoneItemEvent.decData, offset);
             fieldMegaStones.add(item);
         }
         return fieldMegaStones;
@@ -3354,7 +3359,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             byte[] data = normalItemAMX.decData;
             for (int i = normalItemsOffset; i < data.length; i += 12) {
                 int item = iterItems.next();
-                FileFunctions.write2ByteInt(data,i,item);
+                FileFunctions.write2ByteIntLittleEndian(data,i,item);
             }
             scriptGarc.setFile(normalItemsFile,normalItemAMX.getBytes());
 
@@ -3366,7 +3371,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 data = hiddenItemAMX.decData;
                 for (int i = hiddenItemsOffset; i < data.length; i += 12) {
                     int item = iterItems.next();
-                    FileFunctions.write2ByteInt(data,i,item);
+                    FileFunctions.write2ByteIntLittleEndian(data,i,item);
                 }
                 scriptGarc.setFile(hiddenItemsFile,hiddenItemAMX.getBytes());
             } else {
@@ -3376,7 +3381,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     offsHidden += hiddenItemsPrefix.length() / 2;
                     for (int i = 0; i < Gen6Constants.hiddenItemCountORAS; i++) {
                         int item = iterItems.next();
-                        FileFunctions.write2ByteInt(code,offsHidden + (i * 0xE) + 2, item);
+                        FileFunctions.write2ByteIntLittleEndian(code,offsHidden + (i * 0xE) + 2, item);
                     }
                 }
             }
@@ -3396,9 +3401,9 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                         // There are some duplicate entries for certain Mega Stones, and we're not quite sure why.
                         // Set them to the same item for sanity's sake.
                         int replacementItem = megaStoneMap.get(oldItem);
-                        FileFunctions.write2ByteInt(megaStoneItemEvent.decData, offset, replacementItem);
+                        FileFunctions.write2ByteIntLittleEndian(megaStoneItemEvent.decData, offset, replacementItem);
                     } else {
-                        FileFunctions.write2ByteInt(megaStoneItemEvent.decData, offset, newItem);
+                        FileFunctions.write2ByteIntLittleEndian(megaStoneItemEvent.decData, offset, newItem);
                         megaStoneMap.put(oldItem, newItem);
                     }
                 }
@@ -3425,15 +3430,15 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             for (int i = 0; i < count; i++) {
                 IngameTrade trade = new IngameTrade();
                 trade.nickname = tradeStrings.get(textOffset + i);
-                trade.givenPokemon = pokes[FileFunctions.read2ByteInt(code,offset)];
+                trade.givenPokemon = pokes[FileFunctions.read2ByteIntLittleEndian(code,offset)];
                 trade.ivs = new int[6];
                 for (int iv = 0; iv < 6; iv++) {
                     trade.ivs[iv] = code[offset + 5 + iv];
                 }
-                trade.otId = FileFunctions.read2ByteInt(code,offset + 0xE);
-                trade.item = FileFunctions.read2ByteInt(code,offset + 0x10);
+                trade.otId = FileFunctions.read2ByteIntLittleEndian(code,offset + 0xE);
+                trade.item = FileFunctions.read2ByteIntLittleEndian(code,offset + 0x10);
                 trade.otName = tradeStrings.get(textOffset + count + i);
-                trade.requestedPokemon = pokes[FileFunctions.read2ByteInt(code,offset + 0x20)];
+                trade.requestedPokemon = pokes[FileFunctions.read2ByteIntLittleEndian(code,offset + 0x20)];
                 trades.add(trade);
                 offset += Gen6Constants.ingameTradeSize;
             }
@@ -3456,14 +3461,14 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             for (int i = 0; i < count; i++) {
                 IngameTrade trade = trades.get(i);
                 tradeStrings.set(textOffset + i, trade.nickname);
-                FileFunctions.write2ByteInt(code,offset,trade.givenPokemon.number);
+                FileFunctions.write2ByteIntLittleEndian(code,offset,trade.givenPokemon.number);
                 for (int iv = 0; iv < 6; iv++) {
                     code[offset + 5 + iv] = (byte)trade.ivs[iv];
                 }
-                FileFunctions.write2ByteInt(code,offset + 0xE,trade.otId);
-                FileFunctions.write2ByteInt(code,offset + 0x10,trade.item);
+                FileFunctions.write2ByteIntLittleEndian(code,offset + 0xE,trade.otId);
+                FileFunctions.write2ByteIntLittleEndian(code,offset + 0x10,trade.item);
                 tradeStrings.set(textOffset + count + i, trade.otName);
-                FileFunctions.write2ByteInt(code,offset + 0x20,
+                FileFunctions.write2ByteIntLittleEndian(code,offset + 0x20,
                         trade.requestedPokemon == null ? 0 : trade.requestedPokemon.number);
                 offset += Gen6Constants.ingameTradeSize;
 
@@ -3604,7 +3609,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             if (!badShop) {
                 List<Integer> items = new ArrayList<>();
                 for (int j = 0; j < shopItemSizes[i]; j++) {
-                    items.add(FileFunctions.read2ByteInt(code,offset));
+                    items.add(FileFunctions.read2ByteIntLittleEndian(code,offset));
                     offset += 2;
                 }
                 Shop shop = new Shop();
@@ -3651,7 +3656,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 Iterator<Integer> iterItems = shopContents.iterator();
                 for (int j = 0; j < shopItemSizes[i]; j++) {
                     Integer item = iterItems.next();
-                    FileFunctions.write2ByteInt(code,offset,item);
+                    FileFunctions.write2ByteIntLittleEndian(code,offset,item);
                     offset += 2;
                 }
             }
@@ -3697,7 +3702,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         if (pickupItemsTableOffset > 0) {
             for (int i = 0; i < Gen6Constants.numberOfPickupItems; i++) {
                 int itemOffset = pickupItemsTableOffset + (2 * i);
-                int item = FileFunctions.read2ByteInt(code, itemOffset);
+                int item = FileFunctions.read2ByteIntLittleEndian(code, itemOffset);
                 PickupItem pickupItem = new PickupItem(item);
                 pickupItems.add(pickupItem);
             }
@@ -3727,7 +3732,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             for (int i = 0; i < Gen6Constants.numberOfPickupItems; i++) {
                 int itemOffset = pickupItemsTableOffset + (2 * i);
                 int item = pickupItems.get(i).item;
-                FileFunctions.write2ByteInt(code, itemOffset, item);
+                FileFunctions.write2ByteIntLittleEndian(code, itemOffset, item);
             }
         }
     }

@@ -120,10 +120,14 @@ public class FileFunctions {
     }
 
     public static int read2ByteInt(byte[] data, int index) {
+        return (data[index + 1] & 0xFF) | ((data[index] & 0xFF) << 8);
+    }
+
+    public static int read2ByteIntLittleEndian(byte[] data, int index) {
         return (data[index] & 0xFF) | ((data[index + 1] & 0xFF) << 8);
     }
 
-    public static void write2ByteInt(byte[] data, int offset, int value) {
+    public static void write2ByteIntLittleEndian(byte[] data, int offset, int value) {
         data[offset] = (byte) (value & 0xFF);
         data[offset + 1] = (byte) ((value >> 8) & 0xFF);
     }
@@ -169,6 +173,13 @@ public class FileFunctions {
         while (offs < length && (read = in.read(buf, offs + offset, length - offs)) != -1) {
             offs += read;
         }
+    }
+
+    public static int read2ByteIntFromFile(RandomAccessFile file, long offset) throws IOException {
+        byte[] buf = new byte[2];
+        file.seek(offset);
+        file.readFully(buf);
+        return read2ByteInt(buf, 0);
     }
 
     public static int readIntFromFile(RandomAccessFile file, long offset) throws IOException {

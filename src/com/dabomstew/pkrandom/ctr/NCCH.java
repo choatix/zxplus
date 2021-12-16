@@ -33,12 +33,12 @@ import java.security.*;
 import java.util.*;
 
 public class NCCH {
-
     private String romFilename;
     private RandomAccessFile baseRom;
     private long ncchStartingOffset;
     private String productCode;
     private String titleId;
+    private int version;
     private long exefsOffset, romfsOffset, fileDataOffset;
     private ExefsFileHeader codeFileHeader;
     private SMDH smdh;
@@ -56,6 +56,10 @@ public class NCCH {
 
     private static final int media_unit_size = 0x200;
     private static final int header_and_exheader_size = 0xA00;
+    private static final int ncsd_magic = 0x4E435344;
+    private static final int cia_header_size = 0x2020;
+    private static final int ncch_magic = 0x4E434348;
+    private static final int ncch_and_ncsd_magic_offset = 0x100;
     private static final int exefs_header_size = 0x200;
     private static final int romfs_header_size = 0x5C;
     private static final int romfs_magic_1 = 0x49564643;
@@ -63,13 +67,18 @@ public class NCCH {
     private static final int level3_header_size = 0x28;
     private static final int metadata_unused = 0xFFFFFFFF;
 
-    public NCCH(String filename, long ncchStartingOffset, String productCode, String titleId) throws IOException {
+    public NCCH(String filename, String productCode, String titleId) throws IOException {
         this.romFilename = filename;
         this.baseRom = new RandomAccessFile(filename, "r");
-        this.ncchStartingOffset = ncchStartingOffset;
+        this.ncchStartingOffset = NCCH.getCXIOffsetInFile(filename);
         this.productCode = productCode;
         this.titleId = titleId;
         this.romOpen = true;
+
+        if (this.ncchStartingOffset != -1) {
+            this.version = this.readVersionFromFile();
+        }
+
         // TMP folder?
         String rawFilename = new File(filename).getName();
         String dataFolder = "tmp_" + rawFilename.substring(0, rawFilename.lastIndexOf('.'));
@@ -775,6 +784,10 @@ public class NCCH {
         return titleId;
     }
 
+    public int getVersion() {
+        return version;
+    }
+
     public static int alignInt(int num, int alignment) {
         int mask = ~(alignment - 1);
         return (num + (alignment - 1)) & mask;
@@ -783,6 +796,110 @@ public class NCCH {
     public static long alignLong(long num, long alignment) {
         long mask = ~(alignment - 1);
         return (num + (alignment - 1)) & mask;
+    }
+
+    private int readVersionFromFile() {
+        try {
+            // Only CIAs can define a version in their TMD. If this is a different ROM type,
+            // just exit out early.
+            int magic = FileFunctions.readIntFromFile(this.baseRom, ncch_and_ncsd_magic_offset);
+            if (magic == ncch_magic || magic == ncsd_magic) {
+                return 0;
+            }
+
+            // For CIAs, we need to read the title metadata (TMD) in order to retrieve the version.
+            // The TMD is after the certificate chain and ticket.
+            int certChainSize = FileFunctions.readLittleEndianIntFromFile(this.baseRom, 0x08);
+            int ticketSize = FileFunctions.readLittleEndianIntFromFile(this.baseRom, 0x0C);
+            long certChainOffset = NCCH.alignLong(cia_header_size, 64);
+            long ticketOffset = NCCH.alignLong(certChainOffset + certChainSize, 64);
+            long tmdOffset = NCCH.alignLong(ticketOffset + ticketSize, 64);
+
+            // At the start of the TMD is a signature whose length varies based on what type of signature it is.
+            int signatureType = FileFunctions.readIntFromFile(this.baseRom, tmdOffset);
+            int signatureSize, paddingSize;
+            switch (signatureType) {
+                case 0x010003:
+                    signatureSize = 0x200;
+                    paddingSize = 0x3C;
+                    break;
+                case 0x010004:
+                    signatureSize = 0x100;
+                    paddingSize = 0x3C;
+                    break;
+                case 0x010005:
+                    signatureSize = 0x3C;
+                    paddingSize = 0x40;
+                    break;
+                default:
+                    signatureSize = -1;
+                    paddingSize = -1;
+                    break;
+            }
+            if (signatureSize == -1) {
+                // This shouldn't happen in practice, since all used and valid signature types are represented
+                // in the above switch. However, if we can't find the right signature type, then it's probably
+                // an invalid CIA anyway, so we're unlikely to get good version information out of it.
+                return 0;
+            }
+
+            // After the signature is the TMD header, which actually contains the version information.
+            long tmdHeaderOffset = tmdOffset + 4 + signatureSize + paddingSize;
+            return FileFunctions.read2ByteIntFromFile(this.baseRom, tmdHeaderOffset + 0x9C);
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+    }
+
+    // At the bare minimum, a 3DS game consists of what's known as a CXI file, which
+    // is just an NCCH that contains executable code. However, 3DS games are packaged
+    // in various containers that can hold other NCCH files like the game manual and
+    // firmware updates, among other things. This function's determines the location
+    // of the CXI regardless of the container.
+    public static long getCXIOffsetInFile(String filename) {
+        try {
+            RandomAccessFile rom = new RandomAccessFile(filename, "r");
+            int ciaHeaderSize = FileFunctions.readLittleEndianIntFromFile(rom, 0x00);
+            if (ciaHeaderSize == cia_header_size) {
+                // This *might* be a CIA; let's do our best effort to try to get
+                // a CXI out of this.
+                int certChainSize = FileFunctions.readLittleEndianIntFromFile(rom, 0x08);
+                int ticketSize = FileFunctions.readLittleEndianIntFromFile(rom, 0x0C);
+                int tmdFileSize = FileFunctions.readLittleEndianIntFromFile(rom, 0x10);
+
+                // If this is *really* a CIA, we'll find our CXI at the beginning of the
+                // content section, which is after the certificate chain, ticket, and TMD
+                long certChainOffset = NCCH.alignLong(ciaHeaderSize, 64);
+                long ticketOffset = NCCH.alignLong(certChainOffset + certChainSize, 64);
+                long tmdOffset = NCCH.alignLong(ticketOffset + ticketSize, 64);
+                long contentOffset = NCCH.alignLong(tmdOffset + tmdFileSize, 64);
+                int magic = FileFunctions.readIntFromFile(rom, contentOffset + ncch_and_ncsd_magic_offset);
+                if (magic == ncch_magic) {
+                    // This CIA's content contains a valid CXI!
+                    return contentOffset;
+                }
+            }
+
+            // We don't put the following code in an else-block because there *might*
+            // exist a totally-valid CXI or CCI whose first four bytes just so
+            // *happen* to be the same as the first four bytes of a CIA file.
+            int magic = FileFunctions.readIntFromFile(rom, ncch_and_ncsd_magic_offset);
+            rom.close();
+            if (magic == ncch_magic) {
+                // Magic is NCCH, so this just a straight-up NCCH/CXI; there is no container
+                // around the game data. Thus, the CXI offset is the beginning of the file.
+                return 0;
+            } else if (magic == ncsd_magic) {
+                // Magic is NCSD, so this is almost certainly a CCI. The CXI is always
+                // a fixed distance away from the start.
+                return 0x4000;
+            } else {
+                // This doesn't seem to be a valid 3DS file.
+                return -1;
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
     }
 
     private class ExefsFileHeader {

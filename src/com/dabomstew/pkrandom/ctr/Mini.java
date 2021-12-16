@@ -83,7 +83,7 @@ public class Mini {
             return null;
         }
 
-        int count = FileFunctions.read2ByteInt(fileData, 2);
+        int count = FileFunctions.read2ByteIntLittleEndian(fileData, 2);
         int ctr = 4;
         int start = FileFunctions.readFullIntLittleEndian(fileData, ctr);
         ctr += 4;
