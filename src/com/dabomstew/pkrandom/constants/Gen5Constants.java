@@ -404,6 +404,7 @@ public class Gen5Constants {
         map.put(Type.ELECTRIC, Items.electricGem);
         map.put(Type.GRASS, Items.grassGem);
         map.put(Type.ICE, Items.iceGem);
+        map.put(Type.FIGHTING, Items.fightingGem);
         map.put(Type.POISON, Items.poisonGem);
         map.put(Type.GROUND, Items.groundGem);
         map.put(Type.FLYING, Items.flyingGem);
