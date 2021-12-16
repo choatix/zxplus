@@ -195,14 +195,14 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                             String[] values = r[1].substring(1, r[1].length() - 1).split(",");
                             FileEntry entry = new FileEntry();
                             entry.path = values[0].trim();
-                            entry.expectedCRC32 = parseRIILong("0x" + values[1].trim());
+                            entry.expectedCRC32 = parseRILong("0x" + values[1].trim());
                             current.files.put(key, entry);
                         } else if (r[0].equals("Arm9CRC32")) {
-                            current.arm9ExpectedCRC32 = parseRIILong("0x" + r[1]);
+                            current.arm9ExpectedCRC32 = parseRILong("0x" + r[1]);
                         } else if (r[0].startsWith("OverlayCRC32<")) {
                             String keyString = r[0].split("<")[1].split(">")[0];
                             int key = parseRIInt(keyString);
-                            long value = parseRIILong("0x" + r[1]);
+                            long value = parseRILong("0x" + r[1]);
                             current.overlayExpectedCRC32s.put(key, value);
                         } else if (r[0].equals("StaticPokemon{}")) {
                             current.staticPokemon.add(parseStaticPokemon(r[1]));
@@ -303,7 +303,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
     }
 
-    private static long parseRIILong(String off) {
+    private static long parseRILong(String off) {
         int radix = 10;
         off = off.trim().toLowerCase();
         if (off.startsWith("0x") || off.startsWith("&h")) {

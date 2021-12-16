@@ -155,7 +155,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                         } else if (r[0].equals("CRCInHeader")) {
                             current.crcInHeader = parseRIInt(r[1]);
                         } else if (r[0].equals("CRC32")) {
-                            current.expectedCRC32 = parseRIILong("0x" + r[1]);
+                            current.expectedCRC32 = parseRILong("0x" + r[1]);
                         } else if (r[0].endsWith("Tweak")) {
                             current.codeTweaks.put(r[0], r[1]);
                         } else if (r[0].equals("CopyFrom")) {
@@ -252,7 +252,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         }
     }
 
-    private static long parseRIILong(String off) {
+    private static long parseRILong(String off) {
         int radix = 10;
         off = off.trim().toLowerCase();
         if (off.startsWith("0x") || off.startsWith("&h")) {

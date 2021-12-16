@@ -129,12 +129,6 @@ public abstract class AbstractDSRomHandler extends AbstractRomHandler {
         baseRom.printRomDiagnostics(logStream);
     }
 
-    @Override
-    public boolean isRomValid() {
-        // not implemented yet
-        return true;
-    }
-
     public void closeInnerRom() throws IOException {
         baseRom.closeROM();
     }
