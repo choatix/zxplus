@@ -97,7 +97,7 @@ public class FileFunctions {
         return cns;
     }
 
-    public static long readFullLongLittleEndian(byte[] data, int offset) {
+    public static long readFullLong(byte[] data, int offset) {
         ByteBuffer buf = ByteBuffer.allocate(8);
         buf.order(ByteOrder.LITTLE_ENDIAN);
         buf.put(data, offset, 8);
@@ -105,7 +105,7 @@ public class FileFunctions {
         return buf.getLong();
     }
 
-    public static int readFullIntLittleEndian(byte[] data, int offset) {
+    public static int readFullInt(byte[] data, int offset) {
         ByteBuffer buf = ByteBuffer.allocate(4);
         buf.order(ByteOrder.LITTLE_ENDIAN);
         buf.put(data, offset, 4);
@@ -113,36 +113,36 @@ public class FileFunctions {
         return buf.getInt();
     }
 
-    public static int readFullInt(byte[] data, int offset) {
+    public static int readFullIntBigEndian(byte[] data, int offset) {
         ByteBuffer buf = ByteBuffer.allocate(4).put(data, offset, 4);
         buf.rewind();
         return buf.getInt();
     }
 
-    public static int read2ByteInt(byte[] data, int index) {
+    public static int read2ByteIntBigEndian(byte[] data, int index) {
         return (data[index + 1] & 0xFF) | ((data[index] & 0xFF) << 8);
     }
 
-    public static int read2ByteIntLittleEndian(byte[] data, int index) {
+    public static int read2ByteInt(byte[] data, int index) {
         return (data[index] & 0xFF) | ((data[index + 1] & 0xFF) << 8);
     }
 
-    public static void write2ByteIntLittleEndian(byte[] data, int offset, int value) {
+    public static void write2ByteInt(byte[] data, int offset, int value) {
         data[offset] = (byte) (value & 0xFF);
         data[offset + 1] = (byte) ((value >> 8) & 0xFF);
     }
 
-    public static void writeFullIntLittleEndian(byte[] data, int offset, int value) {
+    public static void writeFullInt(byte[] data, int offset, int value) {
         byte[] valueBytes = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(value).array();
         System.arraycopy(valueBytes, 0, data, offset, 4);
     }
 
-    public static void writeFullInt(byte[] data, int offset, int value) {
+    public static void writeFullIntBigEndian(byte[] data, int offset, int value) {
         byte[] valueBytes = ByteBuffer.allocate(4).putInt(value).array();
         System.arraycopy(valueBytes, 0, data, offset, 4);
     }
 
-    public static void writeFullLongLittleEndian(byte[] data, int offset, long value) {
+    public static void writeFullLong(byte[] data, int offset, long value) {
         byte[] valueBytes = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong(value).array();
         System.arraycopy(valueBytes, 0, data, offset, 8);
     }
@@ -175,11 +175,18 @@ public class FileFunctions {
         }
     }
 
-    public static int read2ByteIntFromFile(RandomAccessFile file, long offset) throws IOException {
+    public static int read2ByteBigEndianIntFromFile(RandomAccessFile file, long offset) throws IOException {
         byte[] buf = new byte[2];
         file.seek(offset);
         file.readFully(buf);
-        return read2ByteInt(buf, 0);
+        return read2ByteIntBigEndian(buf, 0);
+    }
+
+    public static int readBigEndianIntFromFile(RandomAccessFile file, long offset) throws IOException {
+        byte[] buf = new byte[4];
+        file.seek(offset);
+        file.readFully(buf);
+        return readFullIntBigEndian(buf, 0);
     }
 
     public static int readIntFromFile(RandomAccessFile file, long offset) throws IOException {
@@ -187,13 +194,6 @@ public class FileFunctions {
         file.seek(offset);
         file.readFully(buf);
         return readFullInt(buf, 0);
-    }
-
-    public static int readLittleEndianIntFromFile(RandomAccessFile file, long offset) throws IOException {
-        byte[] buf = new byte[4];
-        file.seek(offset);
-        file.readFully(buf);
-        return readFullIntLittleEndian(buf, 0);
     }
 
     public static void writeBytesToFile(String filename, byte[] data) throws IOException {
@@ -243,7 +243,7 @@ public class FileFunctions {
         int switches = data[byteIndex] & 0xFF;
         if (((switches >> switchIndex) & 0x01) == 0x01) {
             // have to check the CRC
-            int crc = readFullInt(data, offsetInData);
+            int crc = readFullIntBigEndian(data, offsetInData);
 
             return getFileChecksum(filename) == crc;
         }

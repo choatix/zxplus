@@ -127,8 +127,8 @@ public class NCCH {
     }
 
     private void readFileSystem() throws IOException {
-        exefsOffset = ncchStartingOffset + FileFunctions.readLittleEndianIntFromFile(baseRom, ncchStartingOffset + 0x1A0) * media_unit_size;
-        romfsOffset = ncchStartingOffset + FileFunctions.readLittleEndianIntFromFile(baseRom, ncchStartingOffset + 0x1B0) * media_unit_size;
+        exefsOffset = ncchStartingOffset + FileFunctions.readIntFromFile(baseRom, ncchStartingOffset + 0x1A0) * media_unit_size;
+        romfsOffset = ncchStartingOffset + FileFunctions.readIntFromFile(baseRom, ncchStartingOffset + 0x1B0) * media_unit_size;
         baseRom.seek(ncchStartingOffset + 0x20D);
         byte systemControlInfoFlags = baseRom.readByte();
         codeCompressed = (systemControlInfoFlags & 0x01) != 0;
@@ -168,29 +168,29 @@ public class NCCH {
         baseRom.seek(romfsOffset);
         baseRom.readFully(romfsHeaderData);
         originalRomfsHeaderCRC = FileFunctions.getCRC32(romfsHeaderData);
-        int magic1 = FileFunctions.readFullInt(romfsHeaderData, 0x00);
-        int magic2 = FileFunctions.readFullInt(romfsHeaderData, 0x04);
+        int magic1 = FileFunctions.readFullIntBigEndian(romfsHeaderData, 0x00);
+        int magic2 = FileFunctions.readFullIntBigEndian(romfsHeaderData, 0x04);
         if (magic1 != romfs_magic_1 || magic2 != romfs_magic_2) {
             // Not a valid romfs
             return;
         }
-        int masterHashSize = FileFunctions.readFullIntLittleEndian(romfsHeaderData, 0x08);
-        int level3HashBlockSize = 1 << FileFunctions.readFullIntLittleEndian(romfsHeaderData, 0x4C);
+        int masterHashSize = FileFunctions.readFullInt(romfsHeaderData, 0x08);
+        int level3HashBlockSize = 1 << FileFunctions.readFullInt(romfsHeaderData, 0x4C);
         long level3Offset = romfsOffset + alignLong(0x60 + masterHashSize, level3HashBlockSize);
 
         byte[] level3HeaderData = new byte[level3_header_size];
         baseRom.seek(level3Offset);
         baseRom.readFully(level3HeaderData);
-        int headerLength = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x00);
+        int headerLength = FileFunctions.readFullInt(level3HeaderData, 0x00);
         if (headerLength != level3_header_size) {
             // Not a valid romfs
             return;
         }
-        int directoryMetadataOffset = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x0C);
-        int directoryMetadataLength = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x10);
-        int fileMetadataOffset = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x1c);
-        int fileMetadataLength = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x20);
-        int fileDataOffsetFromHeaderStart = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x24);
+        int directoryMetadataOffset = FileFunctions.readFullInt(level3HeaderData, 0x0C);
+        int directoryMetadataLength = FileFunctions.readFullInt(level3HeaderData, 0x10);
+        int fileMetadataOffset = FileFunctions.readFullInt(level3HeaderData, 0x1c);
+        int fileMetadataLength = FileFunctions.readFullInt(level3HeaderData, 0x20);
+        int fileDataOffsetFromHeaderStart = FileFunctions.readFullInt(level3HeaderData, 0x24);
         fileDataOffset = level3Offset + fileDataOffsetFromHeaderStart;
 
         byte[] directoryMetadataBlock = new byte[directoryMetadataLength];
@@ -261,8 +261,8 @@ public class NCCH {
 
         // The logo is small enough (8KB) to just read the whole thing into memory. Write it to the new ROM directly
         // after the header, then update the new ROM's logo offset
-        long logoOffset = ncchStartingOffset + FileFunctions.readLittleEndianIntFromFile(baseRom, ncchStartingOffset + 0x198) * media_unit_size;
-        long logoLength = FileFunctions.readLittleEndianIntFromFile(baseRom, ncchStartingOffset + 0x19C) * media_unit_size;
+        long logoOffset = ncchStartingOffset + FileFunctions.readIntFromFile(baseRom, ncchStartingOffset + 0x198) * media_unit_size;
+        long logoLength = FileFunctions.readIntFromFile(baseRom, ncchStartingOffset + 0x19C) * media_unit_size;
         if (logoLength > 0) {
             byte[] logo = new byte[(int) logoLength];
             baseRom.seek(logoOffset);
@@ -275,8 +275,8 @@ public class NCCH {
         }
 
         // The plain region is even smaller (1KB) so repeat the same process
-        long plainOffset = ncchStartingOffset + FileFunctions.readLittleEndianIntFromFile(baseRom, ncchStartingOffset + 0x190) * media_unit_size;
-        long plainLength = FileFunctions.readLittleEndianIntFromFile(baseRom, ncchStartingOffset + 0x194) * media_unit_size;
+        long plainOffset = ncchStartingOffset + FileFunctions.readIntFromFile(baseRom, ncchStartingOffset + 0x190) * media_unit_size;
+        long plainLength = FileFunctions.readIntFromFile(baseRom, ncchStartingOffset + 0x194) * media_unit_size;
         if (plainLength > 0) {
             byte[] plain = new byte[(int) plainLength];
             baseRom.seek(plainOffset);
@@ -311,14 +311,14 @@ public class NCCH {
 
         // Lastly, reconstruct the superblock hashes
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        int exefsHashRegionSize = FileFunctions.readLittleEndianIntFromFile(baseRom, ncchStartingOffset + 0x1A8) * media_unit_size;
+        int exefsHashRegionSize = FileFunctions.readIntFromFile(baseRom, ncchStartingOffset + 0x1A8) * media_unit_size;
         byte[] exefsDataToHash = new byte[exefsHashRegionSize];
         fNew.seek(newExefsOffset);
         fNew.readFully(exefsDataToHash);
         byte[] exefsSuperblockHash = digest.digest(exefsDataToHash);
         fNew.seek(0x1C0);
         fNew.write(exefsSuperblockHash);
-        int romfsHashRegionSize = FileFunctions.readLittleEndianIntFromFile(baseRom, ncchStartingOffset + 0x1B8) * media_unit_size;
+        int romfsHashRegionSize = FileFunctions.readIntFromFile(baseRom, ncchStartingOffset + 0x1B8) * media_unit_size;
         byte[] romfsDataToHash = new byte[romfsHashRegionSize];
         fNew.seek(newRomfsOffset);
         fNew.readFully(romfsDataToHash);
@@ -407,8 +407,8 @@ public class NCCH {
         // updated file data. We're assuming here that the master hash size is smaller than the level 3
         // hash block size, which it almost certainly will because we're not adding large amounts of data
         // to the romfs
-        int masterHashSize = FileFunctions.readFullIntLittleEndian(romfsHeaderData, 0x08);
-        int level3HashBlockSize = 1 << FileFunctions.readFullIntLittleEndian(romfsHeaderData, 0x4C);
+        int masterHashSize = FileFunctions.readFullInt(romfsHeaderData, 0x08);
+        int level3HashBlockSize = 1 << FileFunctions.readFullInt(romfsHeaderData, 0x4C);
         long level3Offset = romfsOffset + alignLong(0x60 + masterHashSize, level3HashBlockSize);
         long newLevel3Offset = newRomfsOffset + alignLong(0x60 + masterHashSize, level3HashBlockSize);
 
@@ -422,12 +422,12 @@ public class NCCH {
 
         // Write out both hash tables and the directory metadata table. Since we're not adding or removing
         // any files/directories, we can just use what's in the base ROM for this.
-        int directoryHashTableOffset = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x04);
-        int directoryHashTableLength = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x08);
-        int directoryMetadataTableOffset = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x0C);
-        int directoryMetadataTableLength = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x10);
-        int fileHashTableOffset = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x14);
-        int fileHashTableLength = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x18);
+        int directoryHashTableOffset = FileFunctions.readFullInt(level3HeaderData, 0x04);
+        int directoryHashTableLength = FileFunctions.readFullInt(level3HeaderData, 0x08);
+        int directoryMetadataTableOffset = FileFunctions.readFullInt(level3HeaderData, 0x0C);
+        int directoryMetadataTableLength = FileFunctions.readFullInt(level3HeaderData, 0x10);
+        int fileHashTableOffset = FileFunctions.readFullInt(level3HeaderData, 0x14);
+        int fileHashTableLength = FileFunctions.readFullInt(level3HeaderData, 0x18);
         byte[] directoryHashTable = new byte[directoryHashTableLength];
         baseRom.seek(level3Offset + directoryHashTableOffset);
         baseRom.readFully(directoryHashTable);
@@ -445,14 +445,14 @@ public class NCCH {
         fNew.write(fileHashTable);
 
         // Now reconstruct the file metadata table. It may need to be changed if any file grew or shrunk
-        int fileMetadataTableOffset = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x1C);
-        int fileMetadataTableLength = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x20);
+        int fileMetadataTableOffset = FileFunctions.readFullInt(level3HeaderData, 0x1C);
+        int fileMetadataTableLength = FileFunctions.readFullInt(level3HeaderData, 0x20);
         byte[] newFileMetadataTable = updateFileMetadataTable(fileMetadataTableLength);
         fNew.seek(newLevel3Offset + fileMetadataTableOffset);
         fNew.write(newFileMetadataTable);
 
         // Using the new file metadata table, output the file data
-        int fileDataOffset = FileFunctions.readFullIntLittleEndian(level3HeaderData, 0x24);
+        int fileDataOffset = FileFunctions.readFullInt(level3HeaderData, 0x24);
         long endOfFileDataOffset = 0;
         for (FileMetadata metadata : fileMetadataList) {
             // Users have sent us bug reports with really bizarre errors here that seem to indicate
@@ -483,10 +483,10 @@ public class NCCH {
         long newLevel3EndingOffset = endOfFileDataOffset;
         long newLevel3HashdataSize = newLevel3EndingOffset - newLevel3Offset;
         long numberOfLevel3HashBlocks = alignLong(newLevel3HashdataSize, level3HashBlockSize) / level3HashBlockSize;
-        int level2HashBlockSize = 1 << FileFunctions.readFullIntLittleEndian(romfsHeaderData, 0x34);
+        int level2HashBlockSize = 1 << FileFunctions.readFullInt(romfsHeaderData, 0x34);
         long newLevel2HashdataSize = numberOfLevel3HashBlocks * 0x20;
         long numberOfLevel2HashBlocks = alignLong(newLevel2HashdataSize, level2HashBlockSize) / level2HashBlockSize;
-        int level1HashBlockSize = 1 << FileFunctions.readFullIntLittleEndian(romfsHeaderData, 0x1C);
+        int level1HashBlockSize = 1 << FileFunctions.readFullInt(romfsHeaderData, 0x1C);
         long newLevel1HashdataSize = numberOfLevel2HashBlocks * 0x20;
         long newLevel1Offset = newLevel3Offset + alignLong(newLevel3HashdataSize, level3HashBlockSize);
         long newLevel2Offset = newLevel1Offset + alignLong(newLevel1HashdataSize, level1HashBlockSize);
@@ -528,13 +528,13 @@ public class NCCH {
         long level1LogicalOffset = 0;
         long level2LogicalOffset = alignLong(newLevel1HashdataSize, level1HashBlockSize);
         long level3LogicalOffset = alignLong(level2LogicalOffset + newLevel2HashdataSize, level2HashBlockSize);
-        FileFunctions.writeFullIntLittleEndian(romfsHeaderData, 0x08, (int) numberOfLevel1HashBlocks * 0x20);
-        FileFunctions.writeFullLongLittleEndian(romfsHeaderData, 0x0C, level1LogicalOffset);
-        FileFunctions.writeFullLongLittleEndian(romfsHeaderData, 0x14, newLevel1HashdataSize);
-        FileFunctions.writeFullLongLittleEndian(romfsHeaderData, 0x24, level2LogicalOffset);
-        FileFunctions.writeFullLongLittleEndian(romfsHeaderData, 0x2C, newLevel2HashdataSize);
-        FileFunctions.writeFullLongLittleEndian(romfsHeaderData, 0x3C, level3LogicalOffset);
-        FileFunctions.writeFullLongLittleEndian(romfsHeaderData, 0x44, newLevel3HashdataSize);
+        FileFunctions.writeFullInt(romfsHeaderData, 0x08, (int) numberOfLevel1HashBlocks * 0x20);
+        FileFunctions.writeFullLong(romfsHeaderData, 0x0C, level1LogicalOffset);
+        FileFunctions.writeFullLong(romfsHeaderData, 0x14, newLevel1HashdataSize);
+        FileFunctions.writeFullLong(romfsHeaderData, 0x24, level2LogicalOffset);
+        FileFunctions.writeFullLong(romfsHeaderData, 0x2C, newLevel2HashdataSize);
+        FileFunctions.writeFullLong(romfsHeaderData, 0x3C, level3LogicalOffset);
+        FileFunctions.writeFullLong(romfsHeaderData, 0x44, newLevel3HashdataSize);
         fNew.seek(newRomfsOffset);
         fNew.write(romfsHeaderData);
         long currentLength = newFileEndingOffset - newRomfsOffset;
@@ -802,21 +802,21 @@ public class NCCH {
         try {
             // Only CIAs can define a version in their TMD. If this is a different ROM type,
             // just exit out early.
-            int magic = FileFunctions.readIntFromFile(this.baseRom, ncch_and_ncsd_magic_offset);
+            int magic = FileFunctions.readBigEndianIntFromFile(this.baseRom, ncch_and_ncsd_magic_offset);
             if (magic == ncch_magic || magic == ncsd_magic) {
                 return 0;
             }
 
             // For CIAs, we need to read the title metadata (TMD) in order to retrieve the version.
             // The TMD is after the certificate chain and ticket.
-            int certChainSize = FileFunctions.readLittleEndianIntFromFile(this.baseRom, 0x08);
-            int ticketSize = FileFunctions.readLittleEndianIntFromFile(this.baseRom, 0x0C);
+            int certChainSize = FileFunctions.readIntFromFile(this.baseRom, 0x08);
+            int ticketSize = FileFunctions.readIntFromFile(this.baseRom, 0x0C);
             long certChainOffset = NCCH.alignLong(cia_header_size, 64);
             long ticketOffset = NCCH.alignLong(certChainOffset + certChainSize, 64);
             long tmdOffset = NCCH.alignLong(ticketOffset + ticketSize, 64);
 
             // At the start of the TMD is a signature whose length varies based on what type of signature it is.
-            int signatureType = FileFunctions.readIntFromFile(this.baseRom, tmdOffset);
+            int signatureType = FileFunctions.readBigEndianIntFromFile(this.baseRom, tmdOffset);
             int signatureSize, paddingSize;
             switch (signatureType) {
                 case 0x010003:
@@ -845,7 +845,7 @@ public class NCCH {
 
             // After the signature is the TMD header, which actually contains the version information.
             long tmdHeaderOffset = tmdOffset + 4 + signatureSize + paddingSize;
-            return FileFunctions.read2ByteIntFromFile(this.baseRom, tmdHeaderOffset + 0x9C);
+            return FileFunctions.read2ByteBigEndianIntFromFile(this.baseRom, tmdHeaderOffset + 0x9C);
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
@@ -859,13 +859,13 @@ public class NCCH {
     public static long getCXIOffsetInFile(String filename) {
         try {
             RandomAccessFile rom = new RandomAccessFile(filename, "r");
-            int ciaHeaderSize = FileFunctions.readLittleEndianIntFromFile(rom, 0x00);
+            int ciaHeaderSize = FileFunctions.readIntFromFile(rom, 0x00);
             if (ciaHeaderSize == cia_header_size) {
                 // This *might* be a CIA; let's do our best effort to try to get
                 // a CXI out of this.
-                int certChainSize = FileFunctions.readLittleEndianIntFromFile(rom, 0x08);
-                int ticketSize = FileFunctions.readLittleEndianIntFromFile(rom, 0x0C);
-                int tmdFileSize = FileFunctions.readLittleEndianIntFromFile(rom, 0x10);
+                int certChainSize = FileFunctions.readIntFromFile(rom, 0x08);
+                int ticketSize = FileFunctions.readIntFromFile(rom, 0x0C);
+                int tmdFileSize = FileFunctions.readIntFromFile(rom, 0x10);
 
                 // If this is *really* a CIA, we'll find our CXI at the beginning of the
                 // content section, which is after the certificate chain, ticket, and TMD
@@ -873,7 +873,7 @@ public class NCCH {
                 long ticketOffset = NCCH.alignLong(certChainOffset + certChainSize, 64);
                 long tmdOffset = NCCH.alignLong(ticketOffset + ticketSize, 64);
                 long contentOffset = NCCH.alignLong(tmdOffset + tmdFileSize, 64);
-                int magic = FileFunctions.readIntFromFile(rom, contentOffset + ncch_and_ncsd_magic_offset);
+                int magic = FileFunctions.readBigEndianIntFromFile(rom, contentOffset + ncch_and_ncsd_magic_offset);
                 if (magic == ncch_magic) {
                     // This CIA's content contains a valid CXI!
                     return contentOffset;
@@ -883,7 +883,7 @@ public class NCCH {
             // We don't put the following code in an else-block because there *might*
             // exist a totally-valid CXI or CCI whose first four bytes just so
             // *happen* to be the same as the first four bytes of a CIA file.
-            int magic = FileFunctions.readIntFromFile(rom, ncch_and_ncsd_magic_offset);
+            int magic = FileFunctions.readBigEndianIntFromFile(rom, ncch_and_ncsd_magic_offset);
             rom.close();
             if (magic == ncch_magic) {
                 // Magic is NCCH, so this just a straight-up NCCH/CXI; there is no container
@@ -913,8 +913,8 @@ public class NCCH {
             byte[] filenameBytes = new byte[0x8];
             System.arraycopy(exefsHeaderData, fileHeaderOffset, filenameBytes, 0, 0x8);
             this.filename = new String(filenameBytes, StandardCharsets.UTF_8).trim();
-            this.offset = FileFunctions.readFullIntLittleEndian(exefsHeaderData, fileHeaderOffset + 0x08);
-            this.size = FileFunctions.readFullIntLittleEndian(exefsHeaderData, fileHeaderOffset + 0x0C);
+            this.offset = FileFunctions.readFullInt(exefsHeaderData, fileHeaderOffset + 0x08);
+            this.size = FileFunctions.readFullInt(exefsHeaderData, fileHeaderOffset + 0x0C);
         }
 
         public boolean isValid() {
@@ -925,8 +925,8 @@ public class NCCH {
             byte[] output = new byte[0x10];
             byte[] filenameBytes = this.filename.getBytes(StandardCharsets.UTF_8);
             System.arraycopy(filenameBytes, 0, output, 0, filenameBytes.length);
-            FileFunctions.writeFullIntLittleEndian(output, 0x08, this.offset);
-            FileFunctions.writeFullIntLittleEndian(output, 0x0C, this.size);
+            FileFunctions.writeFullInt(output, 0x08, this.offset);
+            FileFunctions.writeFullInt(output, 0x0C, this.size);
             return output;
         }
     }
@@ -941,12 +941,12 @@ public class NCCH {
         public String name;
 
         public DirectoryMetadata(byte[] directoryMetadataBlock, int offset) {
-            parentDirectoryOffset = FileFunctions.readFullIntLittleEndian(directoryMetadataBlock, offset);
-            siblingDirectoryOffset = FileFunctions.readFullIntLittleEndian(directoryMetadataBlock, offset + 0x04);
-            firstChildDirectoryOffset = FileFunctions.readFullIntLittleEndian(directoryMetadataBlock, offset + 0x08);
-            firstFileOffset = FileFunctions.readFullIntLittleEndian(directoryMetadataBlock, offset + 0x0C);
-            nextDirectoryInHashBucketOffset = FileFunctions.readFullIntLittleEndian(directoryMetadataBlock, offset + 0x10);
-            nameLength = FileFunctions.readFullIntLittleEndian(directoryMetadataBlock, offset + 0x14);
+            parentDirectoryOffset = FileFunctions.readFullInt(directoryMetadataBlock, offset);
+            siblingDirectoryOffset = FileFunctions.readFullInt(directoryMetadataBlock, offset + 0x04);
+            firstChildDirectoryOffset = FileFunctions.readFullInt(directoryMetadataBlock, offset + 0x08);
+            firstFileOffset = FileFunctions.readFullInt(directoryMetadataBlock, offset + 0x0C);
+            nextDirectoryInHashBucketOffset = FileFunctions.readFullInt(directoryMetadataBlock, offset + 0x10);
+            nameLength = FileFunctions.readFullInt(directoryMetadataBlock, offset + 0x14);
             name = "";
             if (nameLength != metadata_unused) {
                 byte[] nameBytes = new byte[nameLength];
@@ -969,12 +969,12 @@ public class NCCH {
 
         public FileMetadata(byte[] fileMetadataBlock, int offset) {
             this.offset = offset;
-            parentDirectoryOffset = FileFunctions.readFullIntLittleEndian(fileMetadataBlock, offset);
-            siblingFileOffset = FileFunctions.readFullIntLittleEndian(fileMetadataBlock, offset + 0x04);
-            fileDataOffset = FileFunctions.readFullLongLittleEndian(fileMetadataBlock, offset + 0x08);
-            fileDataLength = FileFunctions.readFullLongLittleEndian(fileMetadataBlock, offset + 0x10);
-            nextFileInHashBucketOffset = FileFunctions.readFullIntLittleEndian(fileMetadataBlock, offset + 0x18);
-            nameLength = FileFunctions.readFullIntLittleEndian(fileMetadataBlock, offset + 0x1C);
+            parentDirectoryOffset = FileFunctions.readFullInt(fileMetadataBlock, offset);
+            siblingFileOffset = FileFunctions.readFullInt(fileMetadataBlock, offset + 0x04);
+            fileDataOffset = FileFunctions.readFullLong(fileMetadataBlock, offset + 0x08);
+            fileDataLength = FileFunctions.readFullLong(fileMetadataBlock, offset + 0x10);
+            nextFileInHashBucketOffset = FileFunctions.readFullInt(fileMetadataBlock, offset + 0x18);
+            nameLength = FileFunctions.readFullInt(fileMetadataBlock, offset + 0x1C);
             name = "";
             if (nameLength != metadata_unused) {
                 byte[] nameBytes = new byte[nameLength];
@@ -989,12 +989,12 @@ public class NCCH {
                 metadataLength += alignInt(nameLength, 4);
             }
             byte[] output = new byte[metadataLength];
-            FileFunctions.writeFullIntLittleEndian(output, 0x00, this.parentDirectoryOffset);
-            FileFunctions.writeFullIntLittleEndian(output, 0x04, this.siblingFileOffset);
-            FileFunctions.writeFullLongLittleEndian(output, 0x08, this.fileDataOffset);
-            FileFunctions.writeFullLongLittleEndian(output, 0x10, this.fileDataLength);
-            FileFunctions.writeFullIntLittleEndian(output, 0x18, this.nextFileInHashBucketOffset);
-            FileFunctions.writeFullIntLittleEndian(output, 0x1C, this.nameLength);
+            FileFunctions.writeFullInt(output, 0x00, this.parentDirectoryOffset);
+            FileFunctions.writeFullInt(output, 0x04, this.siblingFileOffset);
+            FileFunctions.writeFullLong(output, 0x08, this.fileDataOffset);
+            FileFunctions.writeFullLong(output, 0x10, this.fileDataLength);
+            FileFunctions.writeFullInt(output, 0x18, this.nextFileInHashBucketOffset);
+            FileFunctions.writeFullInt(output, 0x1C, this.nameLength);
             if (!name.equals("")) {
                 byte[] nameBytes = name.getBytes(StandardCharsets.UTF_16LE);
                 System.arraycopy(nameBytes, 0, output, 0x20, nameBytes.length);

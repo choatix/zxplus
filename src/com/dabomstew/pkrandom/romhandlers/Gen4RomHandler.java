@@ -1815,7 +1815,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 // constant that has the same effect.
                 int newRange = maxLevel - level;
                 int divisor = (0xFFFF / (newRange + 1)) + 1;
-                FileFunctions.writeFullIntLittleEndian(encounterOverlay, offset + 148, divisor);
+                FileFunctions.writeFullInt(encounterOverlay, offset + 148, divisor);
             }
             writeExtraEncountersDPPt(honeyTreeData, 0, honeyTreeEncounters.encounters);
         }
@@ -3163,7 +3163,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         // The original code had an entry for Darkrai; its species ID is pc-relative loaded. Since this
         // entry is clearly unused, just replace Darkrai's species ID constant with Cresselia's, since
         // in the original code, her ID is computed as 0x7A << 0x2
-        FileFunctions.writeFullIntLittleEndian(arm9, offset + 244, Species.cresselia);
+        FileFunctions.writeFullInt(arm9, offset + 244, Species.cresselia);
 
         // Now write a pc-relative load to our new constant over where Cresselia's ID is normally mov'd
         // into r7 and shifted.
@@ -3972,13 +3972,13 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         for (int i = 0; i < shopCount; i++) {
             if (!skipShops.contains(i)) {
                 List<Integer> items = new ArrayList<>();
-                int val = (FileFunctions.read2ByteIntLittleEndian(arm9, offset));
+                int val = (FileFunctions.read2ByteInt(arm9, offset));
                 while ((val & 0xFFFF) != 0xFFFF) {
                     if (val != 0) {
                         items.add(val);
                     }
                     offset += 2;
-                    val = (FileFunctions.read2ByteIntLittleEndian(arm9, offset));
+                    val = (FileFunctions.read2ByteInt(arm9, offset));
                 }
                 offset += 2;
                 Shop shop = new Shop();
@@ -3987,7 +3987,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 shop.isMainGame = mainGameShops.contains(i);
                 shopItemsMap.put(i, shop);
             } else {
-                while ((FileFunctions.read2ByteIntLittleEndian(arm9, offset) & 0xFFFF) != 0xFFFF) {
+                while ((FileFunctions.read2ByteInt(arm9, offset) & 0xFFFF) != 0xFFFF) {
                     offset += 2;
                 }
                 offset += 2;
@@ -4006,20 +4006,20 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         for (int i = 0; i < shopCount; i++) {
             Shop thisShop = shopItems.get(i);
             if (thisShop == null || thisShop.items == null) {
-                while ((FileFunctions.read2ByteIntLittleEndian(arm9, offset) & 0xFFFF) != 0xFFFF) {
+                while ((FileFunctions.read2ByteInt(arm9, offset) & 0xFFFF) != 0xFFFF) {
                     offset += 2;
                 }
                 offset += 2;
                 continue;
             }
             Iterator<Integer> iterItems = thisShop.items.iterator();
-            int val = (FileFunctions.read2ByteIntLittleEndian(arm9, offset));
+            int val = (FileFunctions.read2ByteInt(arm9, offset));
             while ((val & 0xFFFF) != 0xFFFF) {
                 if (val != 0) {
-                    FileFunctions.write2ByteIntLittleEndian(arm9,offset,iterItems.next());
+                    FileFunctions.write2ByteInt(arm9,offset,iterItems.next());
                 }
                 offset += 2;
-                val = (FileFunctions.read2ByteIntLittleEndian(arm9, offset));
+                val = (FileFunctions.read2ByteInt(arm9, offset));
             }
             offset += 2;
         }
@@ -4070,13 +4070,13 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             if (pickupItemsTableOffset > 0 && rarePickupItemsTableOffset > 0) {
                 for (int i = 0; i < Gen4Constants.numberOfCommonPickupItems; i++) {
                     int itemOffset = pickupItemsTableOffset + (2 * i);
-                    int item = FileFunctions.read2ByteIntLittleEndian(battleOverlay, itemOffset);
+                    int item = FileFunctions.read2ByteInt(battleOverlay, itemOffset);
                     PickupItem pickupItem = new PickupItem(item);
                     pickupItems.add(pickupItem);
                 }
                 for (int i = 0; i < Gen4Constants.numberOfRarePickupItems; i++) {
                     int itemOffset = rarePickupItemsTableOffset + (2 * i);
-                    int item = FileFunctions.read2ByteIntLittleEndian(battleOverlay, itemOffset);
+                    int item = FileFunctions.read2ByteInt(battleOverlay, itemOffset);
                     PickupItem pickupItem = new PickupItem(item);
                     pickupItems.add(pickupItem);
                 }
@@ -4112,12 +4112,12 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 for (int i = 0; i < Gen4Constants.numberOfCommonPickupItems; i++) {
                     int itemOffset = pickupItemsTableOffset + (2 * i);
                     int item = itemIterator.next().item;
-                    FileFunctions.write2ByteIntLittleEndian(battleOverlay, itemOffset, item);
+                    FileFunctions.write2ByteInt(battleOverlay, itemOffset, item);
                 }
                 for (int i = 0; i < Gen4Constants.numberOfRarePickupItems; i++) {
                     int itemOffset = rarePickupItemsTableOffset + (2 * i);
                     int item = itemIterator.next().item;
-                    FileFunctions.write2ByteIntLittleEndian(battleOverlay, itemOffset, item);
+                    FileFunctions.write2ByteInt(battleOverlay, itemOffset, item);
                 }
                 writeOverlay(romEntry.getInt("BattleOvlNumber"), battleOverlay);
             }
