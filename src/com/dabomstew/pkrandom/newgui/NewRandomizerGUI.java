@@ -1162,7 +1162,7 @@ public class NewRandomizerGUI {
                 gameUpdates.put(romHandler.getROMCode(), fh.getAbsolutePath());
                 attemptWriteConfig();
                 removeGameUpdateMenuItem.setVisible(true);
-                romNameLabel.setText(romHandler.getROMName() + " (" + romHandler.getGameUpdateVersion() + ")");
+                setRomNameLabel();
                 String text = String.format(bundle.getString("GUI.gameUpdateApplied"), romHandler.getROMName());
                 String url = "https://github.com/Ajarmar/universal-pokemon-randomizer-zx/wiki/Randomizing-the-3DS-games#3ds-game-updates";
                 showMessageDialogWithLink(text, url);
@@ -1181,7 +1181,7 @@ public class NewRandomizerGUI {
         attemptWriteConfig();
         romHandler.removeGameUpdate();
         removeGameUpdateMenuItem.setVisible(false);
-        romNameLabel.setText(romHandler.getROMName());
+        setRomNameLabel();
     }
 
     private void loadGetSettingsMenuItemActionPerformed() {
@@ -2507,18 +2507,7 @@ public class NewRandomizerGUI {
         try {
             int pokemonGeneration = romHandler.generationOfPokemon();
 
-            if (romHandler.hasGameUpdateLoaded()) {
-                romNameLabel.setText(romHandler.getROMName() + " (" + romHandler.getGameUpdateVersion() + ")");
-            } else {
-                romNameLabel.setText(romHandler.getROMName());
-            }
-            if (!romHandler.isRomValid()) {
-                romNameLabel.setForeground(Color.RED);
-                romNameLabel.setText(romNameLabel.getText() + " [Bad CRC32]");
-                showInvalidRomPopup();
-            } else {
-                romNameLabel.setForeground(Color.BLACK);
-            }
+            setRomNameLabel();
             romCodeLabel.setText(romHandler.getROMCode());
             romSupportLabel.setText(bundle.getString("GUI.romSupportPrefix") + " "
                     + this.romHandler.getSupportLevel());
@@ -2866,6 +2855,21 @@ public class NewRandomizerGUI {
             attemptToLogException(e, "GUI.processFailed","GUI.processFailedNoLog", null, null);
             romHandler = null;
             initialState();
+        }
+    }
+
+    private void setRomNameLabel() {
+        if (romHandler.hasGameUpdateLoaded()) {
+            romNameLabel.setText(romHandler.getROMName() + " (" + romHandler.getGameUpdateVersion() + ")");
+        } else {
+            romNameLabel.setText(romHandler.getROMName());
+        }
+        if (!romHandler.isRomValid()) {
+            romNameLabel.setForeground(Color.RED);
+            romNameLabel.setText(romNameLabel.getText() + " [Bad CRC32]");
+            showInvalidRomPopup();
+        } else {
+            romNameLabel.setForeground(Color.BLACK);
         }
     }
 

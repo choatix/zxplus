@@ -98,7 +98,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         private int offset;
     }
 
-    private static class FileWithCRC32Entry {
+    private static class RomFileEntry {
         public String path;
         public long expectedCRC32;
     }
@@ -116,7 +116,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         private Map<String, String> tweakFiles = new HashMap<>();
         private Map<String, int[]> arrayEntries = new HashMap<>();
         private Map<String, OffsetWithinEntry[]> offsetArrayEntries = new HashMap<>();
-        private Map<String, FileWithCRC32Entry> files = new HashMap<>();
+        private Map<String, RomFileEntry> files = new HashMap<>();
         private Map<Integer, Long> overlayExpectedCRC32s = new HashMap<>();
         private List<StaticPokemon> staticPokemon = new ArrayList<>();
         private List<StaticPokemon> staticPokemonFakeBall = new ArrayList<>();
@@ -140,7 +140,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
 
         private String getFile(String key) {
             if (!files.containsKey(key)) {
-                files.put(key, new FileWithCRC32Entry());
+                files.put(key, new RomFileEntry());
             }
             return files.get(key).path;
         }
@@ -215,7 +215,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                         } else if (r[0].startsWith("File<")) {
                             String key = r[0].split("<")[1].split(">")[0];
                             String[] values = r[1].substring(1, r[1].length() - 1).split(",");
-                            FileWithCRC32Entry entry = new FileWithCRC32Entry();
+                            RomFileEntry entry = new RomFileEntry();
                             entry.path = values[0].trim();
                             entry.expectedCRC32 = parseRILong("0x" + values[1].trim());
                             current.files.put(key, entry);
