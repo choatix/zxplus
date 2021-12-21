@@ -40,11 +40,13 @@ public class Randomizer {
 
     private final Settings settings;
     private final RomHandler romHandler;
+    private final ResourceBundle bundle;
     private final boolean saveAsDirectory;
 
-    public Randomizer(Settings settings, RomHandler romHandler, boolean saveAsDirectory) {
+    public Randomizer(Settings settings, RomHandler romHandler, ResourceBundle bundle, boolean saveAsDirectory) {
         this.settings = settings;
         this.romHandler = romHandler;
+        this.bundle = bundle;
         this.saveAsDirectory = saveAsDirectory;
     }
 
@@ -683,7 +685,7 @@ public class Randomizer {
         // Diagnostics
         log.println("--ROM Diagnostics--");
         if (!romHandler.isRomValid()) {
-            printInvalidRomMessage(log);
+            log.println(bundle.getString("Log.InvalidRomLoaded"));
         }
         romHandler.printRomDiagnostics(log);
 
@@ -1288,11 +1290,5 @@ public class Randomizer {
             checkValue ^= value;
         }
         return checkValue;
-    }
-
-    private static void printInvalidRomMessage(final PrintStream log) {
-        log.println("The ROM you loaded is not a clean, official ROM.");
-        log.println("YOU WILL NOT RECEIVE OFFICIAL SUPPORT FOR RANDOMIZING THIS ROM.");
-        log.println();
     }
 }

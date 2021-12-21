@@ -915,7 +915,7 @@ public class NewRandomizerGUI {
                 boolean succeededSave = false;
                 try {
                     romHandler.setLog(verboseLog);
-                    finishedCV.set(new Randomizer(settings, romHandler, saveAsDirectory).randomize(filename,
+                    finishedCV.set(new Randomizer(settings, romHandler, bundle, saveAsDirectory).randomize(filename,
                             verboseLog, seed));
                     succeededSave = true;
                 } catch (RandomizationException ex) {
@@ -1797,6 +1797,9 @@ public class NewRandomizerGUI {
             ex.printStackTrace();
             ps.println();
             ps.println("--ROM Diagnostics--");
+            if (!romHandler.isRomValid()) {
+                ps.println(bundle.getString("Log.InvalidRomLoaded"));
+            }
             romHandler.printRomDiagnostics(ps);
             System.setErr(e1);
             ps.close();
