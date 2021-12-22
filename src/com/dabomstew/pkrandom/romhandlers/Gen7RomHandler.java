@@ -449,12 +449,12 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             pkmn.guaranteedHeldItem = item1;
             pkmn.commonHeldItem = 0;
             pkmn.rareHeldItem = 0;
-            pkmn.darkGrassHeldItem = 0;
+            pkmn.darkGrassHeldItem = -1;
         } else {
             pkmn.guaranteedHeldItem = 0;
             pkmn.commonHeldItem = item1;
             pkmn.rareHeldItem = item2;
-            pkmn.darkGrassHeldItem = FileFunctions.read2ByteInt(stats, Gen7Constants.bsDarkGrassHeldItemOffset);
+            pkmn.darkGrassHeldItem = -1;
         }
 
         int formeCount = stats[Gen7Constants.bsFormeCountOffset] & 0xFF;
@@ -764,7 +764,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         } else {
             FileFunctions.write2ByteInt(stats, Gen7Constants.bsCommonHeldItemOffset, pkmn.commonHeldItem);
             FileFunctions.write2ByteInt(stats, Gen7Constants.bsRareHeldItemOffset, pkmn.rareHeldItem);
-            FileFunctions.write2ByteInt(stats, Gen7Constants.bsDarkGrassHeldItemOffset, pkmn.darkGrassHeldItem);
+            FileFunctions.write2ByteInt(stats, Gen7Constants.bsDarkGrassHeldItemOffset, 0);
         }
 
         if (pkmn.fullName().equals("Meowstic")) {
