@@ -587,7 +587,7 @@ public class NewRandomizerGUI {
     private void showInvalidRomPopup() {
         if (showInvalidRomPopup) {
             String message = String.format(bundle.getString("GUI.invalidRomMessage"));
-            JLabel label = new JLabel("<html><b>You will NOT receive official support for randomizing this ROM.</b>");
+            JLabel label = new JLabel("<html><b>Randomizing ROM hacks or bad ROM dumps is not supported and may cause issues.</b>");
             JCheckBox checkbox = new JCheckBox("Don't show this again");
             Object[] messages = {message, label, checkbox};
             Object[] options = {"OK"};
