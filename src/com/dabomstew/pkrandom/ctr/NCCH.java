@@ -29,6 +29,8 @@ import cuecompressors.BLZCoder;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.util.*;
 
@@ -740,6 +742,8 @@ public class NCCH {
     }
 
     public void printRomDiagnostics(PrintStream logStream, NCCH gameUpdate) {
+        Path p = Paths.get(this.romFilename);
+        logStream.println("File name: " + p.getFileName().toString());
         if (gameUpdate == null) {
             logStream.println(".code: " + String.format("%08X", this.originalCodeCRC));
         } else {
