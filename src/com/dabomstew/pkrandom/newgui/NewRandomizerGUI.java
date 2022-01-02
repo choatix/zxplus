@@ -2934,6 +2934,12 @@ public class NewRandomizerGUI {
             peMakeEvolutionsEasierCheckBox.setSelected(false);
             peRemoveTimeBasedEvolutionsCheckBox.setEnabled(false);
             peRemoveTimeBasedEvolutionsCheckBox.setSelected(false);
+
+            // Disable "Force Fully Evolved" Trainer Pokemon
+            tpForceFullyEvolvedAtCheckBox.setSelected(false);
+            tpForceFullyEvolvedAtCheckBox.setEnabled(false);
+            tpForceFullyEvolvedAtSlider.setEnabled(false);
+            tpForceFullyEvolvedAtSlider.setValue(tpForceFullyEvolvedAtSlider.getMinimum());
         } else {
             // All other "Follow Evolutions" controls get properly set/unset below
             // except this one, so manually enable it again.
@@ -2945,6 +2951,9 @@ public class NewRandomizerGUI {
             peChangeImpossibleEvosCheckBox.setEnabled(true);
             peMakeEvolutionsEasierCheckBox.setEnabled(true);
             peRemoveTimeBasedEvolutionsCheckBox.setEnabled(true);
+
+            // Re-enable "Force Fully Evolved" Trainer Pokemon
+            tpForceFullyEvolvedAtCheckBox.setEnabled(true);
         }
 
         if (pbsUnchangedRadioButton.isSelected()) {
