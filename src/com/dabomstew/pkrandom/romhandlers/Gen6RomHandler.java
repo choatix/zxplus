@@ -2316,6 +2316,25 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             fieldCRO[levelOffset] = (byte) roamers[0].level;
         }
         writeFile(romEntry.getFile("Field"), fieldCRO);
+
+        // We also need to change the Sea Spirit's Den script in order for it to spawn
+        // the correct static version of the roamer.
+        try {
+            GARCArchive encounterGarc = readGARC(romEntry.getFile("WildPokemon"), false);
+            byte[] seaSpiritsDenAreaFile = encounterGarc.getFile(Gen6Constants.seaSpiritsDenEncounterFileXY);
+            AMX seaSpiritsDenAreaScript = new AMX(seaSpiritsDenAreaFile, 1);
+            for (int i = 0; i < roamers.length; i++) {
+                int offset = Gen6Constants.seaSpiritsDenScriptOffsetsXY[i];
+                int species = roamers[i].pkmn.getBaseNumber();
+                FileFunctions.write2ByteInt(seaSpiritsDenAreaScript.decData, offset, species);
+            }
+            byte[] modifiedScript = seaSpiritsDenAreaScript.getBytes();
+            System.arraycopy(modifiedScript, 0, seaSpiritsDenAreaFile, Gen6Constants.seaSpiritsDenLocalScriptOffsetXY, modifiedScript.length);
+            encounterGarc.setFile(Gen6Constants.seaSpiritsDenEncounterFileXY, seaSpiritsDenAreaFile);
+            writeGARC(romEntry.getFile("WildPokemon"), encounterGarc);
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
     }
 
     private void fixRayquazaORAS(int rayquazaEncounterSpecies) throws IOException {

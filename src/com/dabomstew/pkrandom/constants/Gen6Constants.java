@@ -303,6 +303,8 @@ public class Gen6Constants {
     public static final String boxLegendaryFunctionPrefixXY = "14D08DE20900A0E1";
     public static final int boxLegendaryEncounterFileXY = 341, boxLegendaryLocalScriptOffsetXY = 0x6E0;
     public static final int[] boxLegendaryCodeOffsetsXY = new int[]{ 144, 300, 584 };
+    public static final int seaSpiritsDenEncounterFileXY = 351, seaSpiritsDenLocalScriptOffsetXY = 0x1C0;
+    public static final int[] seaSpiritsDenScriptOffsetsXY = new int[]{ 0x500, 0x508, 0x510 };
     public static final String rayquazaFunctionPrefixORAS = "0900A0E1F08FBDE8";
     public static final int[] rayquazaScriptOffsetsORAS = new int[]{ 3334, 14734 }, rayquazaCodeOffsetsORAS = new int[]{ 136, 292, 576 };
     public static final String nationalDexFunctionLocator = "080094E5010000E21080BDE8170F122F", xyGetDexFlagFunctionLocator = "000055E30100A0030A00000A",
