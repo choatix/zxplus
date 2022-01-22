@@ -176,7 +176,13 @@ public class Gen5Constants {
         return absolutePokeNumsByBaseForme.getOrDefault(baseForme,dummyAbsolutePokeNums).getOrDefault(formNum,baseForme);
     }
 
-    public static final List<Integer> irregularFormes = Arrays.asList(
+    private static final List<Integer> bw1IrregularFormes = Arrays.asList(
+            Species.Gen5Formes.castformF, Species.Gen5Formes.castformW, Species.Gen5Formes.castformI,
+            Species.Gen5Formes.darmanitanZ,
+            Species.Gen5Formes.meloettaP
+    );
+
+    private static final List<Integer> bw2IrregularFormes = Arrays.asList(
             Species.Gen5Formes.castformF, Species.Gen5Formes.castformW, Species.Gen5Formes.castformI,
             Species.Gen5Formes.darmanitanZ,
             Species.Gen5Formes.meloettaP,
@@ -542,6 +548,15 @@ public class Gen5Constants {
             return bw1MainGameShops;
         } else if (romType == Type_BW2) {
             return bw2MainGameShops;
+        }
+        return new ArrayList<>();
+    }
+
+    public static List<Integer> getIrregularFormes(int romType) {
+        if (romType == Type_BW) {
+            return bw1IrregularFormes;
+        } else if (romType == Type_BW2) {
+            return bw2IrregularFormes;
         }
         return new ArrayList<>();
     }

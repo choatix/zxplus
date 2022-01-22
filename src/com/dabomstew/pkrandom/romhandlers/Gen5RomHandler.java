@@ -781,7 +781,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
 
     @Override
     public List<Pokemon> getIrregularFormes() {
-        return Gen5Constants.irregularFormes.stream().map(i -> pokes[i]).collect(Collectors.toList());
+        return Gen5Constants.getIrregularFormes(romEntry.romType).stream().map(i -> pokes[i]).collect(Collectors.toList());
     }
 
     @Override
