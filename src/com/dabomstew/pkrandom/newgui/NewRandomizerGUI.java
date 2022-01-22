@@ -1311,6 +1311,7 @@ public class NewRandomizerGUI {
         if (currentRestrictions != null) {
             currentRestrictions.limitToGen(romHandler.generationOfPokemon());
         }
+        noIrregularAltFormesCheckBox.setSelected(settings.isBanIrregularAltFormes());
         raceModeCheckBox.setSelected(settings.isRaceMode());
 
         peChangeImpossibleEvosCheckBox.setSelected(settings.isChangeImpossibleEvolutions());
