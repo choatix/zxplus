@@ -80,7 +80,44 @@ public class Gen6Constants {
         return formeSuffixesByBaseForme.getOrDefault(baseForme,dummyFormeSuffixes).getOrDefault(formNum,"");
     }
 
-    public static final List<Integer> irregularFormes = Arrays.asList(
+    private static final List<Integer> xyIrregularFormes = Arrays.asList(
+            Species.Gen6Formes.castformF, Species.Gen6Formes.castformW, Species.Gen6Formes.castformI,
+            Species.Gen6Formes.darmanitanZ,
+            Species.Gen6Formes.meloettaP,
+            Species.Gen6Formes.kyuremW,
+            Species.Gen6Formes.kyuremB,
+            Species.Gen6Formes.gengarMega,
+            Species.Gen6Formes.gardevoirMega,
+            Species.Gen6Formes.ampharosMega,
+            Species.Gen6Formes.venusaurMega,
+            Species.Gen6Formes.charizardMegaX, Species.Gen6Formes.charizardMegaY,
+            Species.Gen6Formes.mewtwoMegaX, Species.Gen6Formes.mewtwoMegaY,
+            Species.Gen6Formes.blazikenMega,
+            Species.Gen6Formes.medichamMega,
+            Species.Gen6Formes.houndoomMega,
+            Species.Gen6Formes.aggronMega,
+            Species.Gen6Formes.banetteMega,
+            Species.Gen6Formes.tyranitarMega,
+            Species.Gen6Formes.scizorMega,
+            Species.Gen6Formes.pinsirMega,
+            Species.Gen6Formes.aerodactylMega,
+            Species.Gen6Formes.lucarioMega,
+            Species.Gen6Formes.abomasnowMega,
+            Species.Gen6Formes.aegislashB,
+            Species.Gen6Formes.blastoiseMega,
+            Species.Gen6Formes.kangaskhanMega,
+            Species.Gen6Formes.gyaradosMega,
+            Species.Gen6Formes.absolMega,
+            Species.Gen6Formes.alakazamMega,
+            Species.Gen6Formes.heracrossMega,
+            Species.Gen6Formes.mawileMega,
+            Species.Gen6Formes.manectricMega,
+            Species.Gen6Formes.garchompMega,
+            Species.Gen6Formes.latiosMega,
+            Species.Gen6Formes.latiasMega
+    );
+
+    private static final List<Integer> orasIrregularFormes = Arrays.asList(
             Species.Gen6Formes.castformF, Species.Gen6Formes.castformW, Species.Gen6Formes.castformI,
             Species.Gen6Formes.darmanitanZ,
             Species.Gen6Formes.meloettaP,
@@ -443,6 +480,15 @@ public class Gen6Constants {
         } else {
             return bsSizeORAS;
         }
+    }
+
+    public static List<Integer> getIrregularFormes(int romType) {
+        if (romType == Type_XY) {
+            return xyIrregularFormes;
+        } else if (romType == Type_ORAS) {
+            return orasIrregularFormes;
+        }
+        return new ArrayList<>();
     }
 
     public static int getFormeCount(int romType) {

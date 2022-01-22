@@ -951,7 +951,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
 
     @Override
     public List<Pokemon> getIrregularFormes() {
-        return Gen6Constants.irregularFormes.stream().map(i -> pokes[i]).collect(Collectors.toList());
+        return Gen6Constants.getIrregularFormes(romEntry.romType).stream().map(i -> pokes[i]).collect(Collectors.toList());
     }
 
     @Override
