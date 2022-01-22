@@ -46,7 +46,7 @@
     - When this setting is enabled, it changes how "Follow Evolutions"/"Follow Mega Evolutions" works; when a Pokemon evolves, the additional BST it gains will be assigned randomly on top of the pre-evo's stats instead of the evolved Pokemon having the exact same ratio between its stats as the pre-evo.
 
 - CHANGED: Follow Evolutions/Follow Mega Evolutions
-	- When using these settings, split Evolutions/Mega Evolutions will now have the additional BST they gain assigned randomly on top of the pre-evo's stats instead of having completely random base stats.
+    - When using these settings, split Evolutions/Mega Evolutions will now have the additional BST they gain assigned randomly on top of the pre-evo's stats instead of having completely random base stats.
 
 - FIX: Random
     - Gen 1: Fixed an issue where randomizing base stats would cause a Pokemon's base stat total to change.
@@ -127,7 +127,7 @@
         - Enabling this setting will prevent you from accessing Easy Mode or Normal Mode entirely.
 
 - CHANGED: Give National Dex at Start
-    - Fire Red/Leaf Green: When this setting is enabled, Oak's Aides will now use how many Pokemon in the National Dex you've caught to determine whether or not to give you an item rather than only caring about how many Pokemon in the Kanto Dex you've caught.
+    - FireRed/LeafGreen: When this setting is enabled, Oak's Aides will now use how many Pokemon in the National Dex you've caught to determine whether or not to give you an item rather than only caring about how many Pokemon in the Kanto Dex you've caught.
 
 - CHANGED: Update Type Effectiveness
     - This setting is now available for all games from Gens 2-5. When enabled, it removes Steel's Ghost and Dark resistances to match the type chart from Gen 6 onward.
