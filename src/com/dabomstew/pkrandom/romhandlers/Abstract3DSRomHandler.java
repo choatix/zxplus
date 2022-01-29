@@ -124,6 +124,7 @@ public abstract class Abstract3DSRomHandler extends AbstractRomHandler {
             }
             int version = gameUpdate.getVersion();
             if (!this.isGameUpdateSupported(version)) {
+                System.out.println("Game Update: Supplied unsupported version " + version);
                 throw new UnsupportedUpdateException(filename);
             }
         } catch (IOException e) {
