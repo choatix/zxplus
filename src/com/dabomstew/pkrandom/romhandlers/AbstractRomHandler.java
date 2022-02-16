@@ -416,6 +416,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     public void randomizePokemonTypes(Settings settings) {
         boolean evolutionSanity = settings.getTypesMod() == Settings.TypesMod.RANDOM_FOLLOW_EVOLUTIONS;
         boolean megaEvolutionSanity = settings.isTypesFollowMegaEvolutions();
+        boolean dualTypeOnly = settings.isDualTypeOnly();
 
         List<Pokemon> allPokes = this.getPokemonInclFormes();
         if (evolutionSanity) {
@@ -428,14 +429,14 @@ public abstract class AbstractRomHandler implements RomHandler {
                 pk.primaryType = randomType();
                 pk.secondaryType = null;
                 if (pk.evolutionsFrom.size() == 1 && pk.evolutionsFrom.get(0).carryStats) {
-                    if (AbstractRomHandler.this.random.nextDouble() < 0.35||settings.isDualTypeOnly()) {
+                    if (AbstractRomHandler.this.random.nextDouble() < 0.35 || dualTypeOnly) {
                         pk.secondaryType = randomType();
                         while (pk.secondaryType == pk.primaryType) {
                             pk.secondaryType = randomType();
                         }
                     }
                 } else {
-                    if (AbstractRomHandler.this.random.nextDouble() < 0.5||settings.isDualTypeOnly()) {
+                    if (AbstractRomHandler.this.random.nextDouble() < 0.5 || dualTypeOnly) {
                         pk.secondaryType = randomType();
                         while (pk.secondaryType == pk.primaryType) {
                             pk.secondaryType = randomType();
@@ -448,7 +449,7 @@ public abstract class AbstractRomHandler implements RomHandler {
 
                 if (evTo.secondaryType == null) {
                     double chance = toMonIsFinalEvo ? 0.25 : 0.15;
-                    if (AbstractRomHandler.this.random.nextDouble() < chance||settings.isDualTypeOnly()) {
+                    if (AbstractRomHandler.this.random.nextDouble() < chance || dualTypeOnly) {
                         evTo.secondaryType = randomType();
                         while (evTo.secondaryType == evTo.primaryType) {
                             evTo.secondaryType = randomType();
