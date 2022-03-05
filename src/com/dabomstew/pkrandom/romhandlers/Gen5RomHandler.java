@@ -2495,19 +2495,18 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     private void forceChallengeMode() {
-        int offset = find(arm9, Gen5Constants.forceChallengeModePrefix);
+        int offset = find(arm9, Gen5Constants.forceChallengeModeLocator);
         if (offset > 0) {
-            offset += Gen5Constants.forceChallengeModePrefix.length() / 2; // because it was a prefix
-
-            // offset is now pointing to the instruction "add r0, r2, #0x0" within the function that determines
-            // the player's current difficulty mode; r2 stores the difficulty mode as determined by the save file,
-            // and the game is moving it to r0 to return it to the caller. We want to enable Challenge Mode
-            // *without* requiring the user to previously have a save file, so we need to override this behavior.
-            // The below code just replaces this instruction with "mov r0, #0x2" to force this function to always
-            // return 2 (the value for Challenge Mode) regardless of what keys are enabled on the user's save file
-            // or regardless of whether they even have a save file or not.
+            // offset is now pointing at the start of sub_2010528, which is the function that
+            // determines which difficulty the player currently has enabled. It returns 0 for
+            // Easy Mode, 1 for Normal Mode, and 2 for Challenge Mode. Since we're just trying
+            // to force Challenge Mode, all we need to do is:
+            // mov r0, #0x2
+            // bx lr
             arm9[offset] = 0x02;
             arm9[offset + 1] = 0x20;
+            arm9[offset + 2] = 0x70;
+            arm9[offset + 3] = 0x47;
         }
     }
 

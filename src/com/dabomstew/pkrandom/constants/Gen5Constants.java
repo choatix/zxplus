@@ -357,7 +357,7 @@ public class Gen5Constants {
 
     public static final String typeEffectivenessTableLocator = "0404040404020400";
 
-    public static final String forceChallengeModePrefix = "816A406B0B1C07490022434090000858834201D1";
+    public static final String forceChallengeModeLocator = "816A406B0B1C07490022434090000858834201D1";
 
     public static final String pickupTableLocator = "19005C00DD00";
     public static final int numberOfPickupItems = 29;
