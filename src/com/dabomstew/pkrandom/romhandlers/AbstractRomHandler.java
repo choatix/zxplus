@@ -2578,8 +2578,6 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
 
             if (generationOfPokemon() == 5) {
-                // Storm Throw 60 Power
-                updateMovePower(moves, Moves.stormThrow, 60);
                 // Synchronoise 120 Power
                 updateMovePower(moves, Moves.synchronoise, 120);
                 // Low Sweep 65 Power
@@ -2594,9 +2592,11 @@ public abstract class AbstractRomHandler implements RomHandler {
                 updateMovePower(moves, Moves.grassPledge, 80);
                 // Struggle Bug 50 Power
                 updateMovePower(moves, Moves.struggleBug, 50);
-                // Frost Breath 45 Power
-                // crits are 2x in these games
+                // Frost Breath and Storm Throw 45 Power
+                // Crits are 2x in these games, so we need to multiply BP by 3/4
+                // Storm Throw was also updated to have a base BP of 60
                 updateMovePower(moves, Moves.frostBreath, 45);
+                updateMovePower(moves, Moves.stormThrow, 45);
                 // Sacred Sword 15 PP
                 updateMovePP(moves, Moves.sacredSword, 15);
                 // Hurricane 110 Power
@@ -2607,7 +2607,6 @@ public abstract class AbstractRomHandler implements RomHandler {
         }
 
         if (generation >= 7 && generationOfPokemon() < 7) {
-
             // Leech Life 80 Power, 10 PP
             updateMovePower(moves, Moves.leechLife, 80);
             updateMovePP(moves, Moves.leechLife, 10);
