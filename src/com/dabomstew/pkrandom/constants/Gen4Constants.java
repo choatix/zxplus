@@ -323,7 +323,8 @@ public class Gen4Constants {
             "Pokemon League Secondary",
             "Veilstone Department Store X Items",
             "Veilstone Department Store Healing",
-            "Veilstone Department Store Balls Etc."
+            "Veilstone Department Store Balls Etc.",
+            "Progressive Shops"
     );
 
     private static List<String> ptShopNames = Arrays.asList(
@@ -355,7 +356,8 @@ public class Gen4Constants {
             "Pokemon League Secondary",
             "Veilstone Department Store X Items",
             "Veilstone Department Store Healing",
-            "Veilstone Department Store Balls Etc."
+            "Veilstone Department Store Balls Etc.",
+            "Progressive Shops"
     );
 
     private static List<String> hgssShopNames = Arrays.asList(
@@ -376,20 +378,20 @@ public class Gen4Constants {
             "Safari Zone Gate Southwest",
             "Goldenrod Herb Shop",
             "Cianwood Pharmacy",
-            "???",
-            "???",
+            "Veilstone Department Store Secret Base Decorations 1",
+            "Veilstone Department Store Secret Base Decorations 2",
             "Goldenrod Department Store Vitamins",
             "Celadon Department Store Vitamins",
             "Mt. Moon Square",
-            "???",
-            "???",
-            "???",
-            "???",
-            "???",
-            "???",
-            "???",
-            "???",
-            "???",
+            "Sunyshore Market Seals 1",
+            "Sunyshore Market Seals 2",
+            "Sunyshore Market Seals 3",
+            "Sunyshore Market Seals 4",
+            "Sunyshore Market Seals 5",
+            "Sunyshore Market Seals 6",
+            "Unused Secondary",
+            "Sunyshore Market Seals 7",
+            "Pokeathlon Dome Data Card Shop 25-27",
             "Goldenrod Department Store X Items",
             "Celadon Department Store X Items",
             "Mahogany After Hideout",
@@ -398,7 +400,26 @@ public class Gen4Constants {
             "Goldenrod Department Store Balls Etc.",
             "Goldenrod TMs",
             "Celadon Department Store Balls Etc.",
-            "Celadon TMs"
+            "Celadon TMs",
+            "Pokeathlon Dome Athlete Shop Sunday (Pre-National Dex)",
+            "Pokeathlon Dome Data Card Shop 19-24",
+            "Pokeathlon Dome Data Card Shop 1-6",
+            "Pokeathlon Dome Athlete Shop Monday (Pre-National Dex)",
+            "Pokeathlon Dome Athlete Shop Tuesday (Pre-National Dex)",
+            "Pokeathlon Dome Data Card Shop 7-12",
+            "Pokeathlon Dome Athlete Shop Wednesday (Pre-National Dex)",
+            "Pokeathlon Dome Athlete Shop Thursday (Pre-National Dex)",
+            "Pokeathlon Dome Athlete Shop Friday (Pre-National Dex)",
+            "Pokeathlon Dome Athlete Shop Saturday (Pre-National Dex)",
+            "Pokeathlon Dome Data Card Shop 13-18",
+            "Pokeathlon Dome Athlete Shop Sunday (Post-National Dex)",
+            "Pokeathlon Dome Athlete Shop Monday (Post-National Dex)",
+            "Pokeathlon Dome Athlete Shop Tuesday (Post-National Dex)",
+            "Pokeathlon Dome Athlete Shop Wednesday (Post-National Dex)",
+            "Pokeathlon Dome Athlete Shop Thursday (Post-National Dex)",
+            "Pokeathlon Dome Athlete Shop Friday (Post-National Dex)",
+            "Pokeathlon Dome Athlete Shop Saturday (Post-National Dex)",
+            "Progressive Shops"
     );
 
     public static List<String> getShopNames(int romType) {
