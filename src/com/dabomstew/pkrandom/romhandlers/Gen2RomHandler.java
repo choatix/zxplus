@@ -1676,6 +1676,14 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                     offsetsInNew[i] = oInNewCurrent;
                     for (int trnum = 0; trnum < limit; trnum++) {
                         String newName = allTrainers.next();
+
+                        // The game uses 0xFF as a signifier for the end of the trainer data.
+                        // It ALSO uses 0xFF to encode the character "9". If a trainer name has
+                        // "9" in it, this causes strange side effects where certain trainers
+                        // effectively get skipped when parsing trainer data. Silently strip out
+                        // "9"s from trainer names to prevent this from happening.
+                        newName = newName.replace("9", "").trim();
+
                         byte[] newNameStr = translateString(newName);
                         newData.write(newNameStr);
                         newData.write(GBConstants.stringTerminator);
@@ -1773,6 +1781,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
     public List<Integer> getEvolutionItems() {
         return null;
     }
+
     @Override
     public void setTrainerClassNames(List<String> trainerClassNames) {
         if (romEntry.getValue("CanChangeTrainerText") != 0) {
