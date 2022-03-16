@@ -2489,6 +2489,19 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
+    public List<Integer> getEliteFourTrainers() {
+        if (romEntry.romType == Gen4Constants.Type_DP | romEntry.romType == Gen4Constants.Type_Plat) {
+            return Gen4Constants.dppEliteFourTrainers;
+        }
+        else if (romEntry.romType == Gen4Constants.Type_HGSS) {
+            return Gen4Constants.hgssEliteFourTrainers;
+        }
+        else {
+            return Gen4Constants.emptyEliteFourTrainers;
+        }
+    }
+
+    @Override
     public List<Integer> getEvolutionItems() {
         return Gen4Constants.evolutionItems;
     }

@@ -1445,6 +1445,20 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
+    public List<Integer> getEliteFourTrainers() {
+        if (romEntry.romType == Gen5Constants.Type_BW) {
+            return Gen5Constants.bw1EliteFourTrainers;
+        }
+        else if (romEntry.romType == Gen5Constants.Type_BW2) {
+            return Gen5Constants.bw2EliteFourTrainers;
+        }
+        else {
+            return Gen5Constants.emptyEliteFourTrainers;
+        }
+    }
+
+
+    @Override
     public List<Integer> getEvolutionItems() {
             return Gen5Constants.evolutionItems;
         }

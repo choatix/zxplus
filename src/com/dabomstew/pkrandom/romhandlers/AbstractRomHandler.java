@@ -1568,8 +1568,59 @@ public abstract class AbstractRomHandler implements RomHandler {
         // New: randomize the order trainers are randomized in.
         // Leads to less predictable results for various modifiers.
         // Need to keep the original ordering around for saving though.
-        List<Trainer> scrambledTrainers = new ArrayList<>(currentTrainers);
-        Collections.shuffle(scrambledTrainers, this.random);
+
+        List<Trainer> scrambledTrainers = new ArrayList<>();
+
+        // If Elite 4 setting was checked, then created scrambledTrainers
+        // to have Elite 4 & Champion at the start of the list
+        // Start of the list is important, so that priority goes to placing
+        // pokemon on them first, then adding those pokemon to the banlist
+
+
+        boolean tempSettingsFlag = true;
+        int tempSettingsE4Num = 2;
+
+        List<Trainer> eliteFourTrainers = new ArrayList<>();
+
+        if (tempSettingsFlag) {
+            // first find the
+            List<Integer> eliteFourIndices = getEliteFourTrainers();
+
+            for (int i : eliteFourIndices){
+                // find matching trainer for Elite Four
+                Trainer t = currentTrainers.get(i - 1);
+                eliteFourTrainers.add(t);
+                System.out.println(t.fullDisplayName);
+                        }
+            // commit eliteFourTrainers to scrambledTrainers first
+            scrambledTrainers.addAll(eliteFourTrainers);
+
+
+            // add all trainers not in eliteFourTrainers to scrambled remaining trainers (temp list)
+
+            List<Trainer> scrambledRemainingTrainers = new ArrayList<>();
+            for (Trainer t: currentTrainers) {
+                if (!eliteFourTrainers.contains(t)) {
+                    scrambledRemainingTrainers.add(t);
+                }
+            }
+            // scramble the remaining trainers
+            Collections.shuffle(scrambledRemainingTrainers, this.random);
+
+            // add the remaining trainers to the elite four list
+            scrambledTrainers.addAll(scrambledRemainingTrainers);
+
+        }
+
+        else {
+            // Otherwise, scramble all together
+            scrambledTrainers.addAll(currentTrainers);
+            Collections.shuffle(scrambledTrainers, this.random);
+        }
+
+//        if (currentTrainers.size == scrambledTrainers.size) {
+//            throw new Exception("ERROR ON TRAINER LIST SIZE");
+//        }
 
         cachedReplacementLists = new TreeMap<>();
         cachedAllList = noLegendaries ? new ArrayList<>(noLegendaryList) : new ArrayList<>(
@@ -1583,6 +1634,8 @@ public abstract class AbstractRomHandler implements RomHandler {
                         .stream()
                         .filter(pk -> !pk.actuallyCosmetic)
                         .collect(Collectors.toList());
+
+
         List<Integer> mainPlaythroughTrainers = getMainPlaythroughTrainers();
 
         List<Pokemon> banned = this.getBannedFormesForTrainerPokemon();
@@ -1595,6 +1648,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         }
         cachedAllList.removeAll(banned);
 
+
         // Fully random is easy enough - randomize then worry about rival
         // carrying starter at the end
         for (Trainer t : scrambledTrainers) {
@@ -1604,14 +1658,46 @@ public abstract class AbstractRomHandler implements RomHandler {
                 // starter, so we can't change it here. Just skip it
                 continue;
             }
+
+            // in order for Elite Four to not have the same pokemon twice
+            // we must keep track of each pokemon placed and provide it
+            // as a parameter for pick replacement function
+            // however, not all of them are added to the global ban list
+            // so we keep track of the list per trainer, and discard once
+            // the trainer is finished. in this case, just E4 trainers
+
+            boolean eliteFourTrackPokemon = false;
+            List<Pokemon> eliteFourPlacedPokemon = new ArrayList<>();
+            if ( (tempSettingsFlag) && (eliteFourTrainers.contains(t)) ) {
+                eliteFourTrackPokemon = true;
+            }
+
             for (TrainerPokemon tp : t.pokemon) {
                 boolean swapThisMegaEvo = swapMegaEvos && tp.canMegaEvolve();
                 boolean wgAllowed = (!noEarlyWonderGuard) || tp.level >= 20;
+
                 Pokemon newPK;
                 Pokemon oldPK = tp.pokemon;
                 if (tp.forme > 0) {
                     oldPK = getAltFormeOfPokemon(oldPK, tp.forme);
                 }
+
+                // this code checks to see if eliteFour setting is on
+                // if so, then check the size of the trainer's pokemon
+                // and apply the eliteFour settings when the pokemon
+                // are at the end of the list, up to the setting's
+                // number of pokemon to apply the setting to
+
+                // e.g., setting is to apply 2 unique pokemon to an Elite 4 trainer
+                // with 5 pokemon. this will apply unique pokemon to #4 and #5
+                boolean eliteFourSetUniquePokemon = false;
+                if (tempSettingsFlag) {
+                    if (((t.pokemon.size() - t.pokemon.indexOf(tp)) <= Math.min(t.pokemon.size(), tempSettingsE4Num)) && (eliteFourTrainers.contains(t)) ) {
+                        eliteFourSetUniquePokemon = true;
+                    }
+                }
+
+
                 // new code for distribution with mainplaythrough balancing
                 // what we do is check each trainer if they're part of the main playthrough
                 // if so, add to placement history, if not, pure random
@@ -1630,13 +1716,20 @@ public abstract class AbstractRomHandler implements RomHandler {
                                         swapThisMegaEvo,
                                         abilitiesAreRandomized,
                                         includeFormes,
-                                        banIrregularAltFormes
+                                        banIrregularAltFormes,
+                                        eliteFourPlacedPokemon
                                 );
                         setPlacementHistory(newPK);
                         tp.absolutePokeNumber = newPK.number;
                         tp.pokemon = newPK;
                         setFormeForTrainerPokemon(tp, newPK);
                         tp.abilitySlot = getRandomAbilitySlot(newPK);
+                        if (eliteFourSetUniquePokemon) {
+                            removeEvolutionChainFromPool(newPK);
+                        }
+                        if (eliteFourTrackPokemon) {
+                            eliteFourPlacedPokemon.add(newPK);
+                        }
                     }
                     else { // pure random when trainer not in pool
                         newPK =
@@ -1650,12 +1743,19 @@ public abstract class AbstractRomHandler implements RomHandler {
                                         swapThisMegaEvo,
                                         abilitiesAreRandomized,
                                         includeFormes,
-                                        banIrregularAltFormes
+                                        banIrregularAltFormes,
+                                        eliteFourPlacedPokemon
                                 );
                         tp.absolutePokeNumber = newPK.number;
                         tp.pokemon = newPK;
                         setFormeForTrainerPokemon(tp, newPK);
                         tp.abilitySlot = getRandomAbilitySlot(newPK);
+                        if (eliteFourSetUniquePokemon) {
+                            removeEvolutionChainFromPool(newPK);
+                        }
+                        if (eliteFourTrackPokemon) {
+                            eliteFourPlacedPokemon.add(newPK);
+                        }
                     }
                 } else {
                     newPK =
@@ -1669,7 +1769,8 @@ public abstract class AbstractRomHandler implements RomHandler {
                                     swapThisMegaEvo,
                                     abilitiesAreRandomized,
                                     includeFormes,
-                                    banIrregularAltFormes
+                                    banIrregularAltFormes,
+                                    eliteFourPlacedPokemon
                             );
                     if (distributionSetting) {
                         setPlacementHistory(newPK);
@@ -1678,6 +1779,12 @@ public abstract class AbstractRomHandler implements RomHandler {
                     tp.pokemon = newPK;
                     setFormeForTrainerPokemon(tp, newPK);
                     tp.abilitySlot = getRandomAbilitySlot(newPK);
+                    if (eliteFourSetUniquePokemon) {
+                        removeEvolutionChainFromPool(newPK);
+                    }
+                    if (eliteFourTrackPokemon) {
+                        eliteFourPlacedPokemon.add(newPK);
+                    }
                 }
 
                 if (swapThisMegaEvo) {
@@ -1698,6 +1805,48 @@ public abstract class AbstractRomHandler implements RomHandler {
         // Save it all up
         this.setTrainers(currentTrainers, false);
     }
+    private void removeEvolutionChainFromPool(Pokemon newPK) {
+
+        cachedAllList.remove(newPK);
+        permanentlyBannedList.add(newPK);
+        // System.out.println("Removed " + newPK.name);
+
+        // first remove any evolutionFrom (aka, Pokemon that newPK will evolve into
+        if (newPK.evolutionsFrom.size() > 0) {
+            for (Evolution evo: newPK.evolutionsFrom) {
+                Pokemon pkToRemove = evo.to;
+                if (cachedAllList.contains(pkToRemove)) {
+                    cachedAllList.remove(pkToRemove);
+                    // System.out.println("Removed stage 1 evolution " + pkToRemove.name);
+                }
+            }
+        }
+
+        // then remove any evolutionTo (preevolutions, 2 stages down)
+        if (newPK.evolutionsTo.size() > 0) {
+            for (Evolution evo: newPK.evolutionsTo) {
+                Pokemon pkToRemove = evo.from;
+                if (cachedAllList.contains(pkToRemove)) {
+                    cachedAllList.remove(pkToRemove);
+                    // System.out.println("Removed stage 1 pre-evo " + pkToRemove.name);
+                    for (Evolution evo2 : pkToRemove.evolutionsTo) {
+                        Pokemon pkToRemove2 = evo2.from;
+                        if (cachedAllList.contains(pkToRemove2)) {
+                            cachedAllList.remove(pkToRemove2);
+                            // System.out.println("Removed stage 2 pre-evo " + pkToRemove2.name);
+                        }
+                        else {
+                            // System.out.println("Stage 2 pre-evo " + pkToRemove2.name + " not in pool any more, not removing");
+                        }
+                    }
+                }
+                else {
+                    // System.out.println("Stage 1 pre-evo " + pkToRemove.name + " not in pool any more, not removing");
+                }
+            }
+        }
+    }
+
 
     private void setFormeForTrainerPokemon(TrainerPokemon tp, Pokemon pk) {
         boolean checkCosmetics = true;
@@ -1846,7 +1995,9 @@ public abstract class AbstractRomHandler implements RomHandler {
                                     swapThisMegaEvo,
                                     abilitiesAreRandomized,
                                     includeFormes,
-                                    banIrregularAltFormes
+                                    banIrregularAltFormes,
+                                    new ArrayList<>()
+
                             );
                     tp.absolutePokeNumber = newPK.number;
                     tp.pokemon = newPK;
@@ -1909,7 +2060,8 @@ public abstract class AbstractRomHandler implements RomHandler {
                                     swapThisMegaEvo,
                                     abilitiesAreRandomized,
                                     includeFormes,
-                                    banIrregularAltFormes
+                                    banIrregularAltFormes,
+                                    new ArrayList<>()
                             );
                     tp.absolutePokeNumber = newPK.number;
                     tp.pokemon = newPK;
@@ -6065,10 +6217,13 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     private Map<Type, List<Pokemon>> cachedReplacementLists;
     private List<Pokemon> cachedAllList;
+    private List<Pokemon> permanentlyBannedList = new ArrayList<>();
+
 
     private Pokemon pickReplacement(Pokemon current, boolean usePowerLevels, Type type, boolean noLegendaries,
                                     boolean wonderGuardAllowed, boolean usePlacementHistory, boolean swapMegaEvos,
-                                    boolean abilitiesAreRandomized, boolean allowAltFormes, boolean banIrregularAltFormes) {
+                                    boolean abilitiesAreRandomized, boolean allowAltFormes, boolean banIrregularAltFormes,
+                                    List<Pokemon> eliteFourPlacedPokemon) {
         List<Pokemon> pickFrom;
         if (swapMegaEvos) {
             pickFrom = megaEvolutionsList
@@ -6090,6 +6245,13 @@ public abstract class AbstractRomHandler implements RomHandler {
                 pickFrom = cachedAllList;
             }
         }
+        // simply not allow Elite Four to place pokemon more than once
+        // this list is only ever non-empty under specific settings
+        // it tracks for 1 trainer, if they were elite four,
+        //   all the pokemon that trainer has placed, to avoid duplicates
+        // in almost all cases, it will be empty (since most trainers are not e4)
+        pickFrom.removeAll(eliteFourPlacedPokemon);
+
         if (type != null) {
             if (!cachedReplacementLists.containsKey(type)) {
 //                System.out.println(current.name + " using cachedReplacementLists");
@@ -6486,7 +6648,6 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     private void setPlacementHistory(Pokemon newPK) {
         Integer history = getPlacementHistory(newPK);
-//         System.out.println("Current history: " + newPK.name + " : " + history);
         placementHistory.put(newPK, history + 1);
     }
 
@@ -6525,11 +6686,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         for (Pokemon newPK : allPK) {
             if (placedPK.contains(newPK)) { // if it's in the list of previously placed, then check its viability 
                 if (placementHistory.get(newPK) <= placedAverage) {
-//                     System.out.println(newPK.name + ": " + placementHistory.get(newPK)+" "+placedAverage+" ACCEPT");
                     toPlacePK.add(newPK);
-                }
-                else {
-//                  System.out.println(newPK.name + ": " + placementHistory.get(newPK)+" "+placedAverage+" REJECT");
                 }
             }
             else {
@@ -6538,7 +6695,6 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
         }
 
-        // System.out.println("Size: " + toPlacePK.size());
         return toPlacePK;
 
     }

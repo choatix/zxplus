@@ -893,6 +893,10 @@ public class Gen6Constants {
     public static ItemList allowedItemsXY, allowedItemsORAS, nonBadItemsXY, nonBadItemsORAS;
     public static List<Integer> regularShopItems, opShopItems;
 
+    public static final List<Integer> emptyEliteFourTrainers = Arrays.asList(new Integer[] { });
+    public static final List<Integer> xyEliteFourTrainers = Arrays.asList(187, 269, 270, 271, 276);
+    public static final List<Integer> orasEliteFourTrainers = Arrays.asList(553, 554, 555, 556, 557);
+
     static {
         setupAllowedItems();
     }

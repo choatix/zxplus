@@ -1879,6 +1879,19 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public List<Integer> getEliteFourTrainers() {
+        if (romEntry.romType == Gen6Constants.Type_XY) {
+            return Gen6Constants.xyEliteFourTrainers;
+        }
+        else if (romEntry.romType == Gen6Constants.Type_ORAS) {
+            return Gen6Constants.orasEliteFourTrainers;
+        }
+        else {
+            return Gen6Constants.emptyEliteFourTrainers;
+        }
+    }
+
+    @Override
     public List<Integer> getEvolutionItems() {
         return Gen6Constants.evolutionItems;
     }

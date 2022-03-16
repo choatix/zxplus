@@ -929,6 +929,10 @@ public class Gen7Constants {
     public static ItemList allowedItemsSM, allowedItemsUSUM, nonBadItems;
     public static List<Integer> regularShopItemsSM, regularShopItemsUSUM, opShopItems;
 
+    public static final List<Integer> emptyEliteFourTrainers = Arrays.asList(new Integer[] { });
+    public static final List<Integer> smEliteFourTrainers = Arrays.asList(149, 152, 153, 156, 129, 413, 414);
+    public static final List<Integer> usumEliteFourTrainers = Arrays.asList(149, 153, 156, 489, 494, 495, 496);
+
     static {
         setupAllowedItems();
     }

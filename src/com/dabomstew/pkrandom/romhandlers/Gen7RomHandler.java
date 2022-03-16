@@ -1593,6 +1593,19 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public List<Integer> getEliteFourTrainers() {
+        if (romEntry.romType == Gen7Constants.Type_SM) {
+            return Gen7Constants.smEliteFourTrainers;
+        }
+        else if (romEntry.romType == Gen3Constants.RomType_FRLG) {
+            return Gen7Constants.usumEliteFourTrainers;
+        }
+        else {
+            return Gen7Constants.emptyEliteFourTrainers;
+        }
+    }
+
+    @Override
     public void setTrainers(List<Trainer> trainerData, boolean doubleBattleMode) {
         Iterator<Trainer> allTrainers = trainerData.iterator();
         try {

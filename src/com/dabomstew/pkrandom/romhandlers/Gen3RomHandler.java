@@ -1513,6 +1513,20 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     @Override
+    public List<Integer> getEliteFourTrainers() {
+        if (romEntry.romType == Gen3Constants.RomType_Ruby | romEntry.romType == Gen3Constants.RomType_Sapp | romEntry.romType == Gen3Constants.RomType_Em) {
+            return Gen3Constants.rseEliteFourTrainers;
+        }
+        else if (romEntry.romType == Gen3Constants.RomType_FRLG) {
+            return Gen3Constants.frlgEliteFourTrainers;
+        }
+        else {
+            return Gen3Constants.emptyEliteFourTrainers;
+        }
+    }
+
+
+    @Override
     public void setTrainers(List<Trainer> trainerData, boolean doubleBattleMode) {
         int baseOffset = romEntry.getValue("TrainerData");
         int amount = romEntry.getValue("TrainerCount");

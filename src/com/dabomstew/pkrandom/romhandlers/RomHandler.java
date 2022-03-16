@@ -243,6 +243,8 @@ public interface RomHandler {
 
     List<Integer> getMainPlaythroughTrainers();
 
+    List<Integer> getEliteFourTrainers();
+
     void setTrainers(List<Trainer> trainerData, boolean doubleBattleMode);
 
     void randomizeTrainerPokes(Settings settings);

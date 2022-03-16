@@ -143,6 +143,8 @@ public class NewRandomizerGUI {
     private JCheckBox tpForceFullyEvolvedAtCheckBox;
     private JSlider tpForceFullyEvolvedAtSlider;
     private JSlider tpPercentageLevelModifierSlider;
+    private JCheckBox tpEliteFourUniquePokemonCheckBox;
+    private JSpinner tpEliteFourUniquePokemonSpinner;
     private JCheckBox tpPercentageLevelModifierCheckBox;
     private JRadioButton wpUnchangedRadioButton;
     private JRadioButton wpRandomRadioButton;
@@ -436,6 +438,7 @@ public class NewRandomizerGUI {
         tpRandomEvenDistributionMainRadioButton.addActionListener(e -> enableOrDisableSubControls());
         tpForceFullyEvolvedAtCheckBox.addActionListener(e -> enableOrDisableSubControls());
         tpPercentageLevelModifierCheckBox.addActionListener(e -> enableOrDisableSubControls());
+        tpEliteFourUniquePokemonCheckBox.addActionListener(e -> enableOrDisableSubControls());
         wpUnchangedRadioButton.addActionListener(e -> enableOrDisableSubControls());
         wpRandomRadioButton.addActionListener(e -> enableOrDisableSubControls());
         wpArea1To1RadioButton.addActionListener(e -> enableOrDisableSubControls());
@@ -663,9 +666,17 @@ public class NewRandomizerGUI {
                 1
         );
 
+        SpinnerModel eliteFourUniquePokemonModel = new SpinnerNumberModel(
+                1,
+                0,
+                2,
+                1
+        );
+
         tpBossTrainersSpinner.setModel(bossTrainerModel);
         tpImportantTrainersSpinner.setModel(importantTrainerModel);
         tpRegularTrainersSpinner.setModel(regularTrainerModel);
+        tpEliteFourUniquePokemonSpinner.setModel(eliteFourUniquePokemonModel);
 
         customNamesEditorMenuItem = new JMenuItem();
         customNamesEditorMenuItem.setText(bundle.getString("GUI.customNamesEditorMenuItem.text"));
@@ -1081,6 +1092,7 @@ public class NewRandomizerGUI {
 
     }
 
+
     private enum SaveType {
         FILE, DIRECTORY, INVALID
     }
@@ -1413,6 +1425,8 @@ public class NewRandomizerGUI {
         tpForceFullyEvolvedAtSlider.setValue(settings.getTrainersForceFullyEvolvedLevel());
         tpPercentageLevelModifierCheckBox.setSelected(settings.isTrainersLevelModified());
         tpPercentageLevelModifierSlider.setValue(settings.getTrainersLevelModifier());
+        tpEliteFourUniquePokemonCheckBox.setSelected(settings.isEliteFourUniquePokemon());
+        tpEliteFourUniquePokemonSpinner.setValue(settings.getEliteFourUniquePokemonModifier() > 0 ? settings.getEliteFourUniquePokemonModifier() : 1);
         tpAllowAlternateFormesCheckBox.setSelected(settings.isAllowTrainerAlternateFormes());
         tpSwapMegaEvosCheckBox.setSelected(settings.isSwapTrainerMegaEvos());
         tpDoubleBattleModeCheckBox.setSelected(settings.isDoubleBattleMode());
@@ -1647,6 +1661,8 @@ public class NewRandomizerGUI {
         settings.setTrainersForceFullyEvolvedLevel(tpForceFullyEvolvedAtSlider.getValue());
         settings.setTrainersLevelModified(tpPercentageLevelModifierCheckBox.isSelected());
         settings.setTrainersLevelModifier(tpPercentageLevelModifierSlider.getValue());
+        settings.setEliteFourUniquePokemon(tpEliteFourUniquePokemonCheckBox.isSelected());
+        settings.setEliteFourUniquePokemonModifier(tpEliteFourUniquePokemonCheckBox.isVisible() && tpEliteFourUniquePokemonCheckBox.isSelected() ? (int)tpEliteFourUniquePokemonSpinner.getValue() : 0);
         settings.setAllowTrainerAlternateFormes(tpAllowAlternateFormesCheckBox.isSelected() && tpAllowAlternateFormesCheckBox.isVisible());
         settings.setSwapTrainerMegaEvos(tpSwapMegaEvosCheckBox.isSelected() && tpSwapMegaEvosCheckBox.isVisible());
         settings.setDoubleBattleMode(tpDoubleBattleModeCheckBox.isVisible() && tpDoubleBattleModeCheckBox.isSelected());
@@ -2189,6 +2205,14 @@ public class NewRandomizerGUI {
         tpPercentageLevelModifierCheckBox.setVisible(true);
         tpPercentageLevelModifierCheckBox.setEnabled(false);
         tpPercentageLevelModifierCheckBox.setSelected(false);
+
+        tpEliteFourUniquePokemonCheckBox.setVisible(true);
+        tpEliteFourUniquePokemonCheckBox.setEnabled(false);
+        tpEliteFourUniquePokemonCheckBox.setSelected(false);
+        tpEliteFourUniquePokemonSpinner.setVisible(true);
+        tpEliteFourUniquePokemonSpinner.setEnabled(false);
+        tpEliteFourUniquePokemonSpinner.setValue(1);
+
         tpAllowAlternateFormesCheckBox.setVisible(true);
         tpAllowAlternateFormesCheckBox.setEnabled(false);
         tpAllowAlternateFormesCheckBox.setSelected(false);
