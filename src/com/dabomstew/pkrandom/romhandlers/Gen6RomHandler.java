@@ -2035,13 +2035,43 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
 
     @Override
     public Map<Integer, List<Integer>> getEggMoves() {
-        // Not currently implemented
-        return new TreeMap<>();
+        Map<Integer, List<Integer>> eggMoves = new TreeMap<>();
+        try {
+            GARCArchive eggMovesGarc = this.readGARC(romEntry.getFile("EggMoves"),true);
+            for (int i = 1; i <= Gen6Constants.pokemonCount; i++) {
+                Pokemon pkmn = pokes[i];
+                byte[] movedata = eggMovesGarc.files.get(i).get(0);
+                int numberOfEggMoves = readWord(movedata, 0);
+                List<Integer> moves = new ArrayList<>();
+                for (int j = 0; j < numberOfEggMoves; j++) {
+                    int move = readWord(movedata, 2 + (j * 2));
+                    moves.add(move);
+                }
+                eggMoves.put(pkmn.number, moves);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+        return eggMoves;
     }
 
     @Override
     public void setEggMoves(Map<Integer, List<Integer>> eggMoves) {
-        // Not currently implemented
+        try {
+            GARCArchive eggMovesGarc = this.readGARC(romEntry.getFile("EggMoves"), true);
+            for (int i = 1; i <= Gen6Constants.pokemonCount; i++) {
+                Pokemon pkmn = pokes[i];
+                byte[] movedata = eggMovesGarc.files.get(i).get(0);
+                List<Integer> moves = eggMoves.get(pkmn.number);
+                for (int j = 0; j < moves.size(); j++) {
+                    writeWord(movedata, 2 + (j * 2), moves.get(j));
+                }
+            }
+            // Save
+            this.writeGARC(romEntry.getFile("EggMoves"), eggMovesGarc);
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
     }
 
     @Override
@@ -3842,6 +3872,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             long expectedCRC32 = romEntry.files.get(fileKey).expectedCRC32s[index];
             long actualCRC32 = actualFileCRC32s.get(fileKey);
             if (expectedCRC32 != actualCRC32) {
+                System.out.println(fileKey + " " + actualCRC32);
                 return false;
             }
         }
