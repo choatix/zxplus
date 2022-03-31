@@ -1714,13 +1714,43 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
 
     @Override
     public Map<Integer, List<Integer>> getEggMoves() {
-        // Not currently implemented
-        return new TreeMap<>();
+        Map<Integer, List<Integer>> eggMoves = new TreeMap<>();
+        try {
+            NARCArchive eggMovesNarc = this.readNARC(romEntry.getFile("EggMoves"));
+            for (int i = 1; i <= Gen5Constants.pokemonCount; i++) {
+                Pokemon pkmn = pokes[i];
+                byte[] movedata = eggMovesNarc.files.get(i);
+                int numberOfEggMoves = readWord(movedata, 0);
+                List<Integer> moves = new ArrayList<>();
+                for (int j = 0; j < numberOfEggMoves; j++) {
+                    int move = readWord(movedata, 2 + (j * 2));
+                    moves.add(move);
+                }
+                eggMoves.put(pkmn.number, moves);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+        return eggMoves;
     }
 
     @Override
     public void setEggMoves(Map<Integer, List<Integer>> eggMoves) {
-        // Not currently implemented
+        try {
+            NARCArchive eggMovesNarc = this.readNARC(romEntry.getFile("EggMoves"));
+            for (int i = 1; i <= Gen5Constants.pokemonCount; i++) {
+                Pokemon pkmn = pokes[i];
+                byte[] movedata = eggMovesNarc.files.get(i);
+                List<Integer> moves = eggMoves.get(pkmn.number);
+                for (int j = 0; j < moves.size(); j++) {
+                    writeWord(movedata, 2 + (j * 2), moves.get(j));
+                }
+            }
+            // Save
+            this.writeNARC(romEntry.getFile("EggMoves"), eggMovesNarc);
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
     }
 
     private static class FileEntry {

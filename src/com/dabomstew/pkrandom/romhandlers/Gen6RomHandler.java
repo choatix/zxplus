@@ -3872,7 +3872,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             long expectedCRC32 = romEntry.files.get(fileKey).expectedCRC32s[index];
             long actualCRC32 = actualFileCRC32s.get(fileKey);
             if (expectedCRC32 != actualCRC32) {
-                System.out.println(fileKey + " " + actualCRC32);
                 return false;
             }
         }
