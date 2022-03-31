@@ -1792,6 +1792,96 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public Map<Integer, List<Integer>> getEggMoves() {
+        Map<Integer, List<Integer>> eggMoves = new TreeMap<>();
+        try {
+            GARCArchive eggMovesGarc = this.readGARC(romEntry.getFile("EggMoves"),true);
+            TreeMap<Pokemon, Integer> altFormeEggMoveFiles = new TreeMap<>();
+            for (int i = 1; i <= Gen7Constants.getPokemonCount(romEntry.romType); i++) {
+                Pokemon pkmn = pokes[i];
+                byte[] movedata = eggMovesGarc.files.get(i).get(0);
+                int formeReference = readWord(movedata, 0);
+                if (formeReference != pkmn.number) {
+                    altFormeEggMoveFiles.put(pkmn, formeReference);
+                }
+                int numberOfEggMoves = readWord(movedata, 2);
+                List<Integer> moves = new ArrayList<>();
+                for (int j = 0; j < numberOfEggMoves; j++) {
+                    int move = readWord(movedata, 4 + (j * 2));
+                    moves.add(move);
+                }
+                eggMoves.put(pkmn.number, moves);
+            }
+            Iterator<Pokemon> iter = altFormeEggMoveFiles.keySet().iterator();
+            while (iter.hasNext()) {
+                Pokemon originalForme = iter.next();
+                int formeNumber = 1;
+                int fileNumber = altFormeEggMoveFiles.get(originalForme);
+                Pokemon altForme = getAltFormeOfPokemon(originalForme, formeNumber);
+                while (!originalForme.equals(altForme)) {
+                    byte[] movedata = eggMovesGarc.files.get(fileNumber).get(0);
+                    int numberOfEggMoves = readWord(movedata, 2);
+                    List<Integer> moves = new ArrayList<>();
+                    for (int j = 0; j < numberOfEggMoves; j++) {
+                        int move = readWord(movedata, 4 + (j * 2));
+                        moves.add(move);
+                    }
+                    eggMoves.put(altForme.number, moves);
+                    formeNumber++;
+                    fileNumber++;
+                    altForme = getAltFormeOfPokemon(originalForme, formeNumber);
+                }
+                iter.remove();
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+        return eggMoves;
+    }
+
+    @Override
+    public void setEggMoves(Map<Integer, List<Integer>> eggMoves) {
+        try {
+            GARCArchive eggMovesGarc = this.readGARC(romEntry.getFile("EggMoves"), true);
+            TreeMap<Pokemon, Integer> altFormeEggMoveFiles = new TreeMap<>();
+            for (int i = 1; i <= Gen7Constants.getPokemonCount(romEntry.romType); i++) {
+                Pokemon pkmn = pokes[i];
+                byte[] movedata = eggMovesGarc.files.get(i).get(0);
+                int formeReference = readWord(movedata, 0);
+                if (formeReference != pkmn.number) {
+                    altFormeEggMoveFiles.put(pkmn, formeReference);
+                }
+                List<Integer> moves = eggMoves.get(pkmn.number);
+                for (int j = 0; j < moves.size(); j++) {
+                    writeWord(movedata, 4 + (j * 2), moves.get(j));
+                }
+            }
+            Iterator<Pokemon> iter = altFormeEggMoveFiles.keySet().iterator();
+            while (iter.hasNext()) {
+                Pokemon originalForme = iter.next();
+                int formeNumber = 1;
+                int fileNumber = altFormeEggMoveFiles.get(originalForme);
+                Pokemon altForme = getAltFormeOfPokemon(originalForme, formeNumber);
+                while (!originalForme.equals(altForme)) {
+                    byte[] movedata = eggMovesGarc.files.get(fileNumber).get(0);
+                    List<Integer> moves = eggMoves.get(altForme.number);
+                    for (int j = 0; j < moves.size(); j++) {
+                        writeWord(movedata, 4 + (j * 2), moves.get(j));
+                    }
+                    formeNumber++;
+                    fileNumber++;
+                    altForme = getAltFormeOfPokemon(originalForme, formeNumber);
+                }
+                iter.remove();
+            }
+            // Save
+            this.writeGARC(romEntry.getFile("EggMoves"), eggMovesGarc);
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+    }
+
+    @Override
     public boolean canChangeStaticPokemon() {
         return true;
     }

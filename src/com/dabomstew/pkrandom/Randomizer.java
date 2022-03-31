@@ -294,6 +294,7 @@ public class Randomizer {
         if (settings.getMovesetsMod() != Settings.MovesetsMod.UNCHANGED &&
                 settings.getMovesetsMod() != Settings.MovesetsMod.METRONOME_ONLY) {
             romHandler.randomizeMovesLearnt(settings);
+            romHandler.randomizeEggMoves(settings);
             movesetsChanged = true;
         }
 
@@ -737,11 +738,11 @@ public class Randomizer {
         log.println("--Pokemon Movesets--");
         List<String> movesets = new ArrayList<>();
         Map<Integer, List<MoveLearnt>> moveData = romHandler.getMovesLearnt();
+        Map<Integer, List<Integer>> eggMoves = romHandler.getEggMoves();
         List<Move> moves = romHandler.getMoves();
         List<Pokemon> pkmnList = romHandler.getPokemonInclFormes();
         int i = 1;
         for (Pokemon pkmn : pkmnList) {
-
             if (pkmn == null || pkmn.actuallyCosmetic) {
                 continue;
             }
@@ -780,6 +781,14 @@ public class Randomizer {
                     sb.append("invalid move at level").append(ml.level);
                 }
             }
+            List<Integer> eggMove = eggMoves.get(pkmn.number);
+            if (eggMove != null && eggMove.size() != 0) {
+                sb.append("Egg Moves:").append(System.getProperty("line.separator"));
+                for (Integer move : eggMove) {
+                    sb.append(" - ").append(moves.get(move).name).append(System.getProperty("line.separator"));
+                }
+            }
+
             movesets.add(sb.toString());
         }
         Collections.sort(movesets);

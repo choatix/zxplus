@@ -2691,116 +2691,13 @@ public abstract class AbstractRomHandler implements RomHandler {
 
         // Get current sets
         Map<Integer, List<MoveLearnt>> movesets = this.getMovesLearnt();
-        List<Integer> hms = this.getHMMoves();
-        List<Move> allMoves = this.getMoves();
-
-        @SuppressWarnings("unchecked")
-        Set<Integer> allBanned = new HashSet<Integer>(noBroken ? this.getGameBreakingMoves() : Collections.EMPTY_SET);
-        allBanned.addAll(hms);
-        allBanned.addAll(this.getMovesBannedFromLevelup());
-        allBanned.addAll(GlobalConstants.zMoves);
-        allBanned.addAll(this.getIllegalMoves());
 
         // Build sets of moves
         List<Move> validMoves = new ArrayList<>();
         List<Move> validDamagingMoves = new ArrayList<>();
         Map<Type, List<Move>> validTypeMoves = new HashMap<>();
         Map<Type, List<Move>> validTypeDamagingMoves = new HashMap<>();
-
-        for (Move mv : allMoves) {
-            if (mv != null && !GlobalConstants.bannedRandomMoves[mv.number] && !allBanned.contains(mv.number)) {
-                validMoves.add(mv);
-                if (mv.type != null) {
-                    if (!validTypeMoves.containsKey(mv.type)) {
-                        validTypeMoves.put(mv.type, new ArrayList<>());
-                    }
-                    validTypeMoves.get(mv.type).add(mv);
-                }
-
-                if (!GlobalConstants.bannedForDamagingMove[mv.number]) {
-                    if ((mv.power * mv.hitCount) >= 2 * GlobalConstants.MIN_DAMAGING_MOVE_POWER
-                            || ((mv.power * mv.hitCount) >= GlobalConstants.MIN_DAMAGING_MOVE_POWER && (mv.hitratio >= 90 || mv.hitratio == perfectAccuracy))) {
-                        validDamagingMoves.add(mv);
-                        if (mv.type != null) {
-                            if (!validTypeDamagingMoves.containsKey(mv.type)) {
-                                validTypeDamagingMoves.put(mv.type, new ArrayList<>());
-                            }
-                            validTypeDamagingMoves.get(mv.type).add(mv);
-                        }
-                    }
-                }
-            }
-        }
-
-        Map<Type,Double> avgTypePowers = new TreeMap<>();
-        double totalAvgPower = 0;
-
-        for (Type type: validTypeMoves.keySet()) {
-            List<Move> typeMoves = validTypeMoves.get(type);
-            int attackingSum = 0;
-            for (Move typeMove: typeMoves) {
-                if (typeMove.power > 0) {
-                    attackingSum += (typeMove.power * typeMove.hitCount);
-                }
-            }
-            double avgTypePower = (double)attackingSum / (double)typeMoves.size();
-            avgTypePowers.put(type, avgTypePower);
-            totalAvgPower += (avgTypePower);
-        }
-
-        totalAvgPower /= (double)validTypeMoves.keySet().size();
-
-        // Want the average power of each type to be within 25% both directions
-        double minAvg = totalAvgPower * 0.75;
-        double maxAvg = totalAvgPower * 1.25;
-
-        // Add extra moves to type lists outside of the range to balance the average power of each type
-
-        for (Type type: avgTypePowers.keySet()) {
-            double avgPowerForType = avgTypePowers.get(type);
-            List<Move> typeMoves = validTypeMoves.get(type);
-            List<Move> alreadyPicked = new ArrayList<>();
-            int iterLoops = 0;
-            while (avgPowerForType < minAvg && iterLoops < 10000) {
-                final double finalAvgPowerForType = avgPowerForType;
-                List<Move> strongerThanAvgTypeMoves = typeMoves
-                        .stream()
-                        .filter(mv -> mv.power * mv.hitCount > finalAvgPowerForType)
-                        .collect(Collectors.toList());
-                if (strongerThanAvgTypeMoves.isEmpty()) break;
-                if (alreadyPicked.containsAll(strongerThanAvgTypeMoves)) {
-                    alreadyPicked = new ArrayList<>();
-                } else {
-                    strongerThanAvgTypeMoves.removeAll(alreadyPicked);
-                }
-                Move extraMove = strongerThanAvgTypeMoves.get(random.nextInt(strongerThanAvgTypeMoves.size()));
-                avgPowerForType = (avgPowerForType * typeMoves.size() + extraMove.power * extraMove.hitCount)
-                        / (typeMoves.size() + 1);
-                typeMoves.add(extraMove);
-                alreadyPicked.add(extraMove);
-                iterLoops++;
-            }
-            iterLoops = 0;
-            while (avgPowerForType > maxAvg && iterLoops < 10000) {
-                final double finalAvgPowerForType = avgPowerForType;
-                List<Move> weakerThanAvgTypeMoves = typeMoves
-                        .stream()
-                        .filter(mv -> mv.power * mv.hitCount < finalAvgPowerForType)
-                        .collect(Collectors.toList());
-                if (weakerThanAvgTypeMoves.isEmpty()) break;
-                if (alreadyPicked.containsAll(weakerThanAvgTypeMoves)) {
-                    alreadyPicked = new ArrayList<>();
-                } else {
-                    weakerThanAvgTypeMoves.removeAll(alreadyPicked);
-                }
-                Move extraMove = weakerThanAvgTypeMoves.get(random.nextInt(weakerThanAvgTypeMoves.size()));
-                avgPowerForType = (avgPowerForType * typeMoves.size() + extraMove.power * extraMove.hitCount)
-                        / (typeMoves.size() + 1);
-                typeMoves.add(extraMove);
-                alreadyPicked.add(extraMove);
-                iterLoops++;
-            }
-        }
+        createSetsOfMoves(noBroken, validMoves, validDamagingMoves, validTypeMoves, validTypeDamagingMoves);
 
         for (Integer pkmnNum : movesets.keySet()) {
             List<Integer> learnt = new ArrayList<>();
@@ -2963,6 +2860,232 @@ public abstract class AbstractRomHandler implements RomHandler {
         // Done, save
         this.setMovesLearnt(movesets);
 
+    }
+
+    @Override
+    public void randomizeEggMoves(Settings settings) {
+        boolean typeThemed = settings.getMovesetsMod() == Settings.MovesetsMod.RANDOM_PREFER_SAME_TYPE;
+        boolean noBroken = settings.isBlockBrokenMovesetMoves();
+        double goodDamagingPercentage =
+                settings.isMovesetsForceGoodDamaging() ? settings.getMovesetsGoodDamagingPercent() / 100.0 : 0;
+
+        // Get current sets
+        Map<Integer, List<Integer>> movesets = this.getEggMoves();
+
+        // Build sets of moves
+        List<Move> validMoves = new ArrayList<>();
+        List<Move> validDamagingMoves = new ArrayList<>();
+        Map<Type, List<Move>> validTypeMoves = new HashMap<>();
+        Map<Type, List<Move>> validTypeDamagingMoves = new HashMap<>();
+        createSetsOfMoves(noBroken, validMoves, validDamagingMoves, validTypeMoves, validTypeDamagingMoves);
+
+        for (Integer pkmnNum : movesets.keySet()) {
+            List<Integer> learnt = new ArrayList<>();
+            List<Integer> moves = movesets.get(pkmnNum);
+            Pokemon pkmn = findPokemonInPoolWithSpeciesID(mainPokemonListInclFormes, pkmnNum);
+            if (pkmn == null) {
+                continue;
+            }
+
+            double atkSpAtkRatio = pkmn.getAttackSpecialAttackRatio();
+
+            if (pkmn.actuallyCosmetic) {
+                for (int i = 0; i < moves.size(); i++) {
+                    moves.set(i, movesets.get(pkmn.baseForme.number).get(i));
+                }
+                continue;
+            }
+
+            // Force a certain amount of good damaging moves depending on the percentage
+            int goodDamagingLeft = (int)Math.round(goodDamagingPercentage * moves.size());
+
+            // Replace moves as needed
+            for (int i = 0; i < moves.size(); i++) {
+                // should this move be forced damaging?
+                boolean attemptDamaging = goodDamagingLeft > 0;
+
+                // type themed?
+                Type typeOfMove = null;
+                if (typeThemed) {
+                    double picked = random.nextDouble();
+                    if ((pkmn.primaryType == Type.NORMAL && pkmn.secondaryType != null) ||
+                            (pkmn.secondaryType == Type.NORMAL)) {
+
+                        Type otherType = pkmn.primaryType == Type.NORMAL ? pkmn.secondaryType : pkmn.primaryType;
+
+                        // Normal/OTHER: 10% normal, 30% other, 60% random
+                        if (picked < 0.1) {
+                            typeOfMove = Type.NORMAL;
+                        } else if (picked < 0.4) {
+                            typeOfMove = otherType;
+                        }
+                        // else random
+                    } else if (pkmn.secondaryType != null) {
+                        // Primary/Secondary: 20% primary, 20% secondary, 60% random
+                        if (picked < 0.2) {
+                            typeOfMove = pkmn.primaryType;
+                        } else if (picked < 0.4) {
+                            typeOfMove = pkmn.secondaryType;
+                        }
+                        // else random
+                    } else {
+                        // Primary/None: 40% primary, 60% random
+                        if (picked < 0.4) {
+                            typeOfMove = pkmn.primaryType;
+                        }
+                        // else random
+                    }
+                }
+
+                // select a list to pick a move from that has at least one free
+                List<Move> pickList = validMoves;
+                if (attemptDamaging) {
+                    if (typeOfMove != null) {
+                        if (validTypeDamagingMoves.containsKey(typeOfMove)
+                                && checkForUnusedMove(validTypeDamagingMoves.get(typeOfMove), learnt)) {
+                            pickList = validTypeDamagingMoves.get(typeOfMove);
+                        } else if (checkForUnusedMove(validDamagingMoves, learnt)) {
+                            pickList = validDamagingMoves;
+                        }
+                    } else if (checkForUnusedMove(validDamagingMoves, learnt)) {
+                        pickList = validDamagingMoves;
+                    }
+                    MoveCategory forcedCategory = random.nextDouble() < atkSpAtkRatio ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL;
+                    List<Move> filteredList = pickList.stream().filter(mv -> mv.category == forcedCategory).collect(Collectors.toList());
+                    if (!filteredList.isEmpty() && checkForUnusedMove(filteredList, learnt)) {
+                        pickList = filteredList;
+                    }
+                } else if (typeOfMove != null) {
+                    if (validTypeMoves.containsKey(typeOfMove)
+                            && checkForUnusedMove(validTypeMoves.get(typeOfMove), learnt)) {
+                        pickList = validTypeMoves.get(typeOfMove);
+                    }
+                }
+
+                // now pick a move until we get a valid one
+                Move mv = pickList.get(random.nextInt(pickList.size()));
+                while (learnt.contains(mv.number)) {
+                    mv = pickList.get(random.nextInt(pickList.size()));
+                }
+
+                goodDamagingLeft--;
+                learnt.add(mv.number);
+            }
+
+            // write all moves for the pokemon
+            Collections.shuffle(learnt, random);
+            for (int i = 0; i < learnt.size(); i++) {
+                moves.set(i, learnt.get(i));
+            }
+        }
+        // Done, save
+        this.setEggMoves(movesets);
+    }
+
+    private void createSetsOfMoves(boolean noBroken, List<Move> validMoves, List<Move> validDamagingMoves,
+                                   Map<Type, List<Move>> validTypeMoves, Map<Type, List<Move>> validTypeDamagingMoves) {
+        List<Move> allMoves = this.getMoves();
+        List<Integer> hms = this.getHMMoves();
+        Set<Integer> allBanned = new HashSet<Integer>(noBroken ? this.getGameBreakingMoves() : Collections.EMPTY_SET);
+        allBanned.addAll(hms);
+        allBanned.addAll(this.getMovesBannedFromLevelup());
+        allBanned.addAll(GlobalConstants.zMoves);
+        allBanned.addAll(this.getIllegalMoves());
+
+        for (Move mv : allMoves) {
+            if (mv != null && !GlobalConstants.bannedRandomMoves[mv.number] && !allBanned.contains(mv.number)) {
+                validMoves.add(mv);
+                if (mv.type != null) {
+                    if (!validTypeMoves.containsKey(mv.type)) {
+                        validTypeMoves.put(mv.type, new ArrayList<>());
+                    }
+                    validTypeMoves.get(mv.type).add(mv);
+                }
+
+                if (!GlobalConstants.bannedForDamagingMove[mv.number]) {
+                    if ((mv.power * mv.hitCount) >= 2 * GlobalConstants.MIN_DAMAGING_MOVE_POWER
+                            || ((mv.power * mv.hitCount) >= GlobalConstants.MIN_DAMAGING_MOVE_POWER && (mv.hitratio >= 90 || mv.hitratio == perfectAccuracy))) {
+                        validDamagingMoves.add(mv);
+                        if (mv.type != null) {
+                            if (!validTypeDamagingMoves.containsKey(mv.type)) {
+                                validTypeDamagingMoves.put(mv.type, new ArrayList<>());
+                            }
+                            validTypeDamagingMoves.get(mv.type).add(mv);
+                        }
+                    }
+                }
+            }
+        }
+
+        Map<Type,Double> avgTypePowers = new TreeMap<>();
+        double totalAvgPower = 0;
+
+        for (Type type: validTypeMoves.keySet()) {
+            List<Move> typeMoves = validTypeMoves.get(type);
+            int attackingSum = 0;
+            for (Move typeMove: typeMoves) {
+                if (typeMove.power > 0) {
+                    attackingSum += (typeMove.power * typeMove.hitCount);
+                }
+            }
+            double avgTypePower = (double)attackingSum / (double)typeMoves.size();
+            avgTypePowers.put(type, avgTypePower);
+            totalAvgPower += (avgTypePower);
+        }
+
+        totalAvgPower /= (double)validTypeMoves.keySet().size();
+
+        // Want the average power of each type to be within 25% both directions
+        double minAvg = totalAvgPower * 0.75;
+        double maxAvg = totalAvgPower * 1.25;
+
+        // Add extra moves to type lists outside of the range to balance the average power of each type
+
+        for (Type type: avgTypePowers.keySet()) {
+            double avgPowerForType = avgTypePowers.get(type);
+            List<Move> typeMoves = validTypeMoves.get(type);
+            List<Move> alreadyPicked = new ArrayList<>();
+            int iterLoops = 0;
+            while (avgPowerForType < minAvg && iterLoops < 10000) {
+                final double finalAvgPowerForType = avgPowerForType;
+                List<Move> strongerThanAvgTypeMoves = typeMoves
+                        .stream()
+                        .filter(mv -> mv.power * mv.hitCount > finalAvgPowerForType)
+                        .collect(Collectors.toList());
+                if (strongerThanAvgTypeMoves.isEmpty()) break;
+                if (alreadyPicked.containsAll(strongerThanAvgTypeMoves)) {
+                    alreadyPicked = new ArrayList<>();
+                } else {
+                    strongerThanAvgTypeMoves.removeAll(alreadyPicked);
+                }
+                Move extraMove = strongerThanAvgTypeMoves.get(random.nextInt(strongerThanAvgTypeMoves.size()));
+                avgPowerForType = (avgPowerForType * typeMoves.size() + extraMove.power * extraMove.hitCount)
+                        / (typeMoves.size() + 1);
+                typeMoves.add(extraMove);
+                alreadyPicked.add(extraMove);
+                iterLoops++;
+            }
+            iterLoops = 0;
+            while (avgPowerForType > maxAvg && iterLoops < 10000) {
+                final double finalAvgPowerForType = avgPowerForType;
+                List<Move> weakerThanAvgTypeMoves = typeMoves
+                        .stream()
+                        .filter(mv -> mv.power * mv.hitCount < finalAvgPowerForType)
+                        .collect(Collectors.toList());
+                if (weakerThanAvgTypeMoves.isEmpty()) break;
+                if (alreadyPicked.containsAll(weakerThanAvgTypeMoves)) {
+                    alreadyPicked = new ArrayList<>();
+                } else {
+                    weakerThanAvgTypeMoves.removeAll(alreadyPicked);
+                }
+                Move extraMove = weakerThanAvgTypeMoves.get(random.nextInt(weakerThanAvgTypeMoves.size()));
+                avgPowerForType = (avgPowerForType * typeMoves.size() + extraMove.power * extraMove.hitCount)
+                        / (typeMoves.size() + 1);
+                typeMoves.add(extraMove);
+                alreadyPicked.add(extraMove);
+                iterLoops++;
+            }
+        }
     }
 
     @Override

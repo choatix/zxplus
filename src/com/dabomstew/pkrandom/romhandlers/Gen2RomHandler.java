@@ -1059,6 +1059,17 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         return Gen2Constants.bannedLevelupMoves;
     }
 
+    @Override
+    public Map<Integer, List<Integer>> getEggMoves() {
+        // Not currently implemented
+        return new TreeMap<>();
+    }
+
+    @Override
+    public void setEggMoves(Map<Integer, List<Integer>> eggMoves) {
+        // Not currently implemented
+    }
+
     private static class StaticPokemon {
         protected int[] speciesOffsets;
         protected int[] levelOffsets;

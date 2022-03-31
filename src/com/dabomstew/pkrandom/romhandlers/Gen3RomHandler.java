@@ -1771,6 +1771,17 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         }
     }
 
+    @Override
+    public Map<Integer, List<Integer>> getEggMoves() {
+        // Not currently implemented
+        return new TreeMap<>();
+    }
+
+    @Override
+    public void setEggMoves(Map<Integer, List<Integer>> eggMoves) {
+        // Not currently implemented
+    }
+
     private static class StaticPokemon {
         private int[] speciesOffsets;
         private int[] levelOffsets;

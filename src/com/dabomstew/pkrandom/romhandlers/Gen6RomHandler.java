@@ -2034,6 +2034,17 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public Map<Integer, List<Integer>> getEggMoves() {
+        // Not currently implemented
+        return new TreeMap<>();
+    }
+
+    @Override
+    public void setEggMoves(Map<Integer, List<Integer>> eggMoves) {
+        // Not currently implemented
+    }
+
+    @Override
     public boolean canChangeStaticPokemon() {
         return romEntry.staticPokemonSupport;
     }

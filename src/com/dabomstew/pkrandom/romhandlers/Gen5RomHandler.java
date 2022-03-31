@@ -1712,6 +1712,17 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
 
     }
 
+    @Override
+    public Map<Integer, List<Integer>> getEggMoves() {
+        // Not currently implemented
+        return new TreeMap<>();
+    }
+
+    @Override
+    public void setEggMoves(Map<Integer, List<Integer>> eggMoves) {
+        // Not currently implemented
+    }
+
     private static class FileEntry {
         private int file;
         private int offset;
