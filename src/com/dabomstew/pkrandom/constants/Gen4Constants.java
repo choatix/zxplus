@@ -851,12 +851,13 @@ public class Gen4Constants {
         // ban specific pokemon hold items, berries, apricorns, mail
         nonBadItems = allowedItems.copy();
 
-        nonBadItems.banSingles(Items.oddKeystone, Items.griseousOrb, Items.lightBall, Items.oranBerry);
+        nonBadItems.banSingles(Items.oddKeystone, Items.griseousOrb, Items.soulDew, Items.lightBall,
+                Items.oranBerry, Items.quickPowder);
         nonBadItems.banRange(Items.shoalSalt,2);
         nonBadItems.banRange(Items.growthMulch, 4); // mulch
         nonBadItems.banRange(Items.adamantOrb, 2); // orbs
         nonBadItems.banRange(Items.mail1, 12); // mails
-        nonBadItems.banRange(Items.figyBerry, 54); // berries DansGame
+        nonBadItems.banRange(Items.figyBerry, 25); // berries without useful battle effects
         nonBadItems.banRange(Items.luckyPunch, 4); // pokemon specific
         nonBadItems.banRange(Items.redScarf, 5); // contest scarves
 
