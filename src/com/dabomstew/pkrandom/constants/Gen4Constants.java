@@ -718,6 +718,8 @@ public class Gen4Constants {
 
     public static final String hpBarSpeedPrefix = "0CD106200090", expBarSpeedPrefix = "011C00D101212E6C", bothBarsSpeedPrefix = "70BD90421DDA";
 
+    public static final String dpptEggMoveTablePrefix = "40016601";
+
     public static final String typeEffectivenessTableLocator = "000505000805";
 
     private static final int trophyGardenGrassEncounterIndexDP = 304, trophyGardenGrassEncounterIndexPt = 308;

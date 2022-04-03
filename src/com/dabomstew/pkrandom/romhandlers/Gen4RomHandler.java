@@ -2789,13 +2789,92 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
     @Override
     public Map<Integer, List<Integer>> getEggMoves() {
-        // Not currently implemented
-        return new TreeMap<>();
+        Map<Integer, List<Integer>> eggMoves = new TreeMap<>();
+        try {
+            if (romEntry.romType == Gen4Constants.Type_HGSS) {
+                NARCArchive eggMoveNARC = this.readNARC(romEntry.getFile("EggMoves"));
+                byte[] eggMoveData = eggMoveNARC.files.get(0);
+                eggMoves = readEggMoves(eggMoveData, 0);
+            } else {
+                byte[] fieldOvl = readOverlay(romEntry.getInt("FieldOvlNumber"));
+                int offset = find(fieldOvl, Gen4Constants.dpptEggMoveTablePrefix);
+                if (offset > 0) {
+                    offset += Gen4Constants.dpptEggMoveTablePrefix.length() / 2; // because it was a prefix
+                    eggMoves = readEggMoves(fieldOvl, offset);
+                }
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+
+        return eggMoves;
     }
 
     @Override
     public void setEggMoves(Map<Integer, List<Integer>> eggMoves) {
-        // Not currently implemented
+        try {
+            if (romEntry.romType == Gen4Constants.Type_HGSS) {
+                NARCArchive eggMoveNARC = this.readNARC(romEntry.getFile("EggMoves"));
+                byte[] eggMoveData = eggMoveNARC.files.get(0);
+                writeEggMoves(eggMoves, eggMoveData, 0);
+                eggMoveNARC.files.set(0, eggMoveData);
+                this.writeNARC(romEntry.getFile("EggMoves"), eggMoveNARC);
+            } else {
+                byte[] fieldOvl = readOverlay(romEntry.getInt("FieldOvlNumber"));
+                int offset = find(fieldOvl, Gen4Constants.dpptEggMoveTablePrefix);
+                if (offset > 0) {
+                    offset += Gen4Constants.dpptEggMoveTablePrefix.length() / 2; // because it was a prefix
+                    writeEggMoves(eggMoves, fieldOvl, offset);
+                    this.writeOverlay(romEntry.getInt("FieldOvlNumber"), fieldOvl);
+                }
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+    }
+
+    private Map<Integer, List<Integer>> readEggMoves(byte[] data, int startingOffset) {
+        Map<Integer, List<Integer>> eggMoves = new TreeMap<>();
+        int currentOffset = startingOffset;
+        int currentSpecies = 0;
+        List<Integer> currentMoves = new ArrayList<>();
+        int val = FileFunctions.read2ByteInt(data, currentOffset);
+
+        // Egg move data is stored exactly like in Gen 3, so check egg_moves.h in the
+        // Gen 3 decomps for more info on how this algorithm works.
+        while (val != 0xFFFF) {
+            if (val > 20000) {
+                int species = val - 20000;
+                if (currentMoves.size() > 0) {
+                    eggMoves.put(currentSpecies, currentMoves);
+                }
+                currentSpecies = species;
+                currentMoves = new ArrayList<>();
+            } else {
+                currentMoves.add(val);
+            }
+            currentOffset += 2;
+            val = FileFunctions.read2ByteInt(data, currentOffset);
+        }
+
+        // Need to make sure the last entry gets recorded too
+        if (currentMoves.size() > 0) {
+            eggMoves.put(currentSpecies, currentMoves);
+        }
+
+        return eggMoves;
+    }
+
+    private void writeEggMoves(Map<Integer, List<Integer>> eggMoves, byte[] data, int startingOffset) {
+        int currentOffset = startingOffset;
+        for (int species : eggMoves.keySet()) {
+            FileFunctions.write2ByteInt(data, currentOffset, species + 20000);
+            currentOffset += 2;
+            for (int move : eggMoves.get(species)) {
+                FileFunctions.write2ByteInt(data, currentOffset, move);
+                currentOffset += 2;
+            }
+        }
     }
 
     private static class ScriptEntry {
