@@ -2154,36 +2154,14 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
 
             // X/Y Trash Can Pokemon
             if (romEntry.romType == Gen6Constants.Type_XY) {
-                offset = find(code, Gen6Constants.xyTrashEncountersTablePrefix);
-                if (offset > 0) {
-                    offset += Gen6Constants.xyTrashEncountersTablePrefix.length() / 2; // because it was a prefix
-                    // Pokemon Village Encounters
-                    Map<Pokemon, StaticEncounter> pokemonVillagePokemon = new HashMap<>();
-                    for (int i = 0; i < Gen6Constants.xyTrashCanEncounterCount / 2; i++) {
-                        StaticEncounter se = readTrashCanEncounter(offset);
-                        if (pokemonVillagePokemon.containsKey(se.pkmn)) {
-                            StaticEncounter mainEncounter = pokemonVillagePokemon.get(se.pkmn);
-                            mainEncounter.linkedEncounters.add(se);
-                        } else {
-                            statics.add(se);
-                            pokemonVillagePokemon.put(se.pkmn, se);
-                        }
-                        offset += Gen6Constants.xyTrashEncounterDataLength;
-                    }
-
-                    // Lost Hotel Encounters
-                    Map<Pokemon, StaticEncounter> lostHotelPokemon = new HashMap<>();
-                    for (int i = Gen6Constants.xyTrashCanEncounterCount / 2; i < Gen6Constants.xyTrashCanEncounterCount; i++) {
-                        StaticEncounter se = readTrashCanEncounter(offset);
-                        if (lostHotelPokemon.containsKey(se.pkmn)) {
-                            StaticEncounter mainEncounter = lostHotelPokemon.get(se.pkmn);
-                            mainEncounter.linkedEncounters.add(se);
-                        } else {
-                            statics.add(se);
-                            lostHotelPokemon.put(se.pkmn, se);
-                        }
-                        offset += Gen6Constants.xyTrashEncounterDataLength;
-                    }
+                int tableBaseOffset = find(code, Gen6Constants.xyTrashEncountersTablePrefix);
+                if (tableBaseOffset > 0) {
+                    tableBaseOffset += Gen6Constants.xyTrashEncountersTablePrefix.length() / 2; // because it was a prefix
+                    statics.addAll(readTrashCanEncounterSet(tableBaseOffset, Gen6Constants.pokemonVillageGarbadorOffset, Gen6Constants.pokemonVillageGarbadorCount, true));
+                    statics.addAll(readTrashCanEncounterSet(tableBaseOffset, Gen6Constants.pokemonVillageBanetteOffset, Gen6Constants.pokemonVillageBanetteCount, true));
+                    statics.addAll(readTrashCanEncounterSet(tableBaseOffset, Gen6Constants.lostHotelGarbadorOffset, Gen6Constants.lostHotelGarbadorCount, true));
+                    statics.addAll(readTrashCanEncounterSet(tableBaseOffset, Gen6Constants.lostHotelTrubbishOffset, Gen6Constants.lostHotelTrubbishCount, true));
+                    statics.addAll(readTrashCanEncounterSet(tableBaseOffset, Gen6Constants.lostHotelRotomOffset, Gen6Constants.lostHotelRotomCount, false));
                 }
             }
         } catch (IOException e) {
@@ -2205,6 +2183,25 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         for (StaticEncounter encounter : encountersToRemove) {
             statics.remove(encounter);
         }
+    }
+
+    private List<StaticEncounter> readTrashCanEncounterSet(int tableBaseOffset, int offsetWithinTable, int count,
+                                                           boolean consolidateSameSpeciesEncounters) {
+        List<StaticEncounter> statics = new ArrayList<>();
+        Map<Pokemon, StaticEncounter> encounterSet = new HashMap<>();
+        int offset = tableBaseOffset + (offsetWithinTable * Gen6Constants.xyTrashEncounterDataLength);
+        for (int i = offsetWithinTable; i < offsetWithinTable + count; i++) {
+            StaticEncounter se = readTrashCanEncounter(offset);
+            if (consolidateSameSpeciesEncounters && encounterSet.containsKey(se.pkmn)) {
+                StaticEncounter mainEncounter = encounterSet.get(se.pkmn);
+                mainEncounter.linkedEncounters.add(se);
+            } else {
+                statics.add(se);
+                encounterSet.put(se.pkmn, se);
+            }
+            offset += Gen6Constants.xyTrashEncounterDataLength;
+        }
+        return statics;
     }
 
     private StaticEncounter readTrashCanEncounter(int offset) {

@@ -355,7 +355,11 @@ public class Gen6Constants {
             xyRoamerLevelPrefix = "B020DDE13F3BC1E3";
 
     public static final String xyTrashEncountersTablePrefix = "4028100000";
-    public static final int xyTrashEncounterDataLength = 16, xyTrashCanEncounterCount = 24;
+    public static final int xyTrashEncounterDataLength = 16, xyTrashCanEncounterCount = 24,
+            pokemonVillageGarbadorOffset = 0, pokemonVillageGarbadorCount = 6, pokemonVillageBanetteOffset = 6,
+            pokemonVillageBanetteCount = 6, lostHotelGarbadorOffset = 12, lostHotelGarbadorCount = 3,
+            lostHotelTrubbishOffset = 15, lostHotelTrubbishCount = 3, lostHotelRotomOffset = 18, lostHotelRotomCount = 6;
+
 
     public static List<Integer> xyHardcodedTradeOffsets = Arrays.asList(1, 8);
     public static List<Integer> xyHardcodedTradeTexts = Arrays.asList(129, 349);
