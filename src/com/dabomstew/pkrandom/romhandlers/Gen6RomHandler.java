@@ -2151,6 +2151,41 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 }
                 statics.add(se);
             }
+
+            // X/Y Trash Can Pokemon
+            if (romEntry.romType == Gen6Constants.Type_XY) {
+                offset = find(code, Gen6Constants.xyTrashEncountersTablePrefix);
+                if (offset > 0) {
+                    offset += Gen6Constants.xyTrashEncountersTablePrefix.length() / 2; // because it was a prefix
+                    // Pokemon Village Encounters
+                    Map<Pokemon, StaticEncounter> pokemonVillagePokemon = new HashMap<>();
+                    for (int i = 0; i < Gen6Constants.xyTrashCanEncounterCount / 2; i++) {
+                        StaticEncounter se = readTrashCanEncounter(offset);
+                        if (pokemonVillagePokemon.containsKey(se.pkmn)) {
+                            StaticEncounter mainEncounter = pokemonVillagePokemon.get(se.pkmn);
+                            mainEncounter.linkedEncounters.add(se);
+                        } else {
+                            statics.add(se);
+                            pokemonVillagePokemon.put(se.pkmn, se);
+                        }
+                        offset += Gen6Constants.xyTrashEncounterDataLength;
+                    }
+
+                    // Lost Hotel Encounters
+                    Map<Pokemon, StaticEncounter> lostHotelPokemon = new HashMap<>();
+                    for (int i = Gen6Constants.xyTrashCanEncounterCount / 2; i < Gen6Constants.xyTrashCanEncounterCount; i++) {
+                        StaticEncounter se = readTrashCanEncounter(offset);
+                        if (lostHotelPokemon.containsKey(se.pkmn)) {
+                            StaticEncounter mainEncounter = lostHotelPokemon.get(se.pkmn);
+                            mainEncounter.linkedEncounters.add(se);
+                        } else {
+                            statics.add(se);
+                            lostHotelPokemon.put(se.pkmn, se);
+                        }
+                        offset += Gen6Constants.xyTrashEncounterDataLength;
+                    }
+                }
+            }
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
@@ -2170,6 +2205,24 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         for (StaticEncounter encounter : encountersToRemove) {
             statics.remove(encounter);
         }
+    }
+
+    private StaticEncounter readTrashCanEncounter(int offset) {
+        int species = FileFunctions.readFullInt(code, offset);
+        int forme = FileFunctions.readFullInt(code, offset + 4);
+        int level = FileFunctions.readFullInt(code, offset + 8);
+        StaticEncounter se = new StaticEncounter();
+        Pokemon pokemon = pokes[species];
+        if (forme > pokemon.cosmeticForms && forme != 30 && forme != 31) {
+            int speciesWithForme = absolutePokeNumByBaseForme
+                    .getOrDefault(species, dummyAbsolutePokeNums)
+                    .getOrDefault(forme, 0);
+            pokemon = pokes[speciesWithForme];
+        }
+        se.pkmn = pokemon;
+        se.forme = forme;
+        se.level = level;
+        return se;
     }
 
     @Override
@@ -2216,6 +2269,31 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 }
             }
             writeFile(romEntry.getFile("StaticPokemon"),staticCRO);
+
+            // X/Y Trash Can Pokemon
+            if (romEntry.romType == Gen6Constants.Type_XY) {
+                offset = find(code, Gen6Constants.xyTrashEncountersTablePrefix);
+                if (offset > 0) {
+                    offset += Gen6Constants.xyTrashEncountersTablePrefix.length() / 2; // because it was a prefix
+                    int currentCount = 0;
+                    while (currentCount != Gen6Constants.xyTrashCanEncounterCount) {
+                        StaticEncounter se = staticIter.next();
+                        FileFunctions.writeFullInt(code, offset, se.pkmn.getBaseNumber());
+                        FileFunctions.writeFullInt(code, offset + 4, se.forme);
+                        FileFunctions.writeFullInt(code, offset + 8, se.level);
+                        offset += Gen6Constants.xyTrashEncounterDataLength;
+                        currentCount++;
+                        for (int i = 0; i < se.linkedEncounters.size(); i++) {
+                            StaticEncounter linkedEncounter = se.linkedEncounters.get(i);
+                            FileFunctions.writeFullInt(code, offset, linkedEncounter.pkmn.getBaseNumber());
+                            FileFunctions.writeFullInt(code, offset + 4, linkedEncounter.forme);
+                            FileFunctions.writeFullInt(code, offset + 8, linkedEncounter.level);
+                            offset += Gen6Constants.xyTrashEncounterDataLength;
+                            currentCount++;
+                        }
+                    }
+                }
+            }
 
             if (romEntry.romType == Gen6Constants.Type_XY) {
                 int[] boxLegendaryOffsets = romEntry.arrayEntries.get("BoxLegendaryOffsets");
