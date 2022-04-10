@@ -1773,13 +1773,48 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
 
     @Override
     public Map<Integer, List<Integer>> getEggMoves() {
-        // Not currently implemented
-        return new TreeMap<>();
+        Map<Integer, List<Integer>> eggMoves = new TreeMap<>();
+        int baseOffset = romEntry.getValue("EggMoves");
+        int currentOffset = baseOffset;
+        int currentSpecies = 0;
+        List<Integer> currentMoves = new ArrayList<>();
+        int val = FileFunctions.read2ByteInt(rom, currentOffset);
+
+        // Check egg_moves.h in the Gen 3 decomps for more info on how this algorithm works.
+        while (val != 0xFFFF) {
+            if (val > 20000) {
+                int species = val - 20000;
+                if (currentMoves.size() > 0) {
+                    eggMoves.put(internalToPokedex[currentSpecies], currentMoves);
+                }
+                currentSpecies = species;
+                currentMoves = new ArrayList<>();
+            } else {
+                currentMoves.add(val);
+            }
+            currentOffset += 2;
+            val = FileFunctions.read2ByteInt(rom, currentOffset);
+        }
+
+        // Need to make sure the last entry gets recorded too
+        if (currentMoves.size() > 0) {
+            eggMoves.put(internalToPokedex[currentSpecies], currentMoves);
+        }
+        return eggMoves;
     }
 
     @Override
     public void setEggMoves(Map<Integer, List<Integer>> eggMoves) {
-        // Not currently implemented
+        int baseOffset = romEntry.getValue("EggMoves");
+        int currentOffset = baseOffset;
+        for (int species : eggMoves.keySet()) {
+            FileFunctions.write2ByteInt(rom, currentOffset, pokedexToInternal[species] + 20000);
+            currentOffset += 2;
+            for (int move : eggMoves.get(species)) {
+                FileFunctions.write2ByteInt(rom, currentOffset, move);
+                currentOffset += 2;
+            }
+        }
     }
 
     private static class StaticPokemon {
