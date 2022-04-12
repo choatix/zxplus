@@ -1061,13 +1061,41 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
 
     @Override
     public Map<Integer, List<Integer>> getEggMoves() {
-        // Not currently implemented
-        return new TreeMap<>();
+        Map<Integer, List<Integer>> eggMoves = new TreeMap<>();
+        int pointersOffset = romEntry.getValue("EggMovesTableOffset");
+        int baseOffset = (pointersOffset / 0x1000) * 0x1000;
+        for (int i = 1; i <= Gen2Constants.pokemonCount; i++) {
+            int eggMovePointer = FileFunctions.read2ByteInt(rom, pointersOffset + ((i - 1) * 2));
+            int eggMoveOffset = baseOffset + (eggMovePointer % 0x1000);
+            List<Integer> moves = new ArrayList<>();
+            int val = rom[eggMoveOffset] & 0xFF;
+            while (val != 0xFF) {
+                moves.add(val);
+                eggMoveOffset++;
+                val = rom[eggMoveOffset] & 0xFF;
+            }
+            if (moves.size() > 0) {
+                eggMoves.put(i, moves);
+            }
+        }
+        return eggMoves;
     }
 
     @Override
     public void setEggMoves(Map<Integer, List<Integer>> eggMoves) {
-        // Not currently implemented
+        int pointersOffset = romEntry.getValue("EggMovesTableOffset");
+        int baseOffset = (pointersOffset / 0x1000) * 0x1000;
+        for (int i = 1; i <= Gen2Constants.pokemonCount; i++) {
+            int eggMovePointer = FileFunctions.read2ByteInt(rom, pointersOffset + ((i - 1) * 2));
+            int eggMoveOffset = baseOffset + (eggMovePointer % 0x1000);
+            if (eggMoves.containsKey(i)) {
+                List<Integer> moves = eggMoves.get(i);
+                for (int move: moves) {
+                    rom[eggMoveOffset] = (byte) move;
+                    eggMoveOffset++;
+                }
+            }
+        }
     }
 
     private static class StaticPokemon {
