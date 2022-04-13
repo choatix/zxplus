@@ -1553,76 +1553,30 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean noLegendaries = settings.isTrainersBlockLegendaries();
         boolean noEarlyWonderGuard = settings.isTrainersBlockEarlyWonderGuard();
         int levelModifier = settings.isTrainersLevelModified() ? settings.getTrainersLevelModifier() : 0;
-        boolean distributionSetting =
-                settings.getTrainersMod() == Settings.TrainersMod.DISTRIBUTED ||
-                settings.getTrainersMod() == Settings.TrainersMod.MAINPLAYTHROUGH;
+        boolean distributionSetting = settings.getTrainersMod() == Settings.TrainersMod.DISTRIBUTED;
         boolean mainPlaythroughSetting = settings.getTrainersMod() == Settings.TrainersMod.MAINPLAYTHROUGH;
         boolean includeFormes = settings.isAllowTrainerAlternateFormes();
         boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
         boolean swapMegaEvos = settings.isSwapTrainerMegaEvos();
         boolean shinyChance = settings.isShinyChance();
         boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOMIZE;
+        int eliteFourUniquePokemonNumber = settings.getEliteFourUniquePokemonNumber();
+        boolean forceFullyEvolved = settings.isTrainersForceFullyEvolved();
+        int forceFullyEvolvedLevel = settings.getTrainersForceFullyEvolvedLevel();
+        boolean forceChallengeMode = (settings.getCurrentMiscTweaks() & MiscTweak.FORCE_CHALLENGE_MODE.getValue()) > 0;
+        boolean rivalCarriesStarter = settings.isRivalCarriesStarterThroughout();
+        List<Pokemon> starterList = getStarters().subList(0,3);
 
         checkPokemonRestrictions();
         List<Trainer> currentTrainers = this.getTrainers();
-        // New: randomize the order trainers are randomized in.
+        // Randomize the order trainers are randomized in.
         // Leads to less predictable results for various modifiers.
         // Need to keep the original ordering around for saving though.
 
-        List<Trainer> scrambledTrainers = new ArrayList<>();
+        List<Trainer> scrambledTrainers = new ArrayList<>(currentTrainers);
+        Collections.shuffle(scrambledTrainers, this.random);
 
-        // If Elite 4 setting was checked, then created scrambledTrainers
-        // to have Elite 4 & Champion at the start of the list
-        // Start of the list is important, so that priority goes to placing
-        // pokemon on them first, then adding those pokemon to the banlist
-
-
-        boolean tempSettingsFlag = true;
-        int tempSettingsE4Num = 2;
-
-        List<Trainer> eliteFourTrainers = new ArrayList<>();
-
-        if (tempSettingsFlag) {
-            // first find the
-            List<Integer> eliteFourIndices = getEliteFourTrainers();
-
-            for (int i : eliteFourIndices){
-                // find matching trainer for Elite Four
-                Trainer t = currentTrainers.get(i - 1);
-                eliteFourTrainers.add(t);
-                System.out.println(t.fullDisplayName);
-                        }
-            // commit eliteFourTrainers to scrambledTrainers first
-            scrambledTrainers.addAll(eliteFourTrainers);
-
-
-            // add all trainers not in eliteFourTrainers to scrambled remaining trainers (temp list)
-
-            List<Trainer> scrambledRemainingTrainers = new ArrayList<>();
-            for (Trainer t: currentTrainers) {
-                if (!eliteFourTrainers.contains(t)) {
-                    scrambledRemainingTrainers.add(t);
-                }
-            }
-            // scramble the remaining trainers
-            Collections.shuffle(scrambledRemainingTrainers, this.random);
-
-            // add the remaining trainers to the elite four list
-            scrambledTrainers.addAll(scrambledRemainingTrainers);
-
-        }
-
-        else {
-            // Otherwise, scramble all together
-            scrambledTrainers.addAll(currentTrainers);
-            Collections.shuffle(scrambledTrainers, this.random);
-        }
-
-//        if (currentTrainers.size == scrambledTrainers.size) {
-//            throw new Exception("ERROR ON TRAINER LIST SIZE");
-//        }
-
-        cachedReplacementLists = new TreeMap<>();
+        // Set up Pokemon pool
         cachedAllList = noLegendaries ? new ArrayList<>(noLegendaryList) : new ArrayList<>(
                 mainPokemonList);
         if (includeFormes) {
@@ -1634,10 +1588,6 @@ public abstract class AbstractRomHandler implements RomHandler {
                         .stream()
                         .filter(pk -> !pk.actuallyCosmetic)
                         .collect(Collectors.toList());
-
-
-        List<Integer> mainPlaythroughTrainers = getMainPlaythroughTrainers();
-
         List<Pokemon> banned = this.getBannedFormesForTrainerPokemon();
         if (!abilitiesAreRandomized) {
             List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
@@ -1648,9 +1598,40 @@ public abstract class AbstractRomHandler implements RomHandler {
         }
         cachedAllList.removeAll(banned);
 
+        // Elite Four Unique Pokemon related
+        boolean eliteFourUniquePokemon = eliteFourUniquePokemonNumber > 0;
+        List<Pokemon> illegalList = new ArrayList<>();
+        List<Pokemon> bannedFromUniqueList = new ArrayList<>();
+        boolean illegalEvoChains = false;
+        List<Integer> eliteFourIndices = getEliteFourTrainers(forceChallengeMode);
+        if (eliteFourUniquePokemon) {
+            // Sort Elite Four Trainers to the start of the list
+            scrambledTrainers.sort((t1, t2) ->
+                    Boolean.compare(eliteFourIndices.contains(currentTrainers.indexOf(t2)+1),eliteFourIndices.contains(currentTrainers.indexOf(t1)+1)));
+            illegalEvoChains = forceFullyEvolved;
+            if (rivalCarriesStarter) {
+                for (Pokemon starter: starterList) {
+                    // If rival/friend carries starter, the starters cannot be set as unique
+                    bannedFromUniqueList.add(starter);
+                    setEvoChainAsIllegal(starter, bannedFromUniqueList, true);
 
-        // Fully random is easy enough - randomize then worry about rival
-        // carrying starter at the end
+                    // If the final boss is a rival/friend, the fully evolved starters will be unique
+                    if (hasRivalFinalBattle()) {
+                        cachedAllList.removeAll(getFinalEvos(starter));
+                        if (illegalEvoChains) {
+                            illegalList.add(starter);
+                            setEvoChainAsIllegal(starter, illegalList, true);
+                        }
+                    }
+                }
+            }
+        }
+
+        List<Integer> mainPlaythroughTrainers = getMainPlaythroughTrainers();
+
+        // Randomize Trainer Pokemon
+        // The result after this is done will not be final if "Force Fully Evolved" or "Rival Carries Starter"
+        // are used, as they are applied later
         for (Trainer t : scrambledTrainers) {
             applyLevelModifierToTrainerPokemon(t, levelModifier);
             if (t.tag != null && t.tag.equals("IRIVAL")) {
@@ -1659,132 +1640,90 @@ public abstract class AbstractRomHandler implements RomHandler {
                 continue;
             }
 
-            // in order for Elite Four to not have the same pokemon twice
-            // we must keep track of each pokemon placed and provide it
-            // as a parameter for pick replacement function
-            // however, not all of them are added to the global ban list
-            // so we keep track of the list per trainer, and discard once
-            // the trainer is finished. in this case, just E4 trainers
+            int trainerIndex = currentTrainers.indexOf(t) + 1;
 
+            List<TrainerPokemon> trainerPokemonList = new ArrayList<>(t.pokemon);
+
+            // Elite Four Unique Pokemon related
             boolean eliteFourTrackPokemon = false;
-            List<Pokemon> eliteFourPlacedPokemon = new ArrayList<>();
-            if ( (tempSettingsFlag) && (eliteFourTrainers.contains(t)) ) {
+            boolean eliteFourRival = false;
+            if (eliteFourUniquePokemon && eliteFourIndices.contains(trainerIndex)) {
                 eliteFourTrackPokemon = true;
+                Collections.reverse(trainerPokemonList);
+                trainerPokemonList.sort((tp1, tp2) -> Integer.compare(tp2.level, tp1.level));
+                if (rivalCarriesStarter && (t.tag.contains("RIVAL") || t.tag.contains("FRIEND"))) {
+                    eliteFourRival = true;
+                }
             }
 
-            for (TrainerPokemon tp : t.pokemon) {
+            for (TrainerPokemon tp : trainerPokemonList) {
                 boolean swapThisMegaEvo = swapMegaEvos && tp.canMegaEvolve();
                 boolean wgAllowed = (!noEarlyWonderGuard) || tp.level >= 20;
+                boolean eliteFourSetUniquePokemon =
+                        eliteFourTrackPokemon && eliteFourUniquePokemonNumber > trainerPokemonList.indexOf(tp);
+                boolean willForceEvolve = forceFullyEvolved && tp.level >= forceFullyEvolvedLevel;
 
-                Pokemon newPK;
                 Pokemon oldPK = tp.pokemon;
                 if (tp.forme > 0) {
                     oldPK = getAltFormeOfPokemon(oldPK, tp.forme);
                 }
 
-                // this code checks to see if eliteFour setting is on
-                // if so, then check the size of the trainer's pokemon
-                // and apply the eliteFour settings when the pokemon
-                // are at the end of the list, up to the setting's
-                // number of pokemon to apply the setting to
-
-                // e.g., setting is to apply 2 unique pokemon to an Elite 4 trainer
-                // with 5 pokemon. this will apply unique pokemon to #4 and #5
-                boolean eliteFourSetUniquePokemon = false;
-                if (tempSettingsFlag) {
-                    if (((t.pokemon.size() - t.pokemon.indexOf(tp)) <= Math.min(t.pokemon.size(), tempSettingsE4Num)) && (eliteFourTrainers.contains(t)) ) {
-                        eliteFourSetUniquePokemon = true;
-                    }
+                bannedList = new ArrayList<>();
+                bannedList.addAll(usedAsUniqueList);
+                if (illegalEvoChains && willForceEvolve) {
+                    bannedList.addAll(illegalList);
+                }
+                if (eliteFourSetUniquePokemon) {
+                    bannedList.addAll(bannedFromUniqueList);
                 }
 
+                Pokemon newPK = pickReplacement(
+                                oldPK,
+                                usePowerLevels,
+                                null,
+                                noLegendaries,
+                                wgAllowed,
+                                distributionSetting || (mainPlaythroughSetting && mainPlaythroughTrainers.contains(t.offset)),
+                                swapThisMegaEvo,
+                                abilitiesAreRandomized,
+                                includeFormes,
+                                banIrregularAltFormes
+                        );
 
-                // new code for distribution with mainplaythrough balancing
-                // what we do is check each trainer if they're part of the main playthrough
-                // if so, add to placement history, if not, pure random
-                if (distributionSetting && mainPlaythroughSetting) {
-                    // new code for main playthrough distribution
-                    if (mainPlaythroughTrainers.contains(t.offset)) { // this determines if this trainer is in the pool of main playthrough
+                // Chosen Pokemon is locked in past here
+                if (distributionSetting || (mainPlaythroughSetting && mainPlaythroughTrainers.contains(t.offset))) {
+                    setPlacementHistory(newPK);
+                }
+                tp.absolutePokeNumber = newPK.number;
+                tp.pokemon = newPK;
+                setFormeForTrainerPokemon(tp, newPK);
+                tp.abilitySlot = getRandomAbilitySlot(newPK);
+                tp.resetMoves = true;
 
-                        newPK =
-                                pickReplacement(
-                                        oldPK,
-                                        usePowerLevels,
-                                        null,
-                                        noLegendaries,
-                                        wgAllowed,
-                                        true,
-                                        swapThisMegaEvo,
-                                        abilitiesAreRandomized,
-                                        includeFormes,
-                                        banIrregularAltFormes,
-                                        eliteFourPlacedPokemon
-                                );
-                        setPlacementHistory(newPK);
-                        tp.absolutePokeNumber = newPK.number;
-                        tp.pokemon = newPK;
-                        setFormeForTrainerPokemon(tp, newPK);
-                        tp.abilitySlot = getRandomAbilitySlot(newPK);
-                        if (eliteFourSetUniquePokemon) {
-                            removeEvolutionChainFromPool(newPK);
+                if (!eliteFourRival) {
+                    if (eliteFourSetUniquePokemon) {
+                        List<Pokemon> actualPKList;
+                        if (willForceEvolve) {
+                            actualPKList = getFinalEvos(newPK);
+                        } else {
+                            actualPKList = new ArrayList<>();
+                            actualPKList.add(newPK);
                         }
-                        if (eliteFourTrackPokemon) {
-                            eliteFourPlacedPokemon.add(newPK);
+                        for (Pokemon actualPK: actualPKList) {
+                            usedAsUniqueList.add(actualPK);
+                            if (illegalEvoChains) {
+                                setEvoChainAsIllegal(actualPK, illegalList, willForceEvolve);
+                            }
                         }
                     }
-                    else { // pure random when trainer not in pool
-                        newPK =
-                                pickReplacement(
-                                        oldPK,
-                                        usePowerLevels,
-                                        null,
-                                        noLegendaries,
-                                        wgAllowed,
-                                        false,
-                                        swapThisMegaEvo,
-                                        abilitiesAreRandomized,
-                                        includeFormes,
-                                        banIrregularAltFormes,
-                                        eliteFourPlacedPokemon
-                                );
-                        tp.absolutePokeNumber = newPK.number;
-                        tp.pokemon = newPK;
-                        setFormeForTrainerPokemon(tp, newPK);
-                        tp.abilitySlot = getRandomAbilitySlot(newPK);
-                        if (eliteFourSetUniquePokemon) {
-                            removeEvolutionChainFromPool(newPK);
-                        }
-                        if (eliteFourTrackPokemon) {
-                            eliteFourPlacedPokemon.add(newPK);
+                    if (eliteFourTrackPokemon) {
+                        bannedFromUniqueList.add(newPK);
+                        if (illegalEvoChains) {
+                            setEvoChainAsIllegal(newPK, bannedFromUniqueList, willForceEvolve);
                         }
                     }
                 } else {
-                    newPK =
-                            pickReplacement(
-                                    oldPK,
-                                    usePowerLevels,
-                                    null,
-                                    noLegendaries,
-                                    wgAllowed,
-                                    distributionSetting,
-                                    swapThisMegaEvo,
-                                    abilitiesAreRandomized,
-                                    includeFormes,
-                                    banIrregularAltFormes,
-                                    eliteFourPlacedPokemon
-                            );
-                    if (distributionSetting) {
-                        setPlacementHistory(newPK);
-                    }
-                    tp.absolutePokeNumber = newPK.number;
-                    tp.pokemon = newPK;
-                    setFormeForTrainerPokemon(tp, newPK);
-                    tp.abilitySlot = getRandomAbilitySlot(newPK);
-                    if (eliteFourSetUniquePokemon) {
-                        removeEvolutionChainFromPool(newPK);
-                    }
-                    if (eliteFourTrackPokemon) {
-                        eliteFourPlacedPokemon.add(newPK);
-                    }
+                    eliteFourRival = false;
                 }
 
                 if (swapThisMegaEvo) {
@@ -1793,7 +1732,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                             .get(this.random.nextInt(newPK.megaEvolutionsFrom.size()))
                             .argument;
                 }
-                tp.resetMoves = true;
+
                 if (shinyChance) {
                     if (this.random.nextInt(256) == 0) {
                         tp.IVs |= (1 << 30);
@@ -1805,48 +1744,49 @@ public abstract class AbstractRomHandler implements RomHandler {
         // Save it all up
         this.setTrainers(currentTrainers, false);
     }
-    private void removeEvolutionChainFromPool(Pokemon newPK) {
 
-        cachedAllList.remove(newPK);
-        permanentlyBannedList.add(newPK);
-        // System.out.println("Removed " + newPK.name);
+    private void setEvoChainAsIllegal(Pokemon newPK, List<Pokemon> illegalList, boolean willForceEvolve) {
+        // set pre-evos as illegal
+        setIllegalPreEvos(newPK, illegalList);
 
-        // first remove any evolutionFrom (aka, Pokemon that newPK will evolve into
-        if (newPK.evolutionsFrom.size() > 0) {
-            for (Evolution evo: newPK.evolutionsFrom) {
-                Pokemon pkToRemove = evo.to;
-                if (cachedAllList.contains(pkToRemove)) {
-                    cachedAllList.remove(pkToRemove);
-                    // System.out.println("Removed stage 1 evolution " + pkToRemove.name);
-                }
-            }
-        }
-
-        // then remove any evolutionTo (preevolutions, 2 stages down)
-        if (newPK.evolutionsTo.size() > 0) {
-            for (Evolution evo: newPK.evolutionsTo) {
-                Pokemon pkToRemove = evo.from;
-                if (cachedAllList.contains(pkToRemove)) {
-                    cachedAllList.remove(pkToRemove);
-                    // System.out.println("Removed stage 1 pre-evo " + pkToRemove.name);
-                    for (Evolution evo2 : pkToRemove.evolutionsTo) {
-                        Pokemon pkToRemove2 = evo2.from;
-                        if (cachedAllList.contains(pkToRemove2)) {
-                            cachedAllList.remove(pkToRemove2);
-                            // System.out.println("Removed stage 2 pre-evo " + pkToRemove2.name);
-                        }
-                        else {
-                            // System.out.println("Stage 2 pre-evo " + pkToRemove2.name + " not in pool any more, not removing");
-                        }
-                    }
-                }
-                else {
-                    // System.out.println("Stage 1 pre-evo " + pkToRemove.name + " not in pool any more, not removing");
-                }
-            }
+        // if the placed Pokemon will be forced fully evolved, set its evolutions as illegal
+        if (willForceEvolve) {
+            setIllegalEvos(newPK, illegalList);
         }
     }
 
+    private void setIllegalPreEvos(Pokemon pk, List<Pokemon> illegalList) {
+        for (Evolution evo: pk.evolutionsTo) {
+            pk = evo.from;
+            illegalList.add(pk);
+            setIllegalPreEvos(pk, illegalList);
+        }
+    }
+
+    private void setIllegalEvos(Pokemon pk, List<Pokemon> illegalList) {
+        for (Evolution evo: pk.evolutionsFrom) {
+            pk = evo.to;
+            illegalList.add(pk);
+            setIllegalEvos(pk, illegalList);
+        }
+    }
+
+    private List<Pokemon> getFinalEvos(Pokemon pk) {
+        List<Pokemon> finalEvos = new ArrayList<>();
+        traverseEvolutions(pk, finalEvos);
+        return finalEvos;
+    }
+
+    private void traverseEvolutions(Pokemon pk, List<Pokemon> finalEvos) {
+        if (!pk.evolutionsFrom.isEmpty()) {
+            for (Evolution evo: pk.evolutionsFrom) {
+                pk = evo.to;
+                traverseEvolutions(pk, finalEvos);
+            }
+        } else {
+            finalEvos.add(pk);
+        }
+    }
 
     private void setFormeForTrainerPokemon(TrainerPokemon tp, Pokemon pk) {
         boolean checkCosmetics = true;
@@ -1885,6 +1825,12 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean swapMegaEvos = settings.isSwapTrainerMegaEvos();
         boolean shinyChance = settings.isShinyChance();
         boolean abilitiesAreRandomized = settings.getAbilitiesMod() == Settings.AbilitiesMod.RANDOMIZE;
+        int eliteFourUniquePokemonNumber = settings.getEliteFourUniquePokemonNumber();
+        boolean forceFullyEvolved = settings.isTrainersForceFullyEvolved();
+        int forceFullyEvolvedLevel = settings.getTrainersForceFullyEvolvedLevel();
+        boolean forceChallengeMode = (settings.getCurrentMiscTweaks() & MiscTweak.FORCE_CHALLENGE_MODE.getValue()) > 0;
+        boolean rivalCarriesStarter = settings.isRivalCarriesStarterThroughout();
+        List<Pokemon> starterList = getStarters().subList(0,3);
 
         checkPokemonRestrictions();
         List<Trainer> currentTrainers = this.getTrainers();
@@ -1918,10 +1864,9 @@ public abstract class AbstractRomHandler implements RomHandler {
 
         // Construct groupings for types
         // Anything starting with GYM or ELITE or CHAMPION is a group
-        Set<Trainer> assignedTrainers = new TreeSet<>();
         Map<String, List<Trainer>> groups = new TreeMap<>();
+        Map<Trainer, Type> trainerTypes = new TreeMap<>();
         for (Trainer t : currentTrainers) {
-            applyLevelModifierToTrainerPokemon(t, levelModifier);
             if (t.tag != null && t.tag.equals("IRIVAL")) {
                 // This is the first rival in Yellow. His Pokemon is used to determine the non-player
                 // starter, so we can't change it here. Just skip it.
@@ -1938,14 +1883,12 @@ public abstract class AbstractRomHandler implements RomHandler {
                     groups.put(group, new ArrayList<>());
                 }
                 groups.get(group).add(t);
-                assignedTrainers.add(t);
             } else if (group.startsWith("GIO")) {
                 // Giovanni has same grouping as his gym, gym 8
                 if (!groups.containsKey("GYM8")) {
                     groups.put("GYM8", new ArrayList<>());
                 }
                 groups.get("GYM8").add(t);
-                assignedTrainers.add(t);
             }
         }
 
@@ -1975,49 +1918,9 @@ public abstract class AbstractRomHandler implements RomHandler {
             if (group.equals("CHAMPION")) {
                 usedUberTypes.add(typeForGroup);
             }
-            // Themed groups just have a theme, no special criteria
+
             for (Trainer t : trainersInGroup) {
-                for (TrainerPokemon tp : t.pokemon) {
-                    boolean swapThisMegaEvo = swapMegaEvos && tp.canMegaEvolve();
-                    boolean wgAllowed = (!noEarlyWonderGuard) || tp.level >= 20;
-                    Pokemon oldPK = tp.pokemon;
-                    if (tp.forme > 0) {
-                        oldPK = getAltFormeOfPokemon(oldPK, tp.forme);
-                    }
-                    Pokemon newPK =
-                            pickReplacement(
-                                    oldPK,
-                                    usePowerLevels,
-                                    typeForGroup,
-                                    noLegendaries,
-                                    wgAllowed,
-                                    false,
-                                    swapThisMegaEvo,
-                                    abilitiesAreRandomized,
-                                    includeFormes,
-                                    banIrregularAltFormes,
-                                    new ArrayList<>()
-
-                            );
-                    tp.absolutePokeNumber = newPK.number;
-                    tp.pokemon = newPK;
-                    setFormeForTrainerPokemon(tp, newPK);
-                    tp.abilitySlot = getRandomAbilitySlot(newPK);
-
-                    if (swapThisMegaEvo) {
-                        tp.heldItem = newPK
-                                .megaEvolutionsFrom
-                                .get(this.random.nextInt(newPK.megaEvolutionsFrom.size()))
-                                .argument;
-                    }
-
-                    tp.resetMoves = true;
-                    if (shinyChance) {
-                        if (this.random.nextInt(256) == 0) {
-                            tp.IVs |= (1 << 30);
-                        }
-                    }
-                }
+                trainerTypes.put(t, typeForGroup);
             }
         }
 
@@ -2027,14 +1930,47 @@ public abstract class AbstractRomHandler implements RomHandler {
         List<Trainer> scrambledTrainers = new ArrayList<>(currentTrainers);
         Collections.shuffle(scrambledTrainers, this.random);
 
+        // Elite Four Unique Pokemon related
+        boolean eliteFourUniquePokemon = eliteFourUniquePokemonNumber > 0;
+        List<Pokemon> illegalList = new ArrayList<>();
+        List<Pokemon> bannedFromUniqueList = new ArrayList<>();
+        boolean illegalEvoChains = false;
+        List<Integer> eliteFourIndices = getEliteFourTrainers(forceChallengeMode);
+        if (eliteFourUniquePokemon) {
+            // Sort Elite Four Trainers to the start of the list
+            scrambledTrainers.sort((t1, t2) ->
+                    Boolean.compare(eliteFourIndices.contains(currentTrainers.indexOf(t2)+1),eliteFourIndices.contains(currentTrainers.indexOf(t1)+1)));
+            illegalEvoChains = forceFullyEvolved;
+            if (rivalCarriesStarter) {
+                for (Pokemon starter: starterList) {
+                    // If rival/friend carries starter, the starters cannot be set as unique
+                    bannedFromUniqueList.add(starter);
+                    setEvoChainAsIllegal(starter, bannedFromUniqueList, true);
+
+                    // If the final boss is a rival/friend, the fully evolved starters will be unique
+                    if (hasRivalFinalBattle()) {
+                        cachedAllList.removeAll(getFinalEvos(starter));
+                        if (illegalEvoChains) {
+                            illegalList.add(starter);
+                            setEvoChainAsIllegal(starter, illegalList, true);
+                        }
+                    }
+                }
+            }
+        }
+
         // Give a type to each unassigned trainer
         for (Trainer t : scrambledTrainers) {
+            applyLevelModifierToTrainerPokemon(t, levelModifier);
             if (t.tag != null && t.tag.equals("IRIVAL")) {
-                continue; // skip
+                // This is the first rival in Yellow. His Pokemon is used to determine the non-player
+                // starter, so we can't change it here. Just skip it.
+                continue;
             }
 
-            if (!assignedTrainers.contains(t)) {
-                Type typeForTrainer = pickType(weightByFrequency, noLegendaries, includeFormes);
+            Type typeForTrainer = trainerTypes.get(t);
+            if (typeForTrainer == null) {
+                typeForTrainer = pickType(weightByFrequency, noLegendaries, includeFormes);
                 // Ubers: can't have the same type as each other
                 if (t.tag != null && t.tag.equals("UBER")) {
                     while (usedUberTypes.contains(typeForTrainer)) {
@@ -2042,44 +1978,102 @@ public abstract class AbstractRomHandler implements RomHandler {
                     }
                     usedUberTypes.add(typeForTrainer);
                 }
-                for (TrainerPokemon tp : t.pokemon) {
-                    boolean swapThisMegaEvo = swapMegaEvos && tp.canMegaEvolve();
-                    boolean shedAllowed = (!noEarlyWonderGuard) || tp.level >= 20;
-                    Pokemon oldPK = tp.pokemon;
-                    if (tp.forme > 0) {
-                        oldPK = getAltFormeOfPokemon(oldPK, tp.forme);
-                    }
-                    Pokemon newPK =
-                            pickReplacement(
-                                    oldPK,
-                                    usePowerLevels,
-                                    typeForTrainer,
-                                    noLegendaries,
-                                    shedAllowed,
-                                    false,
-                                    swapThisMegaEvo,
-                                    abilitiesAreRandomized,
-                                    includeFormes,
-                                    banIrregularAltFormes,
-                                    new ArrayList<>()
-                            );
-                    tp.absolutePokeNumber = newPK.number;
-                    tp.pokemon = newPK;
-                    setFormeForTrainerPokemon(tp, newPK);
-                    tp.abilitySlot = getRandomAbilitySlot(newPK);
+            }
 
-                    if (swapThisMegaEvo) {
-                        tp.heldItem = newPK
-                                        .megaEvolutionsFrom
-                                        .get(this.random.nextInt(newPK.megaEvolutionsFrom.size()))
-                                        .argument;
-                    }
+            int trainerIndex = currentTrainers.indexOf(t) + 1;
 
-                    tp.resetMoves = true;
-                    if (shinyChance) {
-                        if (this.random.nextInt(256) == 0) {
-                            tp.IVs |= (1 << 30);
+            List<TrainerPokemon> trainerPokemonList = new ArrayList<>(t.pokemon);
+
+            // Elite Four Unique Pokemon related
+            boolean eliteFourTrackPokemon = false;
+            boolean eliteFourRival = false;
+            if (eliteFourUniquePokemon && eliteFourIndices.contains(trainerIndex)) {
+                eliteFourTrackPokemon = true;
+                Collections.reverse(trainerPokemonList);
+                trainerPokemonList.sort((tp1, tp2) -> Integer.compare(tp2.level, tp1.level));
+                if (rivalCarriesStarter && (t.tag.contains("RIVAL") || t.tag.contains("FRIEND"))) {
+                    eliteFourRival = true;
+                }
+            }
+
+            for (TrainerPokemon tp : trainerPokemonList) {
+                boolean swapThisMegaEvo = swapMegaEvos && tp.canMegaEvolve();
+                boolean wgAllowed = (!noEarlyWonderGuard) || tp.level >= 20;
+                boolean eliteFourSetUniquePokemon =
+                        eliteFourTrackPokemon && eliteFourUniquePokemonNumber > trainerPokemonList.indexOf(tp);
+                boolean willForceEvolve = forceFullyEvolved && tp.level >= forceFullyEvolvedLevel;
+
+                Pokemon oldPK = tp.pokemon;
+                if (tp.forme > 0) {
+                    oldPK = getAltFormeOfPokemon(oldPK, tp.forme);
+                }
+
+                bannedList = new ArrayList<>();
+                bannedList.addAll(usedAsUniqueList);
+                if (illegalEvoChains && willForceEvolve) {
+                    bannedList.addAll(illegalList);
+                }
+                if (eliteFourSetUniquePokemon) {
+                    bannedList.addAll(bannedFromUniqueList);
+                }
+
+                Pokemon newPK =
+                        pickReplacement(
+                                oldPK,
+                                usePowerLevels,
+                                typeForTrainer,
+                                noLegendaries,
+                                wgAllowed,
+                                false,
+                                swapThisMegaEvo,
+                                abilitiesAreRandomized,
+                                includeFormes,
+                                banIrregularAltFormes
+                        );
+
+                // Chosen Pokemon is locked in past here
+                tp.absolutePokeNumber = newPK.number;
+                tp.pokemon = newPK;
+                setFormeForTrainerPokemon(tp, newPK);
+                tp.abilitySlot = getRandomAbilitySlot(newPK);
+                tp.resetMoves = true;
+
+                if (!eliteFourRival) {
+                    if (eliteFourSetUniquePokemon) {
+                        List<Pokemon> actualPKList;
+                        if (willForceEvolve) {
+                            actualPKList = getFinalEvos(newPK);
+                        } else {
+                            actualPKList = new ArrayList<>();
+                            actualPKList.add(newPK);
                         }
+                        for (Pokemon actualPK: actualPKList) {
+                            usedAsUniqueList.add(actualPK);
+                            if (illegalEvoChains) {
+                                setEvoChainAsIllegal(actualPK, illegalList, willForceEvolve);
+                            }
+                        }
+                    }
+                    if (eliteFourTrackPokemon) {
+                        bannedFromUniqueList.add(newPK);
+                        if (illegalEvoChains) {
+                            setEvoChainAsIllegal(newPK, bannedFromUniqueList, willForceEvolve);
+                        }
+                    }
+                } else {
+                    eliteFourRival = false;
+                }
+
+                if (swapThisMegaEvo) {
+                    tp.heldItem = newPK
+                                    .megaEvolutionsFrom
+                                    .get(this.random.nextInt(newPK.megaEvolutionsFrom.size()))
+                                    .argument;
+                }
+
+                if (shinyChance) {
+                    if (this.random.nextInt(256) == 0) {
+                        tp.IVs |= (1 << 30);
                     }
                 }
             }
@@ -2163,6 +2157,11 @@ public abstract class AbstractRomHandler implements RomHandler {
         rivalCarriesStarterUpdate(currentTrainers, "RIVAL", isORAS ? 0 : 1);
         rivalCarriesStarterUpdate(currentTrainers, "FRIEND", 2);
         this.setTrainers(currentTrainers, false);
+    }
+
+    @Override
+    public boolean hasRivalFinalBattle() {
+        return false;
     }
 
     @Override
@@ -6217,14 +6216,16 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     private Map<Type, List<Pokemon>> cachedReplacementLists;
     private List<Pokemon> cachedAllList;
-    private List<Pokemon> permanentlyBannedList = new ArrayList<>();
+    private List<Pokemon> bannedList = new ArrayList<>();
+    private List<Pokemon> usedAsUniqueList = new ArrayList<>();
 
 
     private Pokemon pickReplacement(Pokemon current, boolean usePowerLevels, Type type, boolean noLegendaries,
                                     boolean wonderGuardAllowed, boolean usePlacementHistory, boolean swapMegaEvos,
-                                    boolean abilitiesAreRandomized, boolean allowAltFormes, boolean banIrregularAltFormes,
-                                    List<Pokemon> eliteFourPlacedPokemon) {
+                                    boolean abilitiesAreRandomized, boolean allowAltFormes, boolean banIrregularAltFormes) {
         List<Pokemon> pickFrom;
+        List<Pokemon> withoutBannedPokemon;
+
         if (swapMegaEvos) {
             pickFrom = megaEvolutionsList
                     .stream()
@@ -6235,7 +6236,9 @@ public abstract class AbstractRomHandler implements RomHandler {
         } else {
             pickFrom = cachedAllList;
         }
+
         if (usePlacementHistory) {
+            // "Distributed" settings
             double placementAverage = getPlacementAverage();
             pickFrom = pickFrom
                     .stream()
@@ -6244,15 +6247,8 @@ public abstract class AbstractRomHandler implements RomHandler {
             if (pickFrom.isEmpty()) {
                 pickFrom = cachedAllList;
             }
-        }
-        // simply not allow Elite Four to place pokemon more than once
-        // this list is only ever non-empty under specific settings
-        // it tracks for 1 trainer, if they were elite four,
-        //   all the pokemon that trainer has placed, to avoid duplicates
-        // in almost all cases, it will be empty (since most trainers are not e4)
-        pickFrom.removeAll(eliteFourPlacedPokemon);
-
-        if (type != null) {
+        } else if (type != null && cachedReplacementLists != null) {
+            // "Type Themed" settings
             if (!cachedReplacementLists.containsKey(type)) {
 //                System.out.println(current.name + " using cachedReplacementLists");
                 List<Pokemon> pokemonOfType = allowAltFormes ? pokemonOfTypeInclFormes(type, noLegendaries) :
@@ -6278,6 +6274,11 @@ public abstract class AbstractRomHandler implements RomHandler {
             } else {
                 pickFrom = cachedReplacementLists.get(type);
             }
+        }
+
+        withoutBannedPokemon = pickFrom.stream().filter(pk -> !bannedList.contains(pk)).collect(Collectors.toList());
+        if (!withoutBannedPokemon.isEmpty()) {
+            pickFrom = withoutBannedPokemon;
         }
 
         if (usePowerLevels) {

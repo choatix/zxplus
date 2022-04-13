@@ -454,10 +454,6 @@ public class Gen3Constants {
     public static ItemList allowedItems, nonBadItems;
     public static List<Integer> regularShopItems, opShopItems;
 
-    public static final List<Integer> emptyEliteFourTrainers = Arrays.asList(new Integer[] { });
-    public static final List<Integer> rseEliteFourTrainers = Arrays.asList(261, 262, 263, 264, 335);
-    public static final List<Integer> frlgEliteFourTrainers = Arrays.asList(410, 411, 412, 413, 438, 439, 440);
-
     public static String getRunningShoesCheckPrefix(int romType) {
         if (romType == Gen3Constants.RomType_Ruby || romType == Gen3Constants.RomType_Sapp) {
             return runningShoesCheckPrefixRS;

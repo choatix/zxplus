@@ -816,10 +816,6 @@ public class Gen5Constants {
     public static ItemList allowedItems, nonBadItems;
     public static List<Integer> regularShopItems, opShopItems;
 
-    public static final List<Integer> emptyEliteFourTrainers = Arrays.asList(new Integer[] { });
-    public static final List<Integer> bw1EliteFourTrainers = Arrays.asList(228, 229, 230, 231, 232, 586, 587);
-    public static final List<Integer> bw2EliteFourTrainers = Arrays.asList(38, 39, 40, 41, 341);
-
     public static String blackBoxLegendaryCheckPrefix1 = "79F6BAEF07B0F0BDC046", blackBoxLegendaryCheckPrefix2 = "DEDB0020C04302B0F8BDC046",
         whiteBoxLegendaryCheckPrefix1 = "00F0FEF8002070BD", whiteBoxLegendaryCheckPrefix2 = "64F62EF970BD0000";
 

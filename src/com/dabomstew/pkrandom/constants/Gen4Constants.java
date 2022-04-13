@@ -702,10 +702,6 @@ public class Gen4Constants {
     public static ItemList allowedItems, nonBadItems;
     public static List<Integer> regularShopItems, opShopItems;
 
-    public static final List<Integer> emptyEliteFourTrainers = Arrays.asList(new Integer[] { });
-    public static final List<Integer> dppEliteFourTrainers = Arrays.asList(261, 262, 263, 264, 267);
-    public static final List<Integer> hgssEliteFourTrainers = Arrays.asList(244, 245, 246, 247, 418);
-
     public static final String shedinjaSpeciesLocator = "492080000090281C0521";
 
     public static final int ilexForestScriptFile = 92, ilexForestStringsFile = 115;

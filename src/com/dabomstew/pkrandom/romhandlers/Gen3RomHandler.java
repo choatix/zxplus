@@ -1513,16 +1513,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     @Override
-    public List<Integer> getEliteFourTrainers() {
-        if (romEntry.romType == Gen3Constants.RomType_Ruby | romEntry.romType == Gen3Constants.RomType_Sapp | romEntry.romType == Gen3Constants.RomType_Em) {
-            return Gen3Constants.rseEliteFourTrainers;
-        }
-        else if (romEntry.romType == Gen3Constants.RomType_FRLG) {
-            return Gen3Constants.frlgEliteFourTrainers;
-        }
-        else {
-            return Gen3Constants.emptyEliteFourTrainers;
-        }
+    public List<Integer> getEliteFourTrainers(boolean isChallengeMode) {
+        return Arrays.stream(romEntry.arrayEntries.get("EliteFourIndices")).boxed().collect(Collectors.toList());
     }
 
 
@@ -3942,6 +3934,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     @Override
     public List<Integer> getAllHeldItems() {
         return Gen3Constants.allHeldItems;
+    }
+
+    @Override
+    public boolean hasRivalFinalBattle() {
+        return romEntry.romType == Gen3Constants.RomType_FRLG;
     }
 
     @Override

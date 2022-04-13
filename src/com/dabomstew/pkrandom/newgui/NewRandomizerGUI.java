@@ -668,7 +668,7 @@ public class NewRandomizerGUI {
 
         SpinnerModel eliteFourUniquePokemonModel = new SpinnerNumberModel(
                 1,
-                0,
+                1,
                 2,
                 1
         );
@@ -1425,8 +1425,8 @@ public class NewRandomizerGUI {
         tpForceFullyEvolvedAtSlider.setValue(settings.getTrainersForceFullyEvolvedLevel());
         tpPercentageLevelModifierCheckBox.setSelected(settings.isTrainersLevelModified());
         tpPercentageLevelModifierSlider.setValue(settings.getTrainersLevelModifier());
-        tpEliteFourUniquePokemonCheckBox.setSelected(settings.isEliteFourUniquePokemon());
-        tpEliteFourUniquePokemonSpinner.setValue(settings.getEliteFourUniquePokemonModifier() > 0 ? settings.getEliteFourUniquePokemonModifier() : 1);
+        tpEliteFourUniquePokemonCheckBox.setSelected(settings.getEliteFourUniquePokemonNumber() > 0);
+        tpEliteFourUniquePokemonSpinner.setValue(settings.getEliteFourUniquePokemonNumber() > 0 ? settings.getEliteFourUniquePokemonNumber() : 1);
         tpAllowAlternateFormesCheckBox.setSelected(settings.isAllowTrainerAlternateFormes());
         tpSwapMegaEvosCheckBox.setSelected(settings.isSwapTrainerMegaEvos());
         tpDoubleBattleModeCheckBox.setSelected(settings.isDoubleBattleMode());
@@ -1661,8 +1661,7 @@ public class NewRandomizerGUI {
         settings.setTrainersForceFullyEvolvedLevel(tpForceFullyEvolvedAtSlider.getValue());
         settings.setTrainersLevelModified(tpPercentageLevelModifierCheckBox.isSelected());
         settings.setTrainersLevelModifier(tpPercentageLevelModifierSlider.getValue());
-        settings.setEliteFourUniquePokemon(tpEliteFourUniquePokemonCheckBox.isSelected());
-        settings.setEliteFourUniquePokemonModifier(tpEliteFourUniquePokemonCheckBox.isVisible() && tpEliteFourUniquePokemonCheckBox.isSelected() ? (int)tpEliteFourUniquePokemonSpinner.getValue() : 0);
+        settings.setEliteFourUniquePokemonNumber(tpEliteFourUniquePokemonCheckBox.isVisible() && tpEliteFourUniquePokemonCheckBox.isSelected() ? (int)tpEliteFourUniquePokemonSpinner.getValue() : 0);
         settings.setAllowTrainerAlternateFormes(tpAllowAlternateFormesCheckBox.isSelected() && tpAllowAlternateFormesCheckBox.isVisible());
         settings.setSwapTrainerMegaEvos(tpSwapMegaEvosCheckBox.isSelected() && tpSwapMegaEvosCheckBox.isVisible());
         settings.setDoubleBattleMode(tpDoubleBattleModeCheckBox.isVisible() && tpDoubleBattleModeCheckBox.isSelected());
@@ -3225,6 +3224,8 @@ public class NewRandomizerGUI {
             tpSensibleItemsCheckBox.setSelected(false);
             tpHighestLevelGetsItemCheckBox.setEnabled(false);
             tpHighestLevelGetsItemCheckBox.setSelected(false);
+            tpEliteFourUniquePokemonCheckBox.setEnabled(false);
+            tpEliteFourUniquePokemonCheckBox.setSelected(false);
         } else {
             tpSimilarStrengthCheckBox.setEnabled(true);
             tpDontUseLegendariesCheckBox.setEnabled(true);
@@ -3245,6 +3246,7 @@ public class NewRandomizerGUI {
             tpBossTrainersItemsCheckBox.setEnabled(tpBossTrainersItemsCheckBox.isVisible());
             tpImportantTrainersItemsCheckBox.setEnabled(tpImportantTrainersItemsCheckBox.isVisible());
             tpRegularTrainersItemsCheckBox.setEnabled(tpRegularTrainersItemsCheckBox.isVisible());
+            tpEliteFourUniquePokemonCheckBox.setEnabled(tpEliteFourUniquePokemonCheckBox.isVisible());
         }
 
         if (tpForceFullyEvolvedAtCheckBox.isSelected()) {
@@ -3305,6 +3307,13 @@ public class NewRandomizerGUI {
         } else {
             tpWeightTypesCheckBox.setEnabled(false);
             tpWeightTypesCheckBox.setSelected(false);
+        }
+
+        if (tpEliteFourUniquePokemonCheckBox.isSelected()) {
+            tpEliteFourUniquePokemonSpinner.setEnabled(true);
+        } else {
+            tpEliteFourUniquePokemonSpinner.setEnabled(false);
+            tpEliteFourUniquePokemonSpinner.setValue(1);
         }
 
         if (!totpUnchangedRadioButton.isSelected() || !totpAllyUnchangedRadioButton.isSelected()) {

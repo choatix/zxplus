@@ -23,10 +23,7 @@ package com.dabomstew.pkrandom.constants;
 /*--  along with this program. If not, see <http://www.gnu.org/licenses/>.  --*/
 /*----------------------------------------------------------------------------*/
 
-import com.dabomstew.pkrandom.pokemon.ItemList;
-import com.dabomstew.pkrandom.pokemon.MoveCategory;
-import com.dabomstew.pkrandom.pokemon.Trainer;
-import com.dabomstew.pkrandom.pokemon.Type;
+import com.dabomstew.pkrandom.pokemon.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -892,10 +889,6 @@ public class Gen6Constants {
 
     public static ItemList allowedItemsXY, allowedItemsORAS, nonBadItemsXY, nonBadItemsORAS;
     public static List<Integer> regularShopItems, opShopItems;
-
-    public static final List<Integer> emptyEliteFourTrainers = Arrays.asList(new Integer[] { });
-    public static final List<Integer> xyEliteFourTrainers = Arrays.asList(187, 269, 270, 271, 276);
-    public static final List<Integer> orasEliteFourTrainers = Arrays.asList(553, 554, 555, 556, 557);
 
     static {
         setupAllowedItems();

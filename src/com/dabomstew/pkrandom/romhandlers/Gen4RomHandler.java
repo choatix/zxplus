@@ -2489,16 +2489,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public List<Integer> getEliteFourTrainers() {
-        if (romEntry.romType == Gen4Constants.Type_DP | romEntry.romType == Gen4Constants.Type_Plat) {
-            return Gen4Constants.dppEliteFourTrainers;
-        }
-        else if (romEntry.romType == Gen4Constants.Type_HGSS) {
-            return Gen4Constants.hgssEliteFourTrainers;
-        }
-        else {
-            return Gen4Constants.emptyEliteFourTrainers;
-        }
+    public List<Integer> getEliteFourTrainers(boolean isChallengeMode) {
+        return Arrays.stream(romEntry.arrayEntries.get("EliteFourIndices")).boxed().collect(Collectors.toList());
     }
 
     @Override

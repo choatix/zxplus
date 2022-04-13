@@ -49,7 +49,7 @@ public class Settings {
 
     public static final int VERSION = Version.VERSION;
 
-    public static final int LENGTH_OF_SETTINGS_DATA = 50;
+    public static final int LENGTH_OF_SETTINGS_DATA = 51;
 
     private CustomNamesSet customNames;
 
@@ -174,8 +174,7 @@ public class Settings {
     private int trainersForceFullyEvolvedLevel = 30;
     private boolean trainersLevelModified;
     private int trainersLevelModifier = 0; // -50 ~ 50
-    private boolean eliteFourUniquePokemon;
-    private int eliteFourUniquePokemonNumber = 1; // 0 ~ 2
+    private int eliteFourUniquePokemonNumber = 0; // 0 ~ 2
     private boolean allowTrainerAlternateFormes;
     private boolean swapTrainerMegaEvos;
     private int additionalBossTrainerPokemon = 0;
@@ -576,6 +575,9 @@ public class Settings {
                 pickupItemsMod == PickupItemsMod.UNCHANGED, banBadRandomPickupItems,
                 banIrregularAltFormes));
 
+        // 50 elite four unique pokemon (3 bits)
+        out.write(eliteFourUniquePokemonNumber);
+
         try {
             byte[] romName = this.romName.getBytes("US-ASCII");
             out.write(romName.length);
@@ -860,6 +862,8 @@ public class Settings {
                 0));       // RANDOMIZE
         settings.setBanBadRandomPickupItems(restoreState(data[49], 2));
         settings.setBanIrregularAltFormes(restoreState(data[49], 3));
+
+        settings.setEliteFourUniquePokemonNumber(data[50] & 0x7);
 
         int romNameLength = data[LENGTH_OF_SETTINGS_DATA] & 0xFF;
         String romName = new String(data, LENGTH_OF_SETTINGS_DATA + 1, romNameLength, "US-ASCII");
@@ -1624,19 +1628,12 @@ public class Settings {
         this.trainersLevelModifier = trainersLevelModifier;
     }
 
-    public boolean isEliteFourUniquePokemon() {
-        return eliteFourUniquePokemon;
-    }
-    public void setEliteFourUniquePokemon(boolean eliteFourUniquePokemon) {
-        this.eliteFourUniquePokemon = eliteFourUniquePokemon;
-    }
-
-    public int getEliteFourUniquePokemonModifier() {
+    public int getEliteFourUniquePokemonNumber() {
         return eliteFourUniquePokemonNumber;
     }
 
-    public void setEliteFourUniquePokemonModifier(int eliteFourUniquePokemonModifier) {
-        this.eliteFourUniquePokemonNumber = eliteFourUniquePokemonModifier;
+    public void setEliteFourUniquePokemonNumber(int eliteFourUniquePokemonNumber) {
+        this.eliteFourUniquePokemonNumber = eliteFourUniquePokemonNumber;
     }
 
 

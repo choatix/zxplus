@@ -922,7 +922,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
-    public List<Integer> getEliteFourTrainers() {
+    public List<Integer> getEliteFourTrainers(boolean isChallengeMode) {
         return new ArrayList<>();
     }
 

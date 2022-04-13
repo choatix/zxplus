@@ -243,7 +243,7 @@ public interface RomHandler {
 
     List<Integer> getMainPlaythroughTrainers();
 
-    List<Integer> getEliteFourTrainers();
+    List<Integer> getEliteFourTrainers(boolean isChallengeMode);
 
     void setTrainers(List<Trainer> trainerData, boolean doubleBattleMode);
 
@@ -260,6 +260,8 @@ public interface RomHandler {
     List<Integer> getAllHeldItems();
 
     void rivalCarriesStarter();
+
+    boolean hasRivalFinalBattle();
 
     void forceFullyEvolvedTrainerPokes(Settings settings);
 

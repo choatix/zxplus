@@ -1098,7 +1098,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
-    public List<Integer> getEliteFourTrainers() {
+    public List<Integer> getEliteFourTrainers(boolean isChallengeMode) {
         return new ArrayList<>();
     }
 
@@ -1164,6 +1164,11 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
             rom[champRivalJump + 1] = GBConstants.gbZ80Nop;
         }
 
+    }
+
+    @Override
+    public boolean hasRivalFinalBattle() {
+        return true;
     }
 
     @Override

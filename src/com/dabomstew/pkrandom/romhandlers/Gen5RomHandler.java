@@ -1445,15 +1445,11 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public List<Integer> getEliteFourTrainers() {
-        if (romEntry.romType == Gen5Constants.Type_BW) {
-            return Gen5Constants.bw1EliteFourTrainers;
-        }
-        else if (romEntry.romType == Gen5Constants.Type_BW2) {
-            return Gen5Constants.bw2EliteFourTrainers;
-        }
-        else {
-            return Gen5Constants.emptyEliteFourTrainers;
+    public List<Integer> getEliteFourTrainers(boolean isChallengeMode) {
+        if (isChallengeMode) {
+            return Arrays.stream(romEntry.arrayEntries.get("ChallengeModeEliteFourIndices")).boxed().collect(Collectors.toList());
+        } else {
+            return Arrays.stream(romEntry.arrayEntries.get("EliteFourIndices")).boxed().collect(Collectors.toList());
         }
     }
 
