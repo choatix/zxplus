@@ -249,8 +249,6 @@ public interface RomHandler {
 
     void randomizeTrainerPokes(Settings settings);
 
-    void typeThemeTrainerPokes(Settings settings);
-
     void randomizeTrainerHeldItems(Settings settings);
 
     List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, Map<Integer, List<MoveLearnt>> movesets);

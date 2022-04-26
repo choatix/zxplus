@@ -336,11 +336,8 @@ public class Randomizer {
             case RANDOM:
             case DISTRIBUTED:
             case MAINPLAYTHROUGH:
-                romHandler.randomizeTrainerPokes(settings);
-                trainersChanged = true;
-                break;
             case TYPE_THEMED:
-                romHandler.typeThemeTrainerPokes(settings);
+                romHandler.randomizeTrainerPokes(settings);
                 trainersChanged = true;
                 break;
             default:
