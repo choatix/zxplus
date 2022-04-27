@@ -296,6 +296,7 @@ public class NewRandomizerGUI {
     private JCheckBox pbsAssignEvoStatsRandomlyCheckBox;
     private JCheckBox noIrregularAltFormesCheckBox;
     private JRadioButton peRandomEveryLevelRadioButton;
+    private JCheckBox miscFastDistortionWorldCheckBox;
 
     private static JFrame frame;
 

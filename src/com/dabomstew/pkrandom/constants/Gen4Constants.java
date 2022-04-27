@@ -89,6 +89,8 @@ public class Gen4Constants {
     public static final String dpItemPalettesPrefix = "8D018E01210132018D018F0122013301",
             pthgssItemPalettesPrefix = "8D018E01210133018D018F0122013401";
 
+    public static final int ptSpearPillarPortalScriptFile = 237;
+
     public static final int evolutionMethodCount = 26;
 
     public static final int highestAbilityIndex = Abilities.badDreams;

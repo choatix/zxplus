@@ -4830,6 +4830,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
         available |= MiscTweak.RUN_WITHOUT_RUNNING_SHOES.getValue();
         available |= MiscTweak.FASTER_HP_AND_EXP_BARS.getValue();
+        if (romEntry.tweakFiles.get("FastDistortionWorldTweak") != null) {
+            available |= MiscTweak.FAST_DISTORTION_WORLD.getValue();
+        }
         return available;
     }
 
@@ -4852,6 +4855,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             patchFasterBars();
         } else if (tweak == MiscTweak.UPDATE_TYPE_EFFECTIVENESS) {
             updateTypeEffectiveness();
+        } else if (tweak == MiscTweak.FAST_DISTORTION_WORLD) {
+            applyFastDistortionWorld();
         }
     }
 
@@ -5067,6 +5072,15 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             battleOverlay[currentOffset + 2] = effectivenessInternal;
             currentOffset += 3;
         }
+    }
+
+    private void applyFastDistortionWorld() {
+        byte[] spearPillarPortalScript = scriptNarc.files.get(Gen4Constants.ptSpearPillarPortalScriptFile);
+        byte[] expandedSpearPillarPortalScript = new byte[spearPillarPortalScript.length + 12];
+        System.arraycopy(spearPillarPortalScript, 0, expandedSpearPillarPortalScript, 0, spearPillarPortalScript.length);
+        spearPillarPortalScript = expandedSpearPillarPortalScript;
+        genericIPSPatch(spearPillarPortalScript, "FastDistortionWorldTweak");
+        scriptNarc.files.set(Gen4Constants.ptSpearPillarPortalScriptFile, spearPillarPortalScript);
     }
 
     @Override
