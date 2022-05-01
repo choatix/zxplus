@@ -1623,6 +1623,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean noEarlyWonderGuard = settings.isTrainersBlockEarlyWonderGuard();
         int levelModifier = settings.isTrainersLevelModified() ? settings.getTrainersLevelModifier() : 0;
         boolean isTypeThemed = settings.getTrainersMod() == Settings.TrainersMod.TYPE_THEMED;
+        boolean isTypeThemedEliteFourGymOnly = settings.getTrainersMod() == Settings.TrainersMod.TYPE_THEMED_ELITE4_GYMS;
         boolean distributionSetting = settings.getTrainersMod() == Settings.TrainersMod.DISTRIBUTED;
         boolean mainPlaythroughSetting = settings.getTrainersMod() == Settings.TrainersMod.MAINPLAYTHROUGH;
         boolean includeFormes = settings.isAllowTrainerAlternateFormes();
@@ -1670,7 +1671,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         // Type Themed related
         Map<Trainer, Type> trainerTypes = new TreeMap<>();
         Set<Type> usedUberTypes = new TreeSet<>();
-        if (isTypeThemed) {
+        if (isTypeThemed || isTypeThemedEliteFourGymOnly) {
             typeWeightings = new TreeMap<>();
             totalTypeWeighting = 0;
             // Construct groupings for types
@@ -1686,8 +1687,8 @@ public abstract class AbstractRomHandler implements RomHandler {
                 if (group.contains("-")) {
                     group = group.substring(0, group.indexOf('-'));
                 }
-                if (group.startsWith("GYM") || group.startsWith("ELITE") || group.startsWith("CHAMPION")
-                        || group.startsWith("THEMED")) {
+                if (group.startsWith("GYM") || group.startsWith("ELITE") ||
+                        ((group.startsWith("CHAMPION") || group.startsWith("THEMED")) && !isTypeThemedEliteFourGymOnly)) {
                     // Yep this is a group
                     if (!groups.containsKey(group)) {
                         groups.put(group, new ArrayList<>());

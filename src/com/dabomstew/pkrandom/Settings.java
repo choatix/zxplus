@@ -157,7 +157,7 @@ public class Settings {
     private boolean evolutionMovesForAll;
 
     public enum TrainersMod {
-        UNCHANGED, RANDOM, DISTRIBUTED, MAINPLAYTHROUGH, TYPE_THEMED
+        UNCHANGED, RANDOM, DISTRIBUTED, MAINPLAYTHROUGH, TYPE_THEMED, TYPE_THEMED_ELITE4_GYMS
     }
 
     private TrainersMod trainersMod = TrainersMod.UNCHANGED;
@@ -405,7 +405,8 @@ public class Settings {
                 trainersMod == TrainersMod.RANDOM,
                 trainersMod == TrainersMod.DISTRIBUTED,
                 trainersMod == TrainersMod.MAINPLAYTHROUGH,
-                trainersMod == TrainersMod.TYPE_THEMED));
+                trainersMod == TrainersMod.TYPE_THEMED,
+                trainersMod == TrainersMod.TYPE_THEMED_ELITE4_GYMS));
         
         // 14 trainer pokemon force evolutions
         out.write((trainersForceFullyEvolved ? 0x80 : 0) | trainersForceFullyEvolvedLevel);
@@ -673,7 +674,8 @@ public class Settings {
                 1, // RANDOM
                 2, // DISTRIBUTED
                 3, // MAINPLAYTHROUGH 
-                4 // TYPE_THEMED
+                4, // TYPE_THEMED
+                5 // TYPE_THEMED_ELITE4_GYMS
         ));
 
         settings.setTrainersForceFullyEvolved(restoreState(data[14], 7));

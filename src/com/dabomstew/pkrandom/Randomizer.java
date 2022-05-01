@@ -337,6 +337,7 @@ public class Randomizer {
             case DISTRIBUTED:
             case MAINPLAYTHROUGH:
             case TYPE_THEMED:
+            case TYPE_THEMED_ELITE4_GYMS:
                 romHandler.randomizeTrainerPokes(settings);
                 trainersChanged = true;
                 break;
