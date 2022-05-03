@@ -825,6 +825,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             moves[i].pp = rom[offs + i * 0xC + 4] & 0xFF;
             moves[i].type = Gen3Constants.typeTable[rom[offs + i * 0xC + 2]];
             moves[i].category = GBConstants.physicalTypes.contains(moves[i].type) ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL;
+            moves[i].priority = rom[offs + i * 0xC + 7];
 
             if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;

@@ -573,6 +573,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 moves[i].pp = moveData[6] & 0xFF;
                 moves[i].type = Gen4Constants.typeTable[moveData[4] & 0xFF];
                 moves[i].category = Gen4Constants.moveCategoryIndices[moveData[2] & 0xFF];
+                moves[i].priority = moveData[10];
 
                 if (i == Moves.swift) {
                     perfectAccuracy = (int)moves[i].hitratio;

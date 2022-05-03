@@ -607,6 +607,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 moves[i].pp = moveData[5] & 0xFF;
                 moves[i].type = Gen6Constants.typeTable[moveData[0] & 0xFF];
                 moves[i].category = Gen6Constants.moveCategoryIndices[moveData[2] & 0xFF];
+                moves[i].priority = moveData[6];
 
                 if (i == Moves.swift) {
                     perfectAccuracy = (int)moves[i].hitratio;

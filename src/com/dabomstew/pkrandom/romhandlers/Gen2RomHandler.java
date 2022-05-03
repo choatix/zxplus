@@ -424,6 +424,20 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             } else if (i == Moves.tripleKick) {
                 moves[i].hitCount = 2.71; // this assumes the first hit lands
             }
+
+            // Values taken from effect_priorities.asm from the Gen 2 disassemblies.
+            if (moves[i].effectIndex == Gen2Constants.priorityHitEffectIndex) {
+                moves[i].priority = 2;
+            } else if (moves[i].effectIndex == Gen2Constants.protectEffectIndex ||
+                       moves[i].effectIndex == Gen2Constants.endureEffectIndex) {
+                moves[i].priority = 3;
+            } else if (moves[i].effectIndex == Gen2Constants.forceSwitchEffectIndex ||
+                       moves[i].effectIndex == Gen2Constants.counterEffectIndex ||
+                       moves[i].effectIndex == Gen2Constants.mirrorCoatEffectIndex) {
+                moves[i].priority = 0;
+            } else {
+                moves[i].priority = 1;
+            }
         }
 
     }
