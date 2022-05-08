@@ -188,6 +188,7 @@ public class Settings {
     private boolean highestLevelOnlyGetsItemsForTrainerPokemon;
     private boolean doubleBattleMode;
     private boolean shinyChance;
+    private boolean betterTrainerMovesets;
 
     public enum WildPokemonMod {
         UNCHANGED, RANDOM, AREA_MAPPING, GLOBAL_MAPPING
@@ -483,7 +484,8 @@ public class Settings {
                 trainersBlockLegendaries,
                 trainersBlockEarlyWonderGuard,
                 swapTrainerMegaEvos,
-                shinyChance));
+                shinyChance,
+                betterTrainerMovesets));
 
         // 28 - 31: pokemon restrictions
         try {
@@ -788,6 +790,7 @@ public class Settings {
         settings.setTrainersBlockEarlyWonderGuard(restoreState(data[27], 4));
         settings.setSwapTrainerMegaEvos(restoreState(data[27], 5));
         settings.setShinyChance(restoreState(data[27], 6));
+        settings.setBetterTrainerMovesets(restoreState(data[27], 7));
 
         // gen restrictions
         int genLimit = FileFunctions.readFullIntBigEndian(data, 28);
@@ -1741,6 +1744,14 @@ public class Settings {
 
     public void setShinyChance(boolean shinyChance) {
         this.shinyChance = shinyChance;
+    }
+
+    public boolean isBetterTrainerMovesets() {
+        return betterTrainerMovesets;
+    }
+
+    public void setBetterTrainerMovesets(boolean betterTrainerMovesets) {
+        this.betterTrainerMovesets = betterTrainerMovesets;
     }
 
     public WildPokemonMod getWildPokemonMod() {

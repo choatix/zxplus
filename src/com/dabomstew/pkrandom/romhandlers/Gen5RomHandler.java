@@ -1440,7 +1440,6 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                     tpk.forcedGenderFlag = (abilityAndFlag & 0xF);
                     tpk.forme = formnum;
                     tpk.formeSuffix = Gen5Constants.getFormeSuffixByBaseForme(species,formnum);
-                    tpk.absolutePokeNumber = Gen5Constants.getAbsolutePokeNumByBaseForme(species,formnum);
                     pokeOffs += 8;
                     if (tr.pokemonHaveItems()) {
                         tpk.heldItem = readWord(trpoke, pokeOffs);
@@ -1484,7 +1483,6 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                             for (int move = 0; move < 4; move++) {
                                 tpk.moves[move] = readWord(pkmndata, 2 + (move*2));
                             }
-                            tpk.absolutePokeNumber = Gen5Constants.getAbsolutePokeNumByBaseForme(species,0);
                             tr.pokemon.add(tpk);
                             currentFile++;
                         }
@@ -1585,7 +1583,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                     }
                     if (tr.pokemonHaveCustomMoves()) {
                         if (tp.resetMoves) {
-                            int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.absolutePokeNumber, movesets, tp.level);
+                            int[] pokeMoves = RomFunctions.getMovesAtLevel(getAltFormeOfPokemon(tp.pokemon, tp.forme).number, movesets, tp.level);
                             for (int m = 0; m < 4; m++) {
                                 writeWord(trpoke, pokeOffs + m * 2, pokeMoves[m]);
                             }
@@ -1705,7 +1703,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                         writeWord(pkmndata, 12, tp.heldItem);
                         // handle moves
                         if (tp.resetMoves) {
-                            int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.absolutePokeNumber, movesets, tp.level);
+                            int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.pokemon.number, movesets, tp.level);
                             for (int m = 0; m < 4; m++) {
                                 writeWord(pkmndata, 2 + m * 2, pokeMoves[m]);
                             }
@@ -2459,6 +2457,11 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         } else if (tweak == MiscTweak.FORCE_CHALLENGE_MODE) {
             forceChallengeMode();
         }
+    }
+
+    @Override
+    public boolean isEffectivenessUpdated() {
+        return effectivenessUpdated;
     }
 
     // Removes the free lucky egg you receive from Professor Juniper and replaces it with a gooey mulch.
@@ -4238,7 +4241,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, Map<Integer, List<MoveLearnt>> movesets) {
+    public List<Integer> getSensibleHeldItemsFor(TrainerPokemon tp, boolean consumableOnly, List<Move> moves, int[] pokeMoves) {
         List<Integer> items = new ArrayList<>();
         items.addAll(Gen5Constants.generalPurposeConsumableItems);
         int frequencyBoostCount = 6; // Make some very good items more common, but not too common
@@ -4246,7 +4249,6 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             frequencyBoostCount = 8; // bigger to account for larger item pool.
             items.addAll(Gen5Constants.generalPurposeItems);
         }
-        int[] pokeMoves = RomFunctions.getMovesAtLevel(tp.pokemon.number, movesets, tp.level);
         for (int moveIdx : pokeMoves) {
             Move move = moves.get(moveIdx);
             if (move == null) {

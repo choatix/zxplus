@@ -331,6 +331,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     private SubMap[] maps;
     private boolean xAccNerfed;
     private long actualCRC32;
+    private boolean effectivenessUpdated;
 
     @Override
     public boolean detectRom(byte[] rom) {
@@ -1445,6 +1446,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         }
         logBlankLine();
         writeTypeEffectivenessTable(typeEffectivenessTable);
+        effectivenessUpdated = true;
     }
 
     private List<TypeRelationship> readTypeEffectivenessTable() {
@@ -2107,6 +2109,11 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         } else if (tweak == MiscTweak.RANDOMIZE_CATCHING_TUTORIAL) {
             randomizeCatchingTutorial();
         }
+    }
+
+    @Override
+    public boolean isEffectivenessUpdated() {
+        return effectivenessUpdated;
     }
 
     private void applyBWEXPPatch() {

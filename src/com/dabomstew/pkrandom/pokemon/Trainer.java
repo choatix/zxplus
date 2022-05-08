@@ -124,6 +124,14 @@ public class Trainer implements Comparable<Trainer> {
         return (this.poketype & 2) == 2;
     }
 
+    public void setPokemonHaveCustomMoves(boolean haveCustomMoves) {
+        if (haveCustomMoves) {
+            this.poketype |= 1;
+        } else {
+            this.poketype = poketype & ~1;
+        }
+    }
+
     public boolean pokemonHaveCustomMoves() {
         // This flag seems consistent for all gens
         return (this.poketype & 1) == 1;
