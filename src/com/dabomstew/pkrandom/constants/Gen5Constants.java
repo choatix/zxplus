@@ -156,6 +156,8 @@ public class Gen5Constants {
         }
     }
 
+    public static final int noDamageStatChangeQuality = 2, noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7;
+
     public static final Type[] typeTable = constructTypeTable();
 
     private static final Map<Integer,String> bw1FormeSuffixes = setupFormeSuffixes(Gen5Constants.Type_BW);

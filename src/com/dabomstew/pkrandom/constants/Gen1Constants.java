@@ -67,6 +67,13 @@ public class Gen1Constants {
     public static final List<Integer> fieldMoves = Arrays.asList(
             Moves.cut, Moves.fly, Moves.surf, Moves.strength, Moves.flash, Moves.dig, Moves.teleport);
 
+    public static final int noDamageAtkPlusOneEffect = 10, noDamageDefPlusOneEffect = 11, noDamageSpecialPlusOneEffect = 13,
+            noDamageEvasionPlusOneEffect = 15, noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19,
+            noDamageSpeMinusOneEffect = 20, noDamageAccuracyMinusOneEffect = 22, noDamageAtkPlusTwoEffect = 50,
+            noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52, noDamageSpecialPlusTwoEffect = 53,
+            noDamageDefMinusTwoEffect = 59, damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69,
+            damageSpeMinusOneEffect = 70, damageSpecialMinusOneEffect = 71;
+
     public static final List<Integer> earlyRequiredHMs = Collections.singletonList(Moves.cut);
 
     public static final int hmsStartIndex = Gen1Items.hm01, tmsStartIndex = Gen1Items.tm01;

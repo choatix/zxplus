@@ -681,6 +681,21 @@ public class Gen4Constants {
         }
     }
 
+    public static final int noDamageAtkPlusOneEffect = 10, noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13,
+            noDamageEvasionPlusOneEffect = 16, noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19,
+            noDamageSpeMinusOneEffect = 20, noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24,
+            noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52,
+            noDamageSpAtkPlusTwoEffect = 53, noDamageSpDefPlusTwoEffect = 54, noDamageAtkMinusTwoEffect = 58,
+            noDamageDefMinusTwoEffect = 59, noDamageSpeMinusTwoEffect = 60, noDamageSpDefMinusTwoEffect = 62,
+            damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70,
+            damageSpAtkMinusOneEffect = 71, damageSpDefMinusOneEffect = 72, damageAccuracyMinusOneEffect = 73,
+            minimizeEffect = 108, swaggerEffect = 118, damageUserDefPlusOneEffect = 138, damageUserAtkPlusOneEffect = 139,
+            damageUserAllPlusOneEffect = 140, defenseCurlEffect = 156, flatterEffect = 166, chargeEffect = 174,
+            damageUserAtkAndDefMinusOneEffect = 182, damageUserSpAtkMinusTwoEffect = 204, noDamageAtkAndDefMinusOneEffect = 205,
+            noDamageDefAndSpDefPlusOneEffect = 206, noDamageAtkAndDefPlusOneEffect = 208, noDamageSpAtkAndSpDefPlusOneEffect = 211,
+            noDamageAtkAndSpePlusOneEffect = 212, damageUserSpeMinusOneEffect = 218, damageUserDefAndSpDefMinusOneEffect = 229,
+            noDamageSpAtkMinusTwoEffect = 265, damageSpDefMinusTwoEffect = 271, damageUserSpAtkPlusOneEffect = 276;
+
     public static final List<Integer> dpRequiredFieldTMs = Arrays.asList(2, 3, 5, 9, 12, 19, 23, 28,
             34, 39, 41, 43, 46, 47, 49, 50, 62, 69, 79, 80, 82, 84, 85, 87);
 

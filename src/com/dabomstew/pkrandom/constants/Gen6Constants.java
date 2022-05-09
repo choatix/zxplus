@@ -192,6 +192,8 @@ public class Gen6Constants {
         }
     }
 
+    public static final int noDamageStatChangeQuality = 2, noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7;
+
     public static List<Integer> bannedMoves = Collections.singletonList(Moves.hyperspaceFury);
 
     public static final Type[] typeTable = constructTypeTable();

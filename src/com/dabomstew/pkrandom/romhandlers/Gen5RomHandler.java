@@ -555,6 +555,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 moves[i].power = moveData[3] & 0xFF;
                 moves[i].pp = moveData[5] & 0xFF;
                 moves[i].type = Gen5Constants.typeTable[moveData[0] & 0xFF];
+                moves[i].target = moveData[20] & 0xFF;
                 moves[i].category = Gen5Constants.moveCategoryIndices[moveData[2] & 0xFF];
                 moves[i].priority = moveData[6];
 
@@ -567,8 +568,35 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 } else if (GlobalConstants.doubleHitMoves.contains(i)) {
                     moves[i].hitCount = 2;
                 } else if (i == Moves.tripleKick) {
-                    moves[i].hitCount = 2.71; // this assumes the first hit
-                                              // lands
+                    moves[i].hitCount = 2.71; // this assumes the first hit lands
+                }
+
+                int qualities = moveData[1];
+                switch (qualities) {
+                    case Gen5Constants.noDamageStatChangeQuality:
+                    case Gen5Constants.noDamageStatusAndStatChangeQuality:
+                        // All Allies or Self
+                        if (moves[i].target == 6 || moves[i].target == 7) {
+                            moves[i].statChangeType = StatChangeType.NO_DAMAGE_STAT_CHANGE_USER;
+                        } else {
+                            moves[i].statChangeType = StatChangeType.NO_DAMAGE_STAT_CHANGE_TARGET;
+                        }
+                        break;
+                    case Gen5Constants.damageTargetDebuffQuality:
+                        moves[i].statChangeType = StatChangeType.DAMAGE_STAT_CHANGE_TARGET;
+                        break;
+                    case Gen5Constants.damageUserBuffQuality:
+                        moves[i].statChangeType = StatChangeType.DAMAGE_STAT_CHANGE_USER;
+                        break;
+                    default:
+                        moves[i].statChangeType = StatChangeType.NONE_OR_UNKNOWN;
+                        break;
+                }
+
+                for (int statChange = 0; statChange < 3; statChange++) {
+                    moves[i].statChanges[statChange].type = StatBuffType.values()[moveData[21 + statChange]];
+                    moves[i].statChanges[statChange].stages = moveData[24 + statChange];
+                    moves[i].statChanges[statChange].percentChance = moveData[27 + statChange];
                 }
             }
         } catch (IOException e) {
