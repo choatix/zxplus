@@ -628,30 +628,49 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     case Gen6Constants.noDamageStatusAndStatChangeQuality:
                         // All Allies or Self
                         if (moves[i].target == 6 || moves[i].target == 7) {
-                            moves[i].statChangeType = StatChangeType.NO_DAMAGE_STAT_CHANGE_USER;
+                            moves[i].statChangeMoveType = StatChangeMoveType.NO_DAMAGE_USER;
                         } else if (moves[i].target == 2) {
-                            moves[i].statChangeType = StatChangeType.NO_DAMAGE_STAT_CHANGE_ALLY;
+                            moves[i].statChangeMoveType = StatChangeMoveType.NO_DAMAGE_ALLY;
                         } else if (moves[i].target == 8) {
-                            moves[i].statChangeType = StatChangeType.NO_DAMAGE_STAT_CHANGE_ALL;
+                            moves[i].statChangeMoveType = StatChangeMoveType.NO_DAMAGE_ALL;
                         } else {
-                            moves[i].statChangeType = StatChangeType.NO_DAMAGE_STAT_CHANGE_TARGET;
+                            moves[i].statChangeMoveType = StatChangeMoveType.NO_DAMAGE_TARGET;
                         }
                         break;
                     case Gen6Constants.damageTargetDebuffQuality:
-                        moves[i].statChangeType = StatChangeType.DAMAGE_STAT_CHANGE_TARGET;
+                        moves[i].statChangeMoveType = StatChangeMoveType.DAMAGE_TARGET;
                         break;
                     case Gen6Constants.damageUserBuffQuality:
-                        moves[i].statChangeType = StatChangeType.DAMAGE_STAT_CHANGE_USER;
+                        moves[i].statChangeMoveType = StatChangeMoveType.DAMAGE_USER;
                         break;
                     default:
-                        moves[i].statChangeType = StatChangeType.NONE_OR_UNKNOWN;
+                        moves[i].statChangeMoveType = StatChangeMoveType.NONE_OR_UNKNOWN;
                         break;
                 }
 
                 for (int statChange = 0; statChange < 3; statChange++) {
-                    moves[i].statChanges[statChange].type = StatBuffType.values()[moveData[21 + statChange]];
+                    moves[i].statChanges[statChange].type = StatChangeType.values()[moveData[21 + statChange]];
                     moves[i].statChanges[statChange].stages = moveData[24 + statChange];
                     moves[i].statChanges[statChange].percentChance = moveData[27 + statChange];
+                }
+
+                int internalStatusType = readWord(moveData, 8);
+                // Exclude status types that aren't in the StatusType enum.
+                if (internalStatusType < 7) {
+                    moves[i].statusType = StatusType.values()[internalStatusType];
+                    if (moves[i].statusType == StatusType.POISON && (i == Moves.toxic || i == Moves.poisonFang)) {
+                        moves[i].statusType = StatusType.TOXIC_POISON;
+                    }
+                    moves[i].statusPercentChance = moveData[10] & 0xFF;
+                    switch (qualities) {
+                        case Gen6Constants.noDamageStatusQuality:
+                        case Gen6Constants.noDamageStatusAndStatChangeQuality:
+                            moves[i].statusMoveType = StatusMoveType.NO_DAMAGE;
+                            break;
+                        case Gen6Constants.damageStatusQuality:
+                            moves[i].statusMoveType = StatusMoveType.DAMAGE;
+                            break;
+                    }
                 }
             }
         } catch (IOException e) {

@@ -72,15 +72,17 @@ public class Gen2Constants {
 
     public static final int mapGroupCount = 26, mapsInLastGroup = 11;
 
-    public static final int noDamageAtkPlusOneEffect = 10, noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13,
+    public static final int noDamageSleepEffect = 1, damagePoisonEffect = 2, damageBurnEffect = 4, damageFreezeEffect = 5,
+            damageParalyzeEffect = 6, noDamageAtkPlusOneEffect = 10, noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13,
             noDamageEvasionPlusOneEffect = 16, noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19,
-            noDamageSpeMinusOneEffect = 20, noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24,
-            noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52,
-            noDamageSpDefPlusTwoEffect = 54, noDamageAtkMinusTwoEffect = 58, noDamageDefMinusTwoEffect = 59,
-            noDamageSpeMinusTwoEffect = 60, noDamageSpDefMinusTwoEffect = 62, damageAtkMinusOneEffect = 68,
-            damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70, damageSpDefMinusOneEffect = 72,
-            damageAccuracyMinusOneEffect = 73, swaggerEffect = 118, damageUserDefPlusOneEffect = 138,
-            damageUserAtkPlusOneEffect = 139, damageUserAllPlusOneEffect = 140, defenseCurlEffect = 156;
+            noDamageSpeMinusOneEffect = 20, noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24, toxicEffect = 33,
+            noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52,
+            noDamageSpDefPlusTwoEffect = 54, noDamageAtkMinusTwoEffect = 58, noDamageDefMinusTwoEffect = 59, noDamageSpeMinusTwoEffect = 60,
+            noDamageSpDefMinusTwoEffect = 62, noDamagePoisonEffect = 66, noDamageParalyzeEffect = 67, damageAtkMinusOneEffect = 68,
+            damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70, damageSpDefMinusOneEffect = 72, damageAccuracyMinusOneEffect = 73,
+            damageConfusionEffect = 76, twineedleEffect = 77, swaggerEffect = 118, damageBurnAndThawUserEffect = 125,
+            damageUserDefPlusOneEffect = 138, damageUserAtkPlusOneEffect = 139, damageUserAllPlusOneEffect = 140, thunderEffect = 152,
+            defenseCurlEffect = 156;
 
     public static final List<Integer> requiredFieldTMs = Arrays.asList(4, 20, 22, 26, 28, 34, 35, 39,
             40, 43, 44, 46);

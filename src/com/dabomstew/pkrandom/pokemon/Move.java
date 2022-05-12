@@ -26,7 +26,7 @@ package com.dabomstew.pkrandom.pokemon;
 
 public class Move {
     public class StatChange {
-        public StatBuffType type;
+        public StatChangeType type;
         public int stages;
         public double percentChance;
     }
@@ -38,8 +38,11 @@ public class Move {
     public int pp;
     public double hitratio;
     public Type type;
-    public StatChangeType statChangeType = StatChangeType.NONE_OR_UNKNOWN;
+    public StatChangeMoveType statChangeMoveType = StatChangeMoveType.NONE_OR_UNKNOWN;
     public StatChange[] statChanges = new StatChange[3];
+    public StatusMoveType statusMoveType = StatusMoveType.NONE_OR_UNKNOWN;
+    public StatusType statusType = StatusType.NONE;
+    public double statusPercentChance;
     public int effectIndex;
     public int target;
     public MoveCategory category;
@@ -52,7 +55,7 @@ public class Move {
         // each RomHandler mess with them if they don't need to.
         for (int i = 0; i < this.statChanges.length; i++) {
             this.statChanges[i] = new StatChange();
-            this.statChanges[i].type = StatBuffType.NONE;
+            this.statChanges[i].type = StatChangeType.NONE;
         }
     }
 

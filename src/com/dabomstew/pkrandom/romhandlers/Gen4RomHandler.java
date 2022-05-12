@@ -37,7 +37,6 @@ import com.dabomstew.pkrandom.*;
 import com.dabomstew.pkrandom.constants.*;
 import com.dabomstew.pkrandom.exceptions.RandomizationException;
 import com.dabomstew.pkrandom.pokemon.*;
-import sun.reflect.generics.tree.Tree;
 import thenewpoketext.PokeTextData;
 import thenewpoketext.TextToPoke;
 
@@ -591,6 +590,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 }
 
                 loadStatChangesFromEffect(moves[i]);
+                loadStatusFromEffect(moves[i]);
             }
         } catch (IOException e) {
             throw new RandomizerIOException(e);
@@ -629,9 +629,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             case Gen4Constants.noDamageAtkAndSpePlusOneEffect:
             case Gen4Constants.noDamageSpAtkMinusTwoEffect:
                 if (move.target == 16) {
-                    move.statChangeType = StatChangeType.NO_DAMAGE_STAT_CHANGE_USER;
+                    move.statChangeMoveType = StatChangeMoveType.NO_DAMAGE_USER;
                 } else {
-                    move.statChangeType = StatChangeType.NO_DAMAGE_STAT_CHANGE_TARGET;
+                    move.statChangeMoveType = StatChangeMoveType.NO_DAMAGE_TARGET;
                 }
                 break;
 
@@ -642,7 +642,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             case Gen4Constants.damageSpDefMinusOneEffect:
             case Gen4Constants.damageAccuracyMinusOneEffect:
             case Gen4Constants.damageSpDefMinusTwoEffect:
-                move.statChangeType = StatChangeType.DAMAGE_STAT_CHANGE_TARGET;
+                move.statChangeMoveType = StatChangeMoveType.DAMAGE_TARGET;
                 break;
 
             case Gen4Constants.damageUserDefPlusOneEffect:
@@ -653,7 +653,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             case Gen4Constants.damageUserSpeMinusOneEffect:
             case Gen4Constants.damageUserDefAndSpDefMinusOneEffect:
             case Gen4Constants.damageUserSpAtkPlusOneEffect:
-                move.statChangeType = StatChangeType.DAMAGE_STAT_CHANGE_USER;
+                move.statChangeMoveType = StatChangeMoveType.DAMAGE_USER;
                 break;
 
             default:
@@ -664,156 +664,254 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         switch (move.effectIndex) {
             case Gen4Constants.noDamageAtkPlusOneEffect:
             case Gen4Constants.damageUserAtkPlusOneEffect:
-                move.statChanges[0].type = StatBuffType.ATTACK;
+                move.statChanges[0].type = StatChangeType.ATTACK;
                 move.statChanges[0].stages = 1;
                 break;
             case Gen4Constants.noDamageDefPlusOneEffect:
             case Gen4Constants.damageUserDefPlusOneEffect:
             case Gen4Constants.defenseCurlEffect:
-                move.statChanges[0].type = StatBuffType.DEFENSE;
+                move.statChanges[0].type = StatChangeType.DEFENSE;
                 move.statChanges[0].stages = 1;
                 break;
             case Gen4Constants.noDamageSpAtkPlusOneEffect:
             case Gen4Constants.flatterEffect:
             case Gen4Constants.damageUserSpAtkPlusOneEffect:
-                move.statChanges[0].type = StatBuffType.SPECIAL_ATTACK;
+                move.statChanges[0].type = StatChangeType.SPECIAL_ATTACK;
                 move.statChanges[0].stages = 1;
                 break;
             case Gen4Constants.noDamageEvasionPlusOneEffect:
             case Gen4Constants.minimizeEffect:
-                move.statChanges[0].type = StatBuffType.EVASION;
+                move.statChanges[0].type = StatChangeType.EVASION;
                 move.statChanges[0].stages = 1;
                 break;
             case Gen4Constants.noDamageAtkMinusOneEffect:
             case Gen4Constants.damageAtkMinusOneEffect:
-                move.statChanges[0].type = StatBuffType.ATTACK;
+                move.statChanges[0].type = StatChangeType.ATTACK;
                 move.statChanges[0].stages = -1;
                 break;
             case Gen4Constants.noDamageDefMinusOneEffect:
             case Gen4Constants.damageDefMinusOneEffect:
-                move.statChanges[0].type = StatBuffType.DEFENSE;
+                move.statChanges[0].type = StatChangeType.DEFENSE;
                 move.statChanges[0].stages = -1;
                 break;
             case Gen4Constants.noDamageSpeMinusOneEffect:
             case Gen4Constants.damageSpeMinusOneEffect:
             case Gen4Constants.damageUserSpeMinusOneEffect:
-                move.statChanges[0].type = StatBuffType.SPEED;
+                move.statChanges[0].type = StatChangeType.SPEED;
                 move.statChanges[0].stages = -1;
                 break;
             case Gen4Constants.noDamageAccuracyMinusOneEffect:
             case Gen4Constants.damageAccuracyMinusOneEffect:
-                move.statChanges[0].type = StatBuffType.ACCURACY;
+                move.statChanges[0].type = StatChangeType.ACCURACY;
                 move.statChanges[0].stages = -1;
                 break;
             case Gen4Constants.noDamageEvasionMinusOneEffect:
-                move.statChanges[0].type = StatBuffType.EVASION;
+                move.statChanges[0].type = StatChangeType.EVASION;
                 move.statChanges[0].stages = -1;
                 break;
             case Gen4Constants.noDamageAtkPlusTwoEffect:
             case Gen4Constants.swaggerEffect:
-                move.statChanges[0].type = StatBuffType.ATTACK;
+                move.statChanges[0].type = StatChangeType.ATTACK;
                 move.statChanges[0].stages = 2;
                 break;
             case Gen4Constants.noDamageDefPlusTwoEffect:
-                move.statChanges[0].type = StatBuffType.DEFENSE;
+                move.statChanges[0].type = StatChangeType.DEFENSE;
                 move.statChanges[0].stages = 2;
                 break;
             case Gen4Constants.noDamageSpePlusTwoEffect:
-                move.statChanges[0].type = StatBuffType.SPEED;
+                move.statChanges[0].type = StatChangeType.SPEED;
                 move.statChanges[0].stages = 2;
                 break;
             case Gen4Constants.noDamageSpAtkPlusTwoEffect:
-                move.statChanges[0].type = StatBuffType.SPECIAL_ATTACK;
+                move.statChanges[0].type = StatChangeType.SPECIAL_ATTACK;
                 move.statChanges[0].stages = 2;
                 break;
             case Gen4Constants.noDamageSpDefPlusTwoEffect:
-                move.statChanges[0].type = StatBuffType.SPECIAL_DEFENSE;
+                move.statChanges[0].type = StatChangeType.SPECIAL_DEFENSE;
                 move.statChanges[0].stages = 2;
                 break;
             case Gen4Constants.noDamageAtkMinusTwoEffect:
-                move.statChanges[0].type = StatBuffType.ATTACK;
+                move.statChanges[0].type = StatChangeType.ATTACK;
                 move.statChanges[0].stages = -2;
                 break;
             case Gen4Constants.noDamageDefMinusTwoEffect:
-                move.statChanges[0].type = StatBuffType.DEFENSE;
+                move.statChanges[0].type = StatChangeType.DEFENSE;
                 move.statChanges[0].stages = -2;
                 break;
             case Gen4Constants.noDamageSpeMinusTwoEffect:
-                move.statChanges[0].type = StatBuffType.SPEED;
+                move.statChanges[0].type = StatChangeType.SPEED;
                 move.statChanges[0].stages = -2;
                 break;
             case Gen4Constants.noDamageSpDefMinusTwoEffect:
             case Gen4Constants.damageSpDefMinusTwoEffect:
-                move.statChanges[0].type = StatBuffType.SPECIAL_DEFENSE;
+                move.statChanges[0].type = StatChangeType.SPECIAL_DEFENSE;
                 move.statChanges[0].stages = -2;
                 break;
             case Gen4Constants.damageSpAtkMinusOneEffect:
-                move.statChanges[0].type = StatBuffType.SPECIAL_ATTACK;
+                move.statChanges[0].type = StatChangeType.SPECIAL_ATTACK;
                 move.statChanges[0].stages = -1;
                 break;
             case Gen4Constants.damageSpDefMinusOneEffect:
-                move.statChanges[0].type = StatBuffType.SPECIAL_DEFENSE;
+                move.statChanges[0].type = StatChangeType.SPECIAL_DEFENSE;
                 move.statChanges[0].stages = -1;
                 break;
             case Gen4Constants.damageUserAllPlusOneEffect:
-                move.statChanges[0].type = StatBuffType.ALL;
+                move.statChanges[0].type = StatChangeType.ALL;
                 move.statChanges[0].stages = 1;
                 break;
             case Gen4Constants.chargeEffect:
-                move.statChanges[0].type = StatBuffType.SPECIAL_DEFENSE;
+                move.statChanges[0].type = StatChangeType.SPECIAL_DEFENSE;
                 move.statChanges[0].stages = 1;
                 break;
             case Gen4Constants.damageUserAtkAndDefMinusOneEffect:
             case Gen4Constants.noDamageAtkAndDefMinusOneEffect:
-                move.statChanges[0].type = StatBuffType.ATTACK;
+                move.statChanges[0].type = StatChangeType.ATTACK;
                 move.statChanges[0].stages = -1;
-                move.statChanges[1].type = StatBuffType.DEFENSE;
+                move.statChanges[1].type = StatChangeType.DEFENSE;
                 move.statChanges[1].stages = -1;
                 break;
             case Gen4Constants.damageUserSpAtkMinusTwoEffect:
             case Gen4Constants.noDamageSpAtkMinusTwoEffect:
-                move.statChanges[0].type = StatBuffType.SPECIAL_ATTACK;
+                move.statChanges[0].type = StatChangeType.SPECIAL_ATTACK;
                 move.statChanges[0].stages = -2;
                 break;
             case Gen4Constants.noDamageDefAndSpDefPlusOneEffect:
-                move.statChanges[0].type = StatBuffType.DEFENSE;
+                move.statChanges[0].type = StatChangeType.DEFENSE;
                 move.statChanges[0].stages = 1;
-                move.statChanges[1].type = StatBuffType.SPECIAL_DEFENSE;
+                move.statChanges[1].type = StatChangeType.SPECIAL_DEFENSE;
                 move.statChanges[1].stages = 1;
                 break;
             case Gen4Constants.noDamageAtkAndDefPlusOneEffect:
-                move.statChanges[0].type = StatBuffType.ATTACK;
+                move.statChanges[0].type = StatChangeType.ATTACK;
                 move.statChanges[0].stages = 1;
-                move.statChanges[1].type = StatBuffType.DEFENSE;
+                move.statChanges[1].type = StatChangeType.DEFENSE;
                 move.statChanges[1].stages = 1;
                 break;
             case Gen4Constants.noDamageSpAtkAndSpDefPlusOneEffect:
-                move.statChanges[0].type = StatBuffType.SPECIAL_ATTACK;
+                move.statChanges[0].type = StatChangeType.SPECIAL_ATTACK;
                 move.statChanges[0].stages = 1;
-                move.statChanges[1].type = StatBuffType.SPECIAL_DEFENSE;
+                move.statChanges[1].type = StatChangeType.SPECIAL_DEFENSE;
                 move.statChanges[1].stages = 1;
                 break;
             case Gen4Constants.noDamageAtkAndSpePlusOneEffect:
-                move.statChanges[0].type = StatBuffType.ATTACK;
+                move.statChanges[0].type = StatChangeType.ATTACK;
                 move.statChanges[0].stages = 1;
-                move.statChanges[1].type = StatBuffType.SPEED;
+                move.statChanges[1].type = StatChangeType.SPEED;
                 move.statChanges[1].stages = 1;
                 break;
             case Gen4Constants.damageUserDefAndSpDefMinusOneEffect:
-                move.statChanges[0].type = StatBuffType.DEFENSE;
+                move.statChanges[0].type = StatChangeType.DEFENSE;
                 move.statChanges[0].stages = -1;
-                move.statChanges[1].type = StatBuffType.SPECIAL_DEFENSE;
+                move.statChanges[1].type = StatChangeType.SPECIAL_DEFENSE;
                 move.statChanges[1].stages = -1;
                 break;
         }
 
-        if (move.statChangeType == StatChangeType.DAMAGE_STAT_CHANGE_TARGET || move.statChangeType == StatChangeType.DAMAGE_STAT_CHANGE_USER) {
+        if (move.statChangeMoveType == StatChangeMoveType.DAMAGE_TARGET || move.statChangeMoveType == StatChangeMoveType.DAMAGE_USER) {
             for (int i = 0; i < move.statChanges.length; i++) {
-                if (move.statChanges[i].type != StatBuffType.NONE) {
+                if (move.statChanges[i].type != StatChangeType.NONE) {
                     move.statChanges[i].percentChance = move.secondaryEffectChance;
                     if (move.statChanges[i].percentChance == 0.0) {
                         move.statChanges[i].percentChance = 100.0;
                     }
+                }
+            }
+        }
+    }
+
+    private void loadStatusFromEffect(Move move) {
+        switch (move.effectIndex) {
+            case Gen4Constants.noDamageSleepEffect:
+            case Gen4Constants.toxicEffect:
+            case Gen4Constants.noDamageConfusionEffect:
+            case Gen4Constants.noDamagePoisonEffect:
+            case Gen4Constants.noDamageParalyzeEffect:
+            case Gen4Constants.noDamageBurnEffect:
+            case Gen4Constants.swaggerEffect:
+            case Gen4Constants.flatterEffect:
+            case Gen4Constants.teeterDanceEffect:
+                move.statusMoveType = StatusMoveType.NO_DAMAGE;
+                break;
+
+            case Gen4Constants.damagePoisonEffect:
+            case Gen4Constants.damageBurnEffect:
+            case Gen4Constants.damageFreezeEffect:
+            case Gen4Constants.damageParalyzeEffect:
+            case Gen4Constants.damageConfusionEffect:
+            case Gen4Constants.twineedleEffect:
+            case Gen4Constants.damageBurnAndThawUserEffect:
+            case Gen4Constants.thunderEffect:
+            case Gen4Constants.blazeKickEffect:
+            case Gen4Constants.poisonFangEffect:
+            case Gen4Constants.damagePoisonWithIncreasedCritEffect:
+            case Gen4Constants.flareBlitzEffect:
+            case Gen4Constants.blizzardEffect:
+            case Gen4Constants.voltTackleEffect:
+            case Gen4Constants.bounceEffect:
+            case Gen4Constants.chatterEffect:
+            case Gen4Constants.fireFangEffect:
+            case Gen4Constants.iceFangEffect:
+            case Gen4Constants.thunderFangEffect:
+                move.statusMoveType = StatusMoveType.DAMAGE;
+                break;
+
+            default:
+                // Move does not have a status effect
+                return;
+        }
+
+        switch (move.effectIndex) {
+            case Gen4Constants.noDamageSleepEffect:
+                move.statusType = StatusType.SLEEP;
+                break;
+            case Gen4Constants.damagePoisonEffect:
+            case Gen4Constants.noDamagePoisonEffect:
+            case Gen4Constants.twineedleEffect:
+            case Gen4Constants.damagePoisonWithIncreasedCritEffect:
+                move.statusType = StatusType.POISON;
+                break;
+            case Gen4Constants.damageBurnEffect:
+            case Gen4Constants.damageBurnAndThawUserEffect:
+            case Gen4Constants.noDamageBurnEffect:
+            case Gen4Constants.blazeKickEffect:
+            case Gen4Constants.flareBlitzEffect:
+            case Gen4Constants.fireFangEffect:
+                move.statusType = StatusType.BURN;
+                break;
+            case Gen4Constants.damageFreezeEffect:
+            case Gen4Constants.blizzardEffect:
+            case Gen4Constants.iceFangEffect:
+                move.statusType = StatusType.FREEZE;
+                break;
+            case Gen4Constants.damageParalyzeEffect:
+            case Gen4Constants.noDamageParalyzeEffect:
+            case Gen4Constants.thunderEffect:
+            case Gen4Constants.voltTackleEffect:
+            case Gen4Constants.bounceEffect:
+            case Gen4Constants.thunderFangEffect:
+                move.statusType = StatusType.PARALYZE;
+                break;
+            case Gen4Constants.toxicEffect:
+            case Gen4Constants.poisonFangEffect:
+                move.statusType = StatusType.TOXIC_POISON;
+                break;
+            case Gen4Constants.noDamageConfusionEffect:
+            case Gen4Constants.damageConfusionEffect:
+            case Gen4Constants.swaggerEffect:
+            case Gen4Constants.flatterEffect:
+            case Gen4Constants.teeterDanceEffect:
+            case Gen4Constants.chatterEffect:
+                move.statusType = StatusType.CONFUSION;
+                break;
+        }
+
+        if (move.statusMoveType == StatusMoveType.DAMAGE) {
+            move.statusPercentChance = move.secondaryEffectChance;
+            if (move.statusPercentChance == 0.0) {
+                if (move.number == Moves.chatter) {
+                    move.statusPercentChance = 1.0;
+                } else {
+                    move.statusPercentChance = 100.0;
                 }
             }
         }

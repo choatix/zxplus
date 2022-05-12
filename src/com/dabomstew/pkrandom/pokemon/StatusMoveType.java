@@ -1,8 +1,8 @@
 package com.dabomstew.pkrandom.pokemon;
 
 /*----------------------------------------------------------------------------*/
-/*--  StatChangeType.java - represents the types of stat buffs that a move  --*/
-/*--                      can apply.                                        --*/
+/*--  StatusMoveType.java - represents the different types of moves         --*/
+/*--                             that can inflict a status effect.          --*/
 /*--                                                                        --*/
 /*--  Part of "Universal Pokemon Randomizer ZX" by the UPR-ZX team          --*/
 /*--  Pokemon and any associated names and the like are                     --*/
@@ -24,15 +24,8 @@ package com.dabomstew.pkrandom.pokemon;
 /*--  along with this program. If not, see <http://www.gnu.org/licenses/>.  --*/
 /*----------------------------------------------------------------------------*/
 
-public enum StatChangeType {
-    NONE,
-    ATTACK,
-    DEFENSE,
-    SPECIAL_ATTACK,
-    SPECIAL_DEFENSE,
-    SPEED,
-    ACCURACY,
-    EVASION,
-    ALL,
-    SPECIAL
+public enum StatusMoveType {
+    NONE_OR_UNKNOWN,
+    NO_DAMAGE,
+    DAMAGE
 }

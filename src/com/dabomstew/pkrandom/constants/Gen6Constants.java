@@ -192,7 +192,8 @@ public class Gen6Constants {
         }
     }
 
-    public static final int noDamageStatChangeQuality = 2, noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7;
+    public static final int noDamageStatusQuality = 1, noDamageStatChangeQuality = 2, damageStatusQuality = 4,
+            noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7;
 
     public static List<Integer> bannedMoves = Collections.singletonList(Moves.hyperspaceFury);
 
