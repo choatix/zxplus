@@ -558,6 +558,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 moves[i].target = moveData[20] & 0xFF;
                 moves[i].category = Gen5Constants.moveCategoryIndices[moveData[2] & 0xFF];
                 moves[i].priority = moveData[6];
+                int flags = FileFunctions.readFullInt(moveData, 32);
+                moves[i].makesContact = (flags & 1) != 0;
 
                 if (i == Moves.swift) {
                     perfectAccuracy = (int)moves[i].hitratio;

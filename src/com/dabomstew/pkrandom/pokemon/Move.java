@@ -49,6 +49,7 @@ public class Move {
     public double hitCount = 1; // not saved, only used in randomized move powers.
     public double secondaryEffectChance;
     public int priority;
+    public boolean makesContact;
 
     public Move() {
         // Initialize all statStageChanges to something sensible so that we don't need to have
