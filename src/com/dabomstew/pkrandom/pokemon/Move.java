@@ -43,6 +43,7 @@ public class Move {
     public StatusMoveType statusMoveType = StatusMoveType.NONE_OR_UNKNOWN;
     public StatusType statusType = StatusType.NONE;
     public double statusPercentChance;
+    public double flinchPercentChance;
     public int effectIndex;
     public int target;
     public MoveCategory category;

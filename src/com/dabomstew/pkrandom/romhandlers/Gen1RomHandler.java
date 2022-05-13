@@ -463,6 +463,12 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
 
                 loadStatChangesFromEffect(moves[trueMoveIndex]);
                 loadStatusFromEffect(moves[trueMoveIndex]);
+
+                if (moves[i].effectIndex == Gen1Constants.flinch10PercentEffect) {
+                    moves[i].flinchPercentChance = 10.0;
+                } else if (moves[i].effectIndex == Gen1Constants.flinch30PercentEffect) {
+                    moves[i].flinchPercentChance = 30.0;
+                }
             }
         }
     }

@@ -835,6 +835,17 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 perfectAccuracy = (int)moves[i].hitratio;
             }
 
+            switch (moves[i].effectIndex) {
+                case Gen3Constants.flinchEffect:
+                case Gen3Constants.skyAttackEffect:
+                case Gen3Constants.snoreEffect:
+                case Gen3Constants.twisterEffect:
+                case Gen3Constants.flinchWithMinimizeBonusEffect:
+                case Gen3Constants.fakeOutEffect:
+                    moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
+                    break;
+            }
+
             if (GlobalConstants.normalMultihitMoves.contains(i)) {
                 moves[i].hitCount = 3;
             } else if (GlobalConstants.doubleHitMoves.contains(i)) {

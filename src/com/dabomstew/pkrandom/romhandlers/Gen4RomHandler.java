@@ -593,6 +593,20 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
                 loadStatChangesFromEffect(moves[i]);
                 loadStatusFromEffect(moves[i]);
+
+                switch (moves[i].effectIndex) {
+                    case Gen4Constants.flinchEffect:
+                    case Gen4Constants.skyAttackEffect:
+                    case Gen4Constants.snoreEffect:
+                    case Gen4Constants.twisterEffect:
+                    case Gen4Constants.stompEffect:
+                    case Gen4Constants.fakeOutEffect:
+                    case Gen4Constants.fireFangEffect:
+                    case Gen4Constants.iceFangEffect:
+                    case Gen4Constants.thunderFangEffect:
+                        moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
+                        break;
+                }
             }
         } catch (IOException e) {
             throw new RandomizerIOException(e);

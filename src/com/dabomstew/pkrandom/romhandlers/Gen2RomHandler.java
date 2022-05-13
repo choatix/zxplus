@@ -442,6 +442,15 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
 
             loadStatChangesFromEffect(moves[i]);
             loadStatusFromEffect(moves[i]);
+
+            switch (moves[i].effectIndex) {
+                case Gen2Constants.flinchEffect:
+                case Gen2Constants.snoreEffect:
+                case Gen2Constants.twisterEffect:
+                case Gen2Constants.stompEffect:
+                    moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
+                    break;
+            }
         }
     }
 

@@ -678,6 +678,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                 moves[i].power = moveData[3] & 0xFF;
                 moves[i].pp = moveData[5] & 0xFF;
                 moves[i].type = Gen7Constants.typeTable[moveData[0] & 0xFF];
+                moves[i].flinchPercentChance = moveData[15] & 0xFF;
                 moves[i].target = moveData[20] & 0xFF;
                 moves[i].category = Gen7Constants.moveCategoryIndices[moveData[2] & 0xFF];
                 moves[i].priority = moveData[6];
