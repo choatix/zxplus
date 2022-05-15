@@ -44,6 +44,8 @@ public class Move {
     public StatusType statusType = StatusType.NONE;
     public double statusPercentChance;
     public double flinchPercentChance;
+    public int recoilPercent;
+    public int absorbPercent;
     public int effectIndex;
     public int target;
     public MoveCategory category;

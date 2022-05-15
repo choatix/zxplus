@@ -561,6 +561,13 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 moves[i].priority = moveData[6];
                 int flags = FileFunctions.readFullInt(moveData, 32);
                 moves[i].makesContact = (flags & 1) != 0;
+                int qualities = moveData[1];
+                int recoilOrAbsorbPercent = moveData[18];
+                if (qualities == Gen5Constants.damageAbsorbQuality) {
+                    moves[i].absorbPercent = recoilOrAbsorbPercent;
+                } else {
+                    moves[i].recoilPercent = -recoilOrAbsorbPercent;
+                }
 
                 if (i == Moves.swift) {
                     perfectAccuracy = (int)moves[i].hitratio;
@@ -574,7 +581,6 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                     moves[i].hitCount = 2.71; // this assumes the first hit lands
                 }
 
-                int qualities = moveData[1];
                 switch (qualities) {
                     case Gen5Constants.noDamageStatChangeQuality:
                     case Gen5Constants.noDamageStatusAndStatChangeQuality:

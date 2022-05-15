@@ -157,7 +157,8 @@ public class Gen5Constants {
     }
 
     public static final int noDamageStatusQuality = 1, noDamageStatChangeQuality = 2, damageStatusQuality = 4,
-            noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7;
+            noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7,
+            damageAbsorbQuality = 8;
 
     public static final Type[] typeTable = constructTypeTable();
 

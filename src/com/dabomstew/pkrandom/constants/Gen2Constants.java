@@ -72,11 +72,12 @@ public class Gen2Constants {
 
     public static final int mapGroupCount = 26, mapsInLastGroup = 11;
 
-    public static final int noDamageSleepEffect = 1, damagePoisonEffect = 2, damageBurnEffect = 4, damageFreezeEffect = 5,
-            damageParalyzeEffect = 6, noDamageAtkPlusOneEffect = 10, noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13,
-            noDamageEvasionPlusOneEffect = 16, noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19,
-            noDamageSpeMinusOneEffect = 20, noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24, flinchEffect = 31,
-            toxicEffect = 33, noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51,
+    public static final int noDamageSleepEffect = 1, damagePoisonEffect = 2, damageAbsorbEffect = 3, damageBurnEffect = 4,
+            damageFreezeEffect = 5, damageParalyzeEffect = 6, dreamEaterEffect = 8, noDamageAtkPlusOneEffect = 10,
+            noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13, noDamageEvasionPlusOneEffect = 16,
+            noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19, noDamageSpeMinusOneEffect = 20,
+            noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24, flinchEffect = 31, toxicEffect = 33,
+            damageRecoilEffect = 48, noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51,
             noDamageSpePlusTwoEffect = 52, noDamageSpDefPlusTwoEffect = 54, noDamageAtkMinusTwoEffect = 58,
             noDamageDefMinusTwoEffect = 59, noDamageSpeMinusTwoEffect = 60, noDamageSpDefMinusTwoEffect = 62, noDamagePoisonEffect = 66,
             noDamageParalyzeEffect = 67, damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70,

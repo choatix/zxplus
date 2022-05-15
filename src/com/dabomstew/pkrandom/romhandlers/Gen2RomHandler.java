@@ -453,6 +453,15 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                 case Gen2Constants.stompEffect:
                     moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
                     break;
+
+                case Gen2Constants.damageAbsorbEffect:
+                case Gen2Constants.dreamEaterEffect:
+                    moves[i].absorbPercent = 50;
+                    break;
+
+                case Gen2Constants.damageRecoilEffect:
+                    moves[i].recoilPercent = 25;
+                    break;
             }
         }
     }

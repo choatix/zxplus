@@ -606,6 +606,25 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     case Gen4Constants.thunderFangEffect:
                         moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
                         break;
+
+                    case Gen4Constants.damageAbsorbEffect:
+                    case Gen4Constants.dreamEaterEffect:
+                        moves[i].absorbPercent = 50;
+                        break;
+
+                    case Gen4Constants.damageRecoil25PercentEffect:
+                        moves[i].recoilPercent = 25;
+                        break;
+
+                    case Gen4Constants.damageRecoil33PercentEffect:
+                    case Gen4Constants.flareBlitzEffect:
+                    case Gen4Constants.voltTackleEffect:
+                        moves[i].recoilPercent = 33;
+                        break;
+
+                    case Gen4Constants.damageRecoil50PercentEffect:
+                        moves[i].recoilPercent = 50;
+                        break;
                 }
             }
         } catch (IOException e) {

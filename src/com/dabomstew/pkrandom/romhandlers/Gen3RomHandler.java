@@ -847,6 +847,19 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 case Gen3Constants.fakeOutEffect:
                     moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
                     break;
+
+                case Gen3Constants.damageAbsorbEffect:
+                case Gen3Constants.dreamEaterEffect:
+                    moves[i].absorbPercent = 50;
+                    break;
+
+                case Gen3Constants.damageRecoil25PercentEffect:
+                    moves[i].recoilPercent = 25;
+                    break;
+
+                case Gen3Constants.damageRecoil33PercentEffect:
+                    moves[i].recoilPercent = 33;
+                    break;
             }
 
             if (GlobalConstants.normalMultihitMoves.contains(i)) {
