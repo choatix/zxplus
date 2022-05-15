@@ -412,6 +412,9 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             moves[i].pp = rom[offs + (i - 1) * 7 + 5] & 0xFF;
             moves[i].type = Gen2Constants.typeTable[rom[offs + (i - 1) * 7 + 3]];
             moves[i].category = GBConstants.physicalTypes.contains(moves[i].type) ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL;
+            if (moves[i].power == 0 && !GlobalConstants.noPowerNonStatusMoves.contains(i)) {
+                moves[i].category = MoveCategory.STATUS;
+            }
             moves[i].secondaryEffectChance = ((rom[offs + (i - 1) * 7 + 6] & 0xFF)) / 255.0 * 100;
 
             if (i == Moves.swift) {

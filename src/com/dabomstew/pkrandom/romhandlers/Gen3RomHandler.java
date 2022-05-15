@@ -826,6 +826,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             moves[i].type = Gen3Constants.typeTable[rom[offs + i * 0xC + 2]];
             moves[i].target = rom[offs + i * 0xC + 6] & 0xFF;
             moves[i].category = GBConstants.physicalTypes.contains(moves[i].type) ? MoveCategory.PHYSICAL : MoveCategory.SPECIAL;
+            if (moves[i].power == 0 && !GlobalConstants.noPowerNonStatusMoves.contains(i)) {
+                moves[i].category = MoveCategory.STATUS;
+            }
             moves[i].priority = rom[offs + i * 0xC + 7];
             moves[i].secondaryEffectChance = rom[offs + i * 0xC + 5] & 0xFF;
             int flags = rom[offs + i * 0xC + 8] & 0xFF;
