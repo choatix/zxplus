@@ -574,7 +574,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 moves[i].type = Gen4Constants.typeTable[moveData[4] & 0xFF];
                 moves[i].target = readWord(moveData, 8);
                 moves[i].category = Gen4Constants.moveCategoryIndices[moveData[2] & 0xFF];
-                moves[i].secondaryEffectChance = moveData[7] & 0xFF;
                 moves[i].priority = moveData[10];
                 int flags = moveData[11] & 0xFF;
                 moves[i].makesContact = (flags & 1) != 0;
@@ -591,48 +590,17 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     moves[i].hitCount = 2.71; // this assumes the first hit lands
                 }
 
-                loadStatChangesFromEffect(moves[i]);
-                loadStatusFromEffect(moves[i]);
-
-                switch (moves[i].effectIndex) {
-                    case Gen4Constants.flinchEffect:
-                    case Gen4Constants.skyAttackEffect:
-                    case Gen4Constants.snoreEffect:
-                    case Gen4Constants.twisterEffect:
-                    case Gen4Constants.stompEffect:
-                    case Gen4Constants.fakeOutEffect:
-                    case Gen4Constants.fireFangEffect:
-                    case Gen4Constants.iceFangEffect:
-                    case Gen4Constants.thunderFangEffect:
-                        moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
-                        break;
-
-                    case Gen4Constants.damageAbsorbEffect:
-                    case Gen4Constants.dreamEaterEffect:
-                        moves[i].absorbPercent = 50;
-                        break;
-
-                    case Gen4Constants.damageRecoil25PercentEffect:
-                        moves[i].recoilPercent = 25;
-                        break;
-
-                    case Gen4Constants.damageRecoil33PercentEffect:
-                    case Gen4Constants.flareBlitzEffect:
-                    case Gen4Constants.voltTackleEffect:
-                        moves[i].recoilPercent = 33;
-                        break;
-
-                    case Gen4Constants.damageRecoil50PercentEffect:
-                        moves[i].recoilPercent = 50;
-                        break;
-                }
+                int secondaryEffectChance = moveData[7] & 0xFF;
+                loadStatChangesFromEffect(moves[i], secondaryEffectChance);
+                loadStatusFromEffect(moves[i], secondaryEffectChance);
+                loadMiscMoveInfoFromEffect(moves[i], secondaryEffectChance);
             }
         } catch (IOException e) {
             throw new RandomizerIOException(e);
         }
     }
 
-    private void loadStatChangesFromEffect(Move move) {
+    private void loadStatChangesFromEffect(Move move, int secondaryEffectChance) {
         switch (move.effectIndex) {
             case Gen4Constants.noDamageAtkPlusOneEffect:
             case Gen4Constants.noDamageDefPlusOneEffect:
@@ -845,7 +813,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         if (move.statChangeMoveType == StatChangeMoveType.DAMAGE_TARGET || move.statChangeMoveType == StatChangeMoveType.DAMAGE_USER) {
             for (int i = 0; i < move.statChanges.length; i++) {
                 if (move.statChanges[i].type != StatChangeType.NONE) {
-                    move.statChanges[i].percentChance = move.secondaryEffectChance;
+                    move.statChanges[i].percentChance = secondaryEffectChance;
                     if (move.statChanges[i].percentChance == 0.0) {
                         move.statChanges[i].percentChance = 100.0;
                     }
@@ -854,7 +822,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
     }
 
-    private void loadStatusFromEffect(Move move) {
+    private void loadStatusFromEffect(Move move, int secondaryEffectChance) {
         switch (move.effectIndex) {
             case Gen4Constants.noDamageSleepEffect:
             case Gen4Constants.toxicEffect:
@@ -941,7 +909,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         }
 
         if (move.statusMoveType == StatusMoveType.DAMAGE) {
-            move.statusPercentChance = move.secondaryEffectChance;
+            move.statusPercentChance = secondaryEffectChance;
             if (move.statusPercentChance == 0.0) {
                 if (move.number == Moves.chatter) {
                     move.statusPercentChance = 1.0;
@@ -949,6 +917,55 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                     move.statusPercentChance = 100.0;
                 }
             }
+        }
+    }
+
+    private void loadMiscMoveInfoFromEffect(Move move, int secondaryEffectChance) {
+        switch (move.effectIndex) {
+            case Gen4Constants.razorWindEffect:
+            case Gen4Constants.increasedCritEffect:
+            case Gen4Constants.blazeKickEffect:
+            case Gen4Constants.damagePoisonWithIncreasedCritEffect:
+                move.criticalChance = CriticalChance.INCREASED;
+                break;
+
+            case Gen4Constants.futureSightAndDoomDesireEffect:
+                move.criticalChance = CriticalChance.NONE;
+
+            case Gen4Constants.flinchEffect:
+            case Gen4Constants.snoreEffect:
+            case Gen4Constants.twisterEffect:
+            case Gen4Constants.stompEffect:
+            case Gen4Constants.fakeOutEffect:
+            case Gen4Constants.fireFangEffect:
+            case Gen4Constants.iceFangEffect:
+            case Gen4Constants.thunderFangEffect:
+                move.flinchPercentChance = secondaryEffectChance;
+                break;
+
+            case Gen4Constants.skyAttackEffect:
+                move.criticalChance = CriticalChance.INCREASED;
+                move.flinchPercentChance = secondaryEffectChance;
+                break;
+
+            case Gen4Constants.damageAbsorbEffect:
+            case Gen4Constants.dreamEaterEffect:
+                move.absorbPercent = 50;
+                break;
+
+            case Gen4Constants.damageRecoil25PercentEffect:
+                move.recoilPercent = 25;
+                break;
+
+            case Gen4Constants.damageRecoil33PercentEffect:
+            case Gen4Constants.flareBlitzEffect:
+            case Gen4Constants.voltTackleEffect:
+                move.recoilPercent = 33;
+                break;
+
+            case Gen4Constants.damageRecoil50PercentEffect:
+                move.recoilPercent = 50;
+                break;
         }
     }
 

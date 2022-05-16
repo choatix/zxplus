@@ -38,21 +38,21 @@ public class Move {
     public int pp;
     public double hitratio;
     public Type type;
+    public MoveCategory category;
     public StatChangeMoveType statChangeMoveType = StatChangeMoveType.NONE_OR_UNKNOWN;
     public StatChange[] statChanges = new StatChange[3];
     public StatusMoveType statusMoveType = StatusMoveType.NONE_OR_UNKNOWN;
     public StatusType statusType = StatusType.NONE;
+    public CriticalChance criticalChance = CriticalChance.NORMAL;
     public double statusPercentChance;
     public double flinchPercentChance;
     public int recoilPercent;
     public int absorbPercent;
-    public int effectIndex;
-    public int target;
-    public MoveCategory category;
-    public double hitCount = 1; // not saved, only used in randomized move powers.
-    public double secondaryEffectChance;
     public int priority;
     public boolean makesContact;
+    public int effectIndex;
+    public int target;
+    public double hitCount = 1; // not saved, only used in randomized move powers.
 
     public Move() {
         // Initialize all statStageChanges to something sensible so that we don't need to have

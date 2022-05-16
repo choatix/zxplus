@@ -80,6 +80,9 @@ public class Gen1Constants {
             damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70,
             damageSpecialMinusOneEffect = 71, damageConfusionEffect = 76, twineedleEffect = 77;
 
+    // Taken from critical_hit_moves.asm; we could read this from the ROM, but it's easier to hardcode it.
+    public static final List<Integer> increasedCritMoves = Arrays.asList(Moves.karateChop, Moves.razorLeaf, Moves.crabhammer, Moves.slash);
+
     public static final List<Integer> earlyRequiredHMs = Collections.singletonList(Moves.cut);
 
     public static final int hmsStartIndex = Gen1Items.hm01, tmsStartIndex = Gen1Items.tm01;

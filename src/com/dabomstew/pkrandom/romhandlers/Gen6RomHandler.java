@@ -610,6 +610,14 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 moves[i].target = moveData[20] & 0xFF;
                 moves[i].category = Gen6Constants.moveCategoryIndices[moveData[2] & 0xFF];
                 moves[i].priority = moveData[6];
+
+                int critStages = moveData[14] & 0xFF;
+                if (critStages == 6) {
+                    moves[i].criticalChance = CriticalChance.GUARANTEED;
+                } else if (critStages > 0) {
+                    moves[i].criticalChance = CriticalChance.INCREASED;
+                }
+
                 int flags = FileFunctions.readFullInt(moveData, 32);
                 moves[i].makesContact = (flags & 1) != 0;
                 int qualities = moveData[1];

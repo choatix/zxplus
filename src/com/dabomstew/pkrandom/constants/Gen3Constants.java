@@ -190,7 +190,7 @@ public class Gen3Constants {
             noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13, noDamageEvasionPlusOneEffect = 16,
             noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19, noDamageSpeMinusOneEffect = 20,
             noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24, flinchEffect = 31, toxicEffect = 33,
-            damageRecoil25PercentEffect = 48, noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50,
+            increasedCritEffect = 43, damageRecoil25PercentEffect = 48, noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50,
             noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52, noDamageSpAtkPlusTwoEffect = 53,
             noDamageSpDefPlusTwoEffect = 54, noDamageAtkMinusTwoEffect = 58, noDamageDefMinusTwoEffect = 59,
             noDamageSpeMinusTwoEffect = 60, noDamageSpDefMinusTwoEffect = 62, noDamagePoisonEffect = 66,
@@ -199,12 +199,13 @@ public class Gen3Constants {
             damageAccuracyMinusOneEffect = 73, skyAttackEffect = 75, damageConfusionEffect = 76, twineedleEffect = 77,
             snoreEffect = 92, minimizeEffect = 108, swaggerEffect = 118, damageBurnAndThawUserEffect = 125,
             damageUserDefPlusOneEffect = 138, damageUserAtkPlusOneEffect = 139, damageUserAllPlusOneEffect = 140,
-            twisterEffect = 146, flinchWithMinimizeBonusEffect = 150, thunderEffect = 152, defenseCurlEffect = 156, fakeOutEffect = 158,
-            flatterEffect = 166, noDamageBurnEffect = 167, chargeEffect = 174, damageUserAtkAndDefMinusOneEffect = 182,
-            damageRecoil33PercentEffect = 198, teeterDanceEffect = 199, blazeKickEffect = 200, poisonFangEffect = 202,
-            damageUserSpAtkMinusTwoEffect = 204, noDamageAtkAndDefMinusOneEffect = 205, noDamageDefAndSpDefPlusOneEffect = 206,
-            noDamageAtkAndDefPlusOneEffect = 208, damagePoisonWithIncreasedCritEffect = 209,
-            noDamageSpAtkAndSpDefPlusOneEffect = 211, noDamageAtkAndSpePlusOneEffect = 212;
+            twisterEffect = 146, futureSightAndDoomDesireEffect = 148, flinchWithMinimizeBonusEffect = 150, thunderEffect = 152,
+            defenseCurlEffect = 156, fakeOutEffect = 158, spitUpEffect = 161, flatterEffect = 166, noDamageBurnEffect = 167,
+            chargeEffect = 174, damageUserAtkAndDefMinusOneEffect = 182, damageRecoil33PercentEffect = 198,
+            teeterDanceEffect = 199, blazeKickEffect = 200, poisonFangEffect = 202, damageUserSpAtkMinusTwoEffect = 204,
+            noDamageAtkAndDefMinusOneEffect = 205, noDamageDefAndSpDefPlusOneEffect = 206,
+            noDamageAtkAndDefPlusOneEffect = 208, poisonTailEffect = 209, noDamageSpAtkAndSpDefPlusOneEffect = 211,
+            noDamageAtkAndSpePlusOneEffect = 212;
 
     public static final List<Integer> rsRequiredFieldTMs = Arrays.asList(1, 2, 6, 7, 11, 18, 22, 23,
             26, 30, 37, 48);

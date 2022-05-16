@@ -415,7 +415,6 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             if (moves[i].power == 0 && !GlobalConstants.noPowerNonStatusMoves.contains(i)) {
                 moves[i].category = MoveCategory.STATUS;
             }
-            moves[i].secondaryEffectChance = ((rom[offs + (i - 1) * 7 + 6] & 0xFF)) / 255.0 * 100;
 
             if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;
@@ -443,30 +442,14 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                 moves[i].priority = 1;
             }
 
-            loadStatChangesFromEffect(moves[i]);
-            loadStatusFromEffect(moves[i]);
-
-            switch (moves[i].effectIndex) {
-                case Gen2Constants.flinchEffect:
-                case Gen2Constants.snoreEffect:
-                case Gen2Constants.twisterEffect:
-                case Gen2Constants.stompEffect:
-                    moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
-                    break;
-
-                case Gen2Constants.damageAbsorbEffect:
-                case Gen2Constants.dreamEaterEffect:
-                    moves[i].absorbPercent = 50;
-                    break;
-
-                case Gen2Constants.damageRecoilEffect:
-                    moves[i].recoilPercent = 25;
-                    break;
-            }
+            double secondaryEffectChance = ((rom[offs + (i - 1) * 7 + 6] & 0xFF)) / 255.0 * 100;
+            loadStatChangesFromEffect(moves[i], secondaryEffectChance);
+            loadStatusFromEffect(moves[i], secondaryEffectChance);
+            loadMiscMoveInfoFromEffect(moves[i], secondaryEffectChance);
         }
     }
 
-    private void loadStatChangesFromEffect(Move move) {
+    private void loadStatChangesFromEffect(Move move, double secondaryEffectChance) {
         switch (move.effectIndex) {
             case Gen2Constants.noDamageAtkPlusOneEffect:
             case Gen2Constants.damageUserAtkPlusOneEffect:
@@ -602,7 +585,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         if (move.statChangeMoveType == StatChangeMoveType.DAMAGE_TARGET || move.statChangeMoveType == StatChangeMoveType.DAMAGE_USER) {
             for (int i = 0; i < move.statChanges.length; i++) {
                 if (move.statChanges[i].type != StatChangeType.NONE) {
-                    move.statChanges[i].percentChance = move.secondaryEffectChance;
+                    move.statChanges[i].percentChance = secondaryEffectChance;
                     if (move.statChanges[i].percentChance == 0.0) {
                         move.statChanges[i].percentChance = 100.0;
                     }
@@ -611,7 +594,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         }
     }
 
-    private void loadStatusFromEffect(Move move) {
+    private void loadStatusFromEffect(Move move, double secondaryEffectChance) {
         switch (move.effectIndex) {
             case Gen2Constants.noDamageSleepEffect:
             case Gen2Constants.toxicEffect:
@@ -670,10 +653,39 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         }
 
         if (move.statusMoveType == StatusMoveType.DAMAGE) {
-            move.statusPercentChance = move.secondaryEffectChance;
+            move.statusPercentChance = secondaryEffectChance;
             if (move.statusPercentChance == 0.0) {
                 move.statusPercentChance = 100.0;
             }
+        }
+    }
+
+    private void loadMiscMoveInfoFromEffect(Move move, double secondaryEffectChance) {
+        switch (move.effectIndex) {
+            case Gen2Constants.flinchEffect:
+            case Gen2Constants.snoreEffect:
+            case Gen2Constants.twisterEffect:
+            case Gen2Constants.stompEffect:
+                move.flinchPercentChance = secondaryEffectChance;
+                break;
+
+            case Gen2Constants.damageAbsorbEffect:
+            case Gen2Constants.dreamEaterEffect:
+                move.absorbPercent = 50;
+                break;
+
+            case Gen2Constants.damageRecoilEffect:
+                move.recoilPercent = 25;
+                break;
+
+            case Gen2Constants.flailAndReversalEffect:
+            case Gen2Constants.futureSightEffect:
+                move.criticalChance = CriticalChance.NONE;
+                break;
+        }
+
+        if (Gen2Constants.increasedCritMoves.contains(move.number)) {
+            move.criticalChance = CriticalChance.INCREASED;
         }
     }
 

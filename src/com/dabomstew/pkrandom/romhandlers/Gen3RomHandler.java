@@ -830,36 +830,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 moves[i].category = MoveCategory.STATUS;
             }
             moves[i].priority = rom[offs + i * 0xC + 7];
-            moves[i].secondaryEffectChance = rom[offs + i * 0xC + 5] & 0xFF;
             int flags = rom[offs + i * 0xC + 8] & 0xFF;
             moves[i].makesContact = (flags & 1) != 0;
 
             if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;
-            }
-
-            switch (moves[i].effectIndex) {
-                case Gen3Constants.flinchEffect:
-                case Gen3Constants.skyAttackEffect:
-                case Gen3Constants.snoreEffect:
-                case Gen3Constants.twisterEffect:
-                case Gen3Constants.flinchWithMinimizeBonusEffect:
-                case Gen3Constants.fakeOutEffect:
-                    moves[i].flinchPercentChance = moves[i].secondaryEffectChance;
-                    break;
-
-                case Gen3Constants.damageAbsorbEffect:
-                case Gen3Constants.dreamEaterEffect:
-                    moves[i].absorbPercent = 50;
-                    break;
-
-                case Gen3Constants.damageRecoil25PercentEffect:
-                    moves[i].recoilPercent = 25;
-                    break;
-
-                case Gen3Constants.damageRecoil33PercentEffect:
-                    moves[i].recoilPercent = 33;
-                    break;
             }
 
             if (GlobalConstants.normalMultihitMoves.contains(i)) {
@@ -870,12 +845,14 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 moves[i].hitCount = 2.71; // this assumes the first hit lands
             }
 
-            loadStatChangesFromEffect(moves[i]);
-            loadStatusFromEffect(moves[i]);
+            int secondaryEffectChance = rom[offs + i * 0xC + 5] & 0xFF;
+            loadStatChangesFromEffect(moves[i], secondaryEffectChance);
+            loadStatusFromEffect(moves[i], secondaryEffectChance);
+            loadMiscMoveInfoFromEffect(moves[i], secondaryEffectChance);
         }
     }
 
-    private void loadStatChangesFromEffect(Move move) {
+    private void loadStatChangesFromEffect(Move move, int secondaryEffectChance) {
         switch (move.effectIndex) {
             case Gen3Constants.noDamageAtkPlusOneEffect:
             case Gen3Constants.noDamageDefPlusOneEffect:
@@ -1073,7 +1050,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         if (move.statChangeMoveType == StatChangeMoveType.DAMAGE_TARGET || move.statChangeMoveType == StatChangeMoveType.DAMAGE_USER) {
             for (int i = 0; i < move.statChanges.length; i++) {
                 if (move.statChanges[i].type != StatChangeType.NONE) {
-                    move.statChanges[i].percentChance = move.secondaryEffectChance;
+                    move.statChanges[i].percentChance = secondaryEffectChance;
                     if (move.statChanges[i].percentChance == 0.0) {
                         move.statChanges[i].percentChance = 100.0;
                     }
@@ -1082,12 +1059,12 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         }
     }
 
-    private void loadStatusFromEffect(Move move) {
+    private void loadStatusFromEffect(Move move, int secondaryEffectChance) {
         if (move.number == Moves.bounce) {
             // GF hardcoded this, so we have to as well
             move.statusMoveType = StatusMoveType.DAMAGE;
             move.statusType = StatusType.PARALYZE;
-            move.statusPercentChance = move.secondaryEffectChance;
+            move.statusPercentChance = secondaryEffectChance;
             return;
         }
 
@@ -1114,7 +1091,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             case Gen3Constants.thunderEffect:
             case Gen3Constants.blazeKickEffect:
             case Gen3Constants.poisonFangEffect:
-            case Gen3Constants.damagePoisonWithIncreasedCritEffect:
+            case Gen3Constants.poisonTailEffect:
                 move.statusMoveType = StatusMoveType.DAMAGE;
                 break;
 
@@ -1130,7 +1107,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             case Gen3Constants.damagePoisonEffect:
             case Gen3Constants.noDamagePoisonEffect:
             case Gen3Constants.twineedleEffect:
-            case Gen3Constants.damagePoisonWithIncreasedCritEffect:
+            case Gen3Constants.poisonTailEffect:
                 move.statusType = StatusType.POISON;
                 break;
             case Gen3Constants.damageBurnEffect:
@@ -1161,10 +1138,49 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         }
 
         if (move.statusMoveType == StatusMoveType.DAMAGE) {
-            move.statusPercentChance = move.secondaryEffectChance;
+            move.statusPercentChance = secondaryEffectChance;
             if (move.statusPercentChance == 0.0) {
                 move.statusPercentChance = 100.0;
             }
+        }
+    }
+
+    private void loadMiscMoveInfoFromEffect(Move move, int secondaryEffectChance) {
+        switch (move.effectIndex) {
+            case Gen3Constants.increasedCritEffect:
+            case Gen3Constants.blazeKickEffect:
+            case Gen3Constants.poisonTailEffect:
+                move.criticalChance = CriticalChance.INCREASED;
+                break;
+
+            case Gen3Constants.futureSightAndDoomDesireEffect:
+            case Gen3Constants.spitUpEffect:
+                move.criticalChance = CriticalChance.NONE;
+
+            case Gen3Constants.flinchEffect:
+            case Gen3Constants.snoreEffect:
+            case Gen3Constants.twisterEffect:
+            case Gen3Constants.flinchWithMinimizeBonusEffect:
+            case Gen3Constants.fakeOutEffect:
+                move.flinchPercentChance = secondaryEffectChance;
+                break;
+
+            case Gen3Constants.skyAttackEffect:
+                move.criticalChance = CriticalChance.INCREASED;
+                move.flinchPercentChance = secondaryEffectChance;
+
+            case Gen3Constants.damageAbsorbEffect:
+            case Gen3Constants.dreamEaterEffect:
+                move.absorbPercent = 50;
+                break;
+
+            case Gen3Constants.damageRecoil25PercentEffect:
+                move.recoilPercent = 25;
+                break;
+
+            case Gen3Constants.damageRecoil33PercentEffect:
+                move.recoilPercent = 33;
+                break;
         }
     }
 

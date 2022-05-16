@@ -466,25 +466,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
 
                 loadStatChangesFromEffect(moves[trueMoveIndex]);
                 loadStatusFromEffect(moves[trueMoveIndex]);
-
-                switch (moves[i].effectIndex) {
-                    case Gen1Constants.flinch10PercentEffect:
-                        moves[i].flinchPercentChance = 10.0;
-                        break;
-
-                    case Gen1Constants.flinch30PercentEffect:
-                        moves[i].flinchPercentChance = 30.0;
-                        break;
-
-                    case Gen1Constants.damageAbsorbEffect:
-                    case Gen1Constants.dreamEaterEffect:
-                        moves[i].absorbPercent = 50;
-                        break;
-
-                    case Gen1Constants.damageRecoilEffect:
-                        moves[i].recoilPercent = 25;
-                        break;
-                }
+                loadMiscMoveInfoFromEffect(moves[trueMoveIndex]);
             }
         }
     }
@@ -673,6 +655,31 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
                     move.statusPercentChance = 40.0;
                     break;
             }
+        }
+    }
+
+    private void loadMiscMoveInfoFromEffect(Move move) {
+        switch (move.effectIndex) {
+            case Gen1Constants.flinch10PercentEffect:
+                move.flinchPercentChance = 10.0;
+                break;
+
+            case Gen1Constants.flinch30PercentEffect:
+                move.flinchPercentChance = 30.0;
+                break;
+
+            case Gen1Constants.damageAbsorbEffect:
+            case Gen1Constants.dreamEaterEffect:
+                move.absorbPercent = 50;
+                break;
+
+            case Gen1Constants.damageRecoilEffect:
+                move.recoilPercent = 25;
+                break;
+        }
+
+        if (Gen1Constants.increasedCritMoves.contains(move.number)) {
+            move.criticalChance = CriticalChance.INCREASED;
         }
     }
 
