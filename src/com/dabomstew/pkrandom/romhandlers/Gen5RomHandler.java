@@ -568,7 +568,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 }
 
                 int flags = FileFunctions.readFullInt(moveData, 32);
-                moves[i].makesContact = (flags & 1) != 0;
+                moves[i].makesContact = (flags & 0x001) != 0;
+                moves[i].isSoundMove = (flags & 0x100) != 0;
                 int qualities = moveData[1];
                 int recoilOrAbsorbPercent = moveData[18];
                 if (qualities == Gen5Constants.damageAbsorbQuality) {

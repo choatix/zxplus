@@ -832,6 +832,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             moves[i].priority = rom[offs + i * 0xC + 7];
             int flags = rom[offs + i * 0xC + 8] & 0xFF;
             moves[i].makesContact = (flags & 1) != 0;
+            moves[i].isSoundMove = Gen3Constants.soundMoves.contains(moves[i].number);
 
             if (i == Moves.swift) {
                 perfectAccuracy = (int)moves[i].hitratio;

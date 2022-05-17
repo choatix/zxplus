@@ -706,6 +706,10 @@ public class Gen4Constants {
             damageRecoil50PercentEffect = 269, damageSpDefMinusTwoEffect = 271, fireFangEffect = 273, iceFangEffect = 274,
             thunderFangEffect = 275, damageUserSpAtkPlusOneEffect = 276;
 
+    public static final List<Integer> soundMoves = Arrays.asList(Moves.growl, Moves.roar, Moves.sing, Moves.supersonic,
+            Moves.screech, Moves.snore, Moves.uproar, Moves.metalSound, Moves.grassWhistle, Moves.hyperVoice,
+            Moves.bugBuzz, Moves.chatter, Moves.perishSong, Moves.healBell);
+
     public static final List<Integer> dpRequiredFieldTMs = Arrays.asList(2, 3, 5, 9, 12, 19, 23, 28,
             34, 39, 41, 43, 46, 47, 49, 50, 62, 69, 79, 80, 82, 84, 85, 87);
 

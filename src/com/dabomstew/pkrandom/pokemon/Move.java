@@ -50,6 +50,7 @@ public class Move {
     public int absorbPercent;
     public int priority;
     public boolean makesContact;
+    public boolean isSoundMove;
     public int effectIndex;
     public int target;
     public double hitCount = 1; // not saved, only used in randomized move powers.
