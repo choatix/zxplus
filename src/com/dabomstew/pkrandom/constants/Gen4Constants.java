@@ -710,6 +710,10 @@ public class Gen4Constants {
             Moves.screech, Moves.snore, Moves.uproar, Moves.metalSound, Moves.grassWhistle, Moves.hyperVoice,
             Moves.bugBuzz, Moves.chatter, Moves.perishSong, Moves.healBell);
 
+    public static final List<Integer> punchMoves = Arrays.asList(Moves.icePunch, Moves.firePunch, Moves.thunderPunch,
+            Moves.machPunch, Moves.focusPunch, Moves.dizzyPunch, Moves.dynamicPunch, Moves.hammerArm, Moves.megaPunch,
+            Moves.cometPunch, Moves.meteorMash, Moves.shadowPunch, Moves.drainPunch, Moves.bulletPunch, Moves.skyUppercut);
+
     public static final List<Integer> dpRequiredFieldTMs = Arrays.asList(2, 3, 5, 9, 12, 19, 23, 28,
             34, 39, 41, 43, 46, 47, 49, 50, 62, 69, 79, 80, 82, 84, 85, 87);
 

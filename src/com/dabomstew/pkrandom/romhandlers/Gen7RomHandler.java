@@ -692,6 +692,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
 
                 int flags = FileFunctions.readFullInt(moveData, 36);
                 moves[i].makesContact = (flags & 0x001) != 0;
+                moves[i].isPunchMove = (flags & 0x080) != 0;
                 moves[i].isSoundMove = (flags & 0x100) != 0;
                 int qualities = moveData[1];
                 int recoilOrAbsorbPercent = moveData[18];

@@ -577,6 +577,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 moves[i].priority = moveData[10];
                 int flags = moveData[11] & 0xFF;
                 moves[i].makesContact = (flags & 1) != 0;
+                moves[i].isPunchMove = Gen4Constants.punchMoves.contains(moves[i].number);
                 moves[i].isSoundMove = Gen4Constants.soundMoves.contains(moves[i].number);
 
                 if (i == Moves.swift) {
