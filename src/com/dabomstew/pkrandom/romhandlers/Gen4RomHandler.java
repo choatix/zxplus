@@ -968,6 +968,11 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             case Gen4Constants.damageRecoil50PercentEffect:
                 move.recoilPercent = 50;
                 break;
+
+            case Gen4Constants.bindingEffect:
+            case Gen4Constants.trappingEffect:
+                move.isTrapMove = true;
+                break;
         }
     }
 

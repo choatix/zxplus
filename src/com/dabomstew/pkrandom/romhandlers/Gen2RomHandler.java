@@ -682,6 +682,11 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             case Gen2Constants.futureSightEffect:
                 move.criticalChance = CriticalChance.NONE;
                 break;
+
+            case Gen2Constants.bindingEffect:
+            case Gen2Constants.trappingEffect:
+                move.isTrapMove = true;
+                break;
         }
 
         if (Gen2Constants.increasedCritMoves.contains(move.number)) {

@@ -216,6 +216,9 @@ public class Gen7Constants {
         }
     }
 
+    public static final int noDamageTargetTrappingEffect = 106, noDamageFieldTrappingEffect = 354,
+            damageAdjacentFoesTrappingEffect = 373, damageTargetTrappingEffect = 384;
+
     public static final int noDamageStatusQuality = 1, noDamageStatChangeQuality = 2, damageStatusQuality = 4,
             noDamageStatusAndStatChangeQuality = 5, damageTargetDebuffQuality = 6, damageUserBuffQuality = 7,
             damageAbsorbQuality = 8;

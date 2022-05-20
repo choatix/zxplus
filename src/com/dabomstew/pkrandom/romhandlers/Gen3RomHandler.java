@@ -1182,6 +1182,11 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             case Gen3Constants.damageRecoil33PercentEffect:
                 move.recoilPercent = 33;
                 break;
+
+            case Gen3Constants.bindingEffect:
+            case Gen3Constants.trappingEffect:
+                move.isTrapMove = true;
+                break;
         }
     }
 

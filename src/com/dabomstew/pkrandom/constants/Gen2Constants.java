@@ -77,14 +77,16 @@ public class Gen2Constants {
             noDamageDefPlusOneEffect = 11, noDamageSpAtkPlusOneEffect = 13, noDamageEvasionPlusOneEffect = 16,
             noDamageAtkMinusOneEffect = 18, noDamageDefMinusOneEffect = 19, noDamageSpeMinusOneEffect = 20,
             noDamageAccuracyMinusOneEffect = 23, noDamageEvasionMinusOneEffect = 24, flinchEffect = 31, toxicEffect = 33,
-            damageRecoilEffect = 48, noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51,
-            noDamageSpePlusTwoEffect = 52, noDamageSpDefPlusTwoEffect = 54, noDamageAtkMinusTwoEffect = 58,
-            noDamageDefMinusTwoEffect = 59, noDamageSpeMinusTwoEffect = 60, noDamageSpDefMinusTwoEffect = 62, noDamagePoisonEffect = 66,
-            noDamageParalyzeEffect = 67, damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70,
-            damageSpDefMinusOneEffect = 72, damageAccuracyMinusOneEffect = 73, damageConfusionEffect = 76, twineedleEffect = 77,
-            snoreEffect = 92, flailAndReversalEffect = 102, swaggerEffect = 118, damageBurnAndThawUserEffect = 125,
-            damageUserDefPlusOneEffect = 138, damageUserAtkPlusOneEffect = 139, damageUserAllPlusOneEffect = 140,
-            twisterEffect = 146, futureSightEffect = 148, stompEffect = 150, thunderEffect = 152, defenseCurlEffect = 156;
+            bindingEffect = 42, damageRecoilEffect = 48, noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50,
+            noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52, noDamageSpDefPlusTwoEffect = 54,
+            noDamageAtkMinusTwoEffect = 58, noDamageDefMinusTwoEffect = 59, noDamageSpeMinusTwoEffect = 60,
+            noDamageSpDefMinusTwoEffect = 62, noDamagePoisonEffect = 66, noDamageParalyzeEffect = 67,
+            damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70,
+            damageSpDefMinusOneEffect = 72, damageAccuracyMinusOneEffect = 73, damageConfusionEffect = 76,
+            twineedleEffect = 77, snoreEffect = 92, flailAndReversalEffect = 102, trappingEffect = 106,
+            swaggerEffect = 118, damageBurnAndThawUserEffect = 125, damageUserDefPlusOneEffect = 138,
+            damageUserAtkPlusOneEffect = 139, damageUserAllPlusOneEffect = 140, twisterEffect = 146,
+            futureSightEffect = 148, stompEffect = 150, thunderEffect = 152, defenseCurlEffect = 156;
 
     // Taken from critical_hit_moves.asm; we could read this from the ROM, but it's easier to hardcode it.
     public static final List<Integer> increasedCritMoves = Arrays.asList(Moves.karateChop, Moves.razorWind, Moves.razorLeaf,

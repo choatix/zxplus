@@ -52,6 +52,7 @@ public class Move {
     public boolean makesContact;
     public boolean isPunchMove;
     public boolean isSoundMove;
+    public boolean isTrapMove; // True for both binding moves (like Wrap) and trapping moves (like Mean Look)
     public int effectIndex;
     public int target;
     public double hitCount = 1; // not saved, only used in randomized move powers.

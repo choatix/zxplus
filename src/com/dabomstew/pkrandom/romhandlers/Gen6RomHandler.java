@@ -602,6 +602,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 moves[i].name = moveNames.get(i);
                 moves[i].number = i;
                 moves[i].internalId = i;
+                moves[i].effectIndex = readWord(moveData, 16);
                 moves[i].hitratio = (moveData[4] & 0xFF);
                 moves[i].power = moveData[3] & 0xFF;
                 moves[i].pp = moveData[5] & 0xFF;
@@ -618,10 +619,20 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     moves[i].criticalChance = CriticalChance.INCREASED;
                 }
 
+                int internalStatusType = readWord(moveData, 8);
                 int flags = FileFunctions.readFullInt(moveData, 32);
                 moves[i].makesContact = (flags & 0x001) != 0;
                 moves[i].isPunchMove = (flags & 0x080) != 0;
                 moves[i].isSoundMove = (flags & 0x100) != 0;
+                moves[i].isTrapMove = internalStatusType == 8;
+                switch (moves[i].effectIndex) {
+                    case Gen6Constants.noDamageTargetTrappingEffect:
+                    case Gen6Constants.noDamageFieldTrappingEffect:
+                    case Gen6Constants.damageAdjacentFoesTrappingEffect:
+                        moves[i].isTrapMove = true;
+                        break;
+                }
+
                 int qualities = moveData[1];
                 int recoilOrAbsorbPercent = moveData[18];
                 if (qualities == Gen6Constants.damageAbsorbQuality) {
@@ -673,7 +684,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                     moves[i].statChanges[statChange].percentChance = moveData[27 + statChange];
                 }
 
-                int internalStatusType = readWord(moveData, 8);
                 // Exclude status types that aren't in the StatusType enum.
                 if (internalStatusType < 7) {
                     moves[i].statusType = StatusType.values()[internalStatusType];
