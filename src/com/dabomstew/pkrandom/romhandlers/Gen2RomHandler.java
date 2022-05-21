@@ -1159,10 +1159,9 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                         offs++;
                     }
                     if ((dataType & 1) == 1) {
-                        tp.move1 = rom[offs] & 0xFF;
-                        tp.move2 = rom[offs + 1] & 0xFF;
-                        tp.move3 = rom[offs + 2] & 0xFF;
-                        tp.move4 = rom[offs + 3] & 0xFF;
+                        for (int move = 0; move < 4; move++) {
+                            tp.moves[move] = rom[offs + move] & 0xFF;
+                        }
                         offs += 4;
                     }
                     tr.pokemon.add(tp);
@@ -1240,10 +1239,10 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                                 rom[offs + m] = (byte) pokeMoves[m];
                             }
                         } else {
-                            rom[offs] = (byte) tp.move1;
-                            rom[offs + 1] = (byte) tp.move2;
-                            rom[offs + 2] = (byte) tp.move3;
-                            rom[offs + 3] = (byte) tp.move4;
+                            rom[offs] = (byte) tp.moves[0];
+                            rom[offs + 1] = (byte) tp.moves[1];
+                            rom[offs + 2] = (byte) tp.moves[2];
+                            rom[offs + 3] = (byte) tp.moves[3];
                         }
                         offs += 4;
                     }

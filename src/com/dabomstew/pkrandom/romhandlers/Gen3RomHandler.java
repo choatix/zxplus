@@ -1811,10 +1811,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                     thisPoke.IVs = ((readWord(pointerToPokes + poke * 16) & 0xFF) * 31) / 255;
                     thisPoke.level = readWord(pointerToPokes + poke * 16 + 2);
                     thisPoke.pokemon = pokesInternal[readWord(pointerToPokes + poke * 16 + 4)];
-                    thisPoke.move1 = readWord(pointerToPokes + poke * 16 + 6);
-                    thisPoke.move2 = readWord(pointerToPokes + poke * 16 + 8);
-                    thisPoke.move3 = readWord(pointerToPokes + poke * 16 + 10);
-                    thisPoke.move4 = readWord(pointerToPokes + poke * 16 + 12);
+                    for (int move = 0; move < 4; move++) {
+                        thisPoke.moves[move] = readWord(pointerToPokes + poke * 16 + 6 + (move*2));
+                    }
                     tr.pokemon.add(thisPoke);
                 }
             } else if (pokeDataType == 3) {
@@ -1825,10 +1824,9 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                     thisPoke.level = readWord(pointerToPokes + poke * 16 + 2);
                     thisPoke.pokemon = pokesInternal[readWord(pointerToPokes + poke * 16 + 4)];
                     thisPoke.heldItem = readWord(pointerToPokes + poke * 16 + 6);
-                    thisPoke.move1 = readWord(pointerToPokes + poke * 16 + 8);
-                    thisPoke.move2 = readWord(pointerToPokes + poke * 16 + 10);
-                    thisPoke.move3 = readWord(pointerToPokes + poke * 16 + 12);
-                    thisPoke.move4 = readWord(pointerToPokes + poke * 16 + 14);
+                    for (int move = 0; move < 4; move++) {
+                        thisPoke.moves[move] = readWord(pointerToPokes + poke * 16 + 8 + (move*2));
+                    }
                     tr.pokemon.add(thisPoke);
                 }
             }
@@ -1936,10 +1934,10 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                             writeWord(pointerToPokes + poke * 16 + movesStart + m * 2, pokeMoves[m]);
                         }
                     } else {
-                        writeWord(pointerToPokes + poke * 16 + movesStart, tp.move1);
-                        writeWord(pointerToPokes + poke * 16 + movesStart + 2, tp.move2);
-                        writeWord(pointerToPokes + poke * 16 + movesStart + 4, tp.move3);
-                        writeWord(pointerToPokes + poke * 16 + movesStart + 6, tp.move4);
+                        writeWord(pointerToPokes + poke * 16 + movesStart, tp.moves[0]);
+                        writeWord(pointerToPokes + poke * 16 + movesStart + 2, tp.moves[1]);
+                        writeWord(pointerToPokes + poke * 16 + movesStart + 4, tp.moves[2]);
+                        writeWord(pointerToPokes + poke * 16 + movesStart + 6, tp.moves[3]);
                     }
                 }
             } else {

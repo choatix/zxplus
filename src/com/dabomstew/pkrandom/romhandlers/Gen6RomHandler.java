@@ -1928,14 +1928,9 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                         tpk.hasMegaStone = Gen6Constants.isMegaStone(tpk.heldItem);
                     }
                     if (tr.pokemonHaveCustomMoves()) {
-                        int attack1 = readWord(trpoke, pokeOffs);
-                        int attack2 = readWord(trpoke, pokeOffs + 2);
-                        int attack3 = readWord(trpoke, pokeOffs + 4);
-                        int attack4 = readWord(trpoke, pokeOffs + 6);
-                        tpk.move1 = attack1;
-                        tpk.move2 = attack2;
-                        tpk.move3 = attack3;
-                        tpk.move4 = attack4;
+                        for (int move = 0; move < 4; move++) {
+                            tpk.moves[move] = readWord(trpoke, pokeOffs + (move*2));
+                        }
                         pokeOffs += 8;
                     }
                     tr.pokemon.add(tpk);
@@ -2034,10 +2029,10 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                                 writeWord(trpoke, pokeOffs + m * 2, pokeMoves[m]);
                             }
                         } else {
-                            writeWord(trpoke, pokeOffs, tp.move1);
-                            writeWord(trpoke, pokeOffs + 2, tp.move2);
-                            writeWord(trpoke, pokeOffs + 4, tp.move3);
-                            writeWord(trpoke, pokeOffs + 6, tp.move4);
+                            writeWord(trpoke, pokeOffs, tp.moves[0]);
+                            writeWord(trpoke, pokeOffs + 2, tp.moves[1]);
+                            writeWord(trpoke, pokeOffs + 4, tp.moves[2]);
+                            writeWord(trpoke, pokeOffs + 6, tp.moves[3]);
                         }
                         pokeOffs += 8;
                     }

@@ -29,10 +29,7 @@ public class TrainerPokemon {
     public Pokemon pokemon;
     public int level;
 
-    public int move1;
-    public int move2;
-    public int move3;
-    public int move4;
+    public int[] moves = {0, 0, 0, 0};
 
     public int heldItem = 0;
     public boolean hasMegaStone;
@@ -87,10 +84,10 @@ public class TrainerPokemon {
         tpk.pokemon = pokemon;
         tpk.level = level;
 
-        tpk.move1 = move1;
-        tpk.move2 = move2;
-        tpk.move3 = move3;
-        tpk.move4 = move4;
+        tpk.moves[0] = moves[0];
+        tpk.moves[1] = moves[1];
+        tpk.moves[2] = moves[2];
+        tpk.moves[3] = moves[3];
 
         tpk.strength = strength;
         tpk.heldItem = heldItem;
