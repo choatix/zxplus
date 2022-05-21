@@ -1656,7 +1656,8 @@ public class NewRandomizerGUI {
         settings.setMovesetsForceGoodDamaging(pmsForceGoodDamagingCheckBox.isSelected());
         settings.setMovesetsGoodDamagingPercent(pmsForceGoodDamagingSlider.getValue());
         settings.setBlockBrokenMovesetMoves(pmsNoGameBreakingMovesCheckBox.isSelected());
-        settings.setEvolutionMovesForAll(pmsEvolutionMovesCheckBox.isSelected());
+        settings.setEvolutionMovesForAll(pmsEvolutionMovesCheckBox.isVisible() &&
+                pmsEvolutionMovesCheckBox.isSelected());
 
         settings.setTrainersMod(isTrainerSetting(TRAINER_UNCHANGED), isTrainerSetting(TRAINER_RANDOM),
                 isTrainerSetting(TRAINER_RANDOM_EVEN), isTrainerSetting(TRAINER_RANDOM_EVEN_MAIN),
