@@ -676,6 +676,15 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
             case Gen1Constants.damageRecoilEffect:
                 move.recoilPercent = 25;
                 break;
+
+            case Gen1Constants.chargeEffect:
+            case Gen1Constants.flyEffect:
+                move.isChargeMove = true;
+                break;
+
+            case Gen1Constants.hyperBeamEffect:
+                move.isRechargeMove = true;
+                break;
         }
 
         if (Gen1Constants.increasedCritMoves.contains(move.number)) {

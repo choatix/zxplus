@@ -687,6 +687,18 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             case Gen2Constants.trappingEffect:
                 move.isTrapMove = true;
                 break;
+
+            case Gen2Constants.razorWindEffect:
+            case Gen2Constants.skyAttackEffect:
+            case Gen2Constants.skullBashEffect:
+            case Gen2Constants.solarbeamEffect:
+            case Gen2Constants.semiInvulnerableEffect:
+                move.isChargeMove = true;
+                break;
+
+            case Gen2Constants.hyperBeamEffect:
+                move.isRechargeMove = true;
+                break;
         }
 
         if (Gen2Constants.increasedCritMoves.contains(move.number)) {

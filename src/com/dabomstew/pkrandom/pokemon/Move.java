@@ -50,6 +50,8 @@ public class Move {
     public int absorbPercent;
     public int priority;
     public boolean makesContact;
+    public boolean isChargeMove;
+    public boolean isRechargeMove;
     public boolean isPunchMove;
     public boolean isSoundMove;
     public boolean isTrapMove; // True for both binding moves (like Wrap) and trapping moves (like Mean Look)

@@ -1166,10 +1166,6 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                 move.flinchPercentChance = secondaryEffectChance;
                 break;
 
-            case Gen3Constants.skyAttackEffect:
-                move.criticalChance = CriticalChance.INCREASED;
-                move.flinchPercentChance = secondaryEffectChance;
-
             case Gen3Constants.damageAbsorbEffect:
             case Gen3Constants.dreamEaterEffect:
                 move.absorbPercent = 50;
@@ -1186,6 +1182,23 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             case Gen3Constants.bindingEffect:
             case Gen3Constants.trappingEffect:
                 move.isTrapMove = true;
+                break;
+
+            case Gen3Constants.razorWindEffect:
+            case Gen3Constants.skullBashEffect:
+            case Gen3Constants.solarbeamEffect:
+            case Gen3Constants.semiInvulnerableEffect:
+                move.isChargeMove = true;
+                break;
+
+            case Gen3Constants.rechargeEffect:
+                move.isRechargeMove = true;
+                break;
+
+            case Gen3Constants.skyAttackEffect:
+                move.criticalChance = CriticalChance.INCREASED;
+                move.flinchPercentChance = secondaryEffectChance;
+                move.isChargeMove = true;
                 break;
         }
     }

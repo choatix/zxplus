@@ -694,6 +694,8 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                 int internalStatusType = readWord(moveData, 8);
                 int flags = FileFunctions.readFullInt(moveData, 36);
                 moves[i].makesContact = (flags & 0x001) != 0;
+                moves[i].isChargeMove = (flags & 0x002) != 0;
+                moves[i].isRechargeMove = (flags & 0x004) != 0;
                 moves[i].isPunchMove = (flags & 0x080) != 0;
                 moves[i].isSoundMove = (flags & 0x100) != 0;
                 moves[i].isTrapMove = internalStatusType == 8;

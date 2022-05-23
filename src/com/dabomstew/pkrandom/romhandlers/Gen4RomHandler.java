@@ -924,7 +924,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
 
     private void loadMiscMoveInfoFromEffect(Move move, int secondaryEffectChance) {
         switch (move.effectIndex) {
-            case Gen4Constants.razorWindEffect:
             case Gen4Constants.increasedCritEffect:
             case Gen4Constants.blazeKickEffect:
             case Gen4Constants.damagePoisonWithIncreasedCritEffect:
@@ -942,11 +941,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             case Gen4Constants.fireFangEffect:
             case Gen4Constants.iceFangEffect:
             case Gen4Constants.thunderFangEffect:
-                move.flinchPercentChance = secondaryEffectChance;
-                break;
-
-            case Gen4Constants.skyAttackEffect:
-                move.criticalChance = CriticalChance.INCREASED;
                 move.flinchPercentChance = secondaryEffectChance;
                 break;
 
@@ -972,6 +966,31 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             case Gen4Constants.bindingEffect:
             case Gen4Constants.trappingEffect:
                 move.isTrapMove = true;
+                break;
+
+            case Gen4Constants.skullBashEffect:
+            case Gen4Constants.solarbeamEffect:
+            case Gen4Constants.flyEffect:
+            case Gen4Constants.diveEffect:
+            case Gen4Constants.digEffect:
+            case Gen4Constants.bounceEffect:
+            case Gen4Constants.shadowForceEffect:
+                move.isChargeMove = true;
+                break;
+
+            case Gen3Constants.rechargeEffect:
+                move.isRechargeMove = true;
+                break;
+
+            case Gen4Constants.razorWindEffect:
+                move.criticalChance = CriticalChance.INCREASED;
+                move.isChargeMove = true;
+                break;
+
+            case Gen4Constants.skyAttackEffect:
+                move.criticalChance = CriticalChance.INCREASED;
+                move.flinchPercentChance = secondaryEffectChance;
+                move.isChargeMove = true;
                 break;
         }
     }

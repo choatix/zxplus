@@ -74,11 +74,12 @@ public class Gen1Constants {
             noDamageSpeMinusOneEffect = 20, noDamageAccuracyMinusOneEffect = 22, flinch10PercentEffect = 31,
             noDamageSleepEffect = 32, damagePoison40PercentEffect = 33, damageBurn30PercentEffect = 34,
             damageFreeze30PercentEffect = 35, damageParalyze30PercentEffect = 36, flinch30PercentEffect = 37,
-            damageRecoilEffect = 48, noDamageConfusionEffect = 49, noDamageAtkPlusTwoEffect = 50,
-            noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52, noDamageSpecialPlusTwoEffect = 53,
-            noDamageDefMinusTwoEffect = 59, noDamagePoisonEffect = 66, noDamageParalyzeEffect = 67,
-            damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69, damageSpeMinusOneEffect = 70,
-            damageSpecialMinusOneEffect = 71, damageConfusionEffect = 76, twineedleEffect = 77;
+            chargeEffect = 39, flyEffect = 43, damageRecoilEffect = 48, noDamageConfusionEffect = 49,
+            noDamageAtkPlusTwoEffect = 50, noDamageDefPlusTwoEffect = 51, noDamageSpePlusTwoEffect = 52,
+            noDamageSpecialPlusTwoEffect = 53, noDamageDefMinusTwoEffect = 59, noDamagePoisonEffect = 66,
+            noDamageParalyzeEffect = 67, damageAtkMinusOneEffect = 68, damageDefMinusOneEffect = 69,
+            damageSpeMinusOneEffect = 70, damageSpecialMinusOneEffect = 71, damageConfusionEffect = 76,
+            twineedleEffect = 77, hyperBeamEffect = 80;
 
     // Taken from critical_hit_moves.asm; we could read this from the ROM, but it's easier to hardcode it.
     public static final List<Integer> increasedCritMoves = Arrays.asList(Moves.karateChop, Moves.razorLeaf, Moves.crabhammer, Moves.slash);
