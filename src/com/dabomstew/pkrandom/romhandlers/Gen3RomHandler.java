@@ -482,7 +482,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         loadItemNames();
 
         allowedItems = Gen3Constants.allowedItems.copy();
-        nonBadItems = Gen3Constants.nonBadItems.copy();
+        nonBadItems = Gen3Constants.getNonBadItems(romEntry.romType).copy();
 
         actualCRC32 = FileFunctions.getCRC32(rom);
     }

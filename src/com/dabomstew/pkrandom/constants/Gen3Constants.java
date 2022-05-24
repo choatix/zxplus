@@ -480,7 +480,7 @@ public class Gen3Constants {
         }
     }
 
-    public static ItemList allowedItems, nonBadItems;
+    public static ItemList allowedItems, nonBadItemsRSE, nonBadItemsFRLG;
     public static List<Integer> regularShopItems, opShopItems;
 
     public static String getRunningShoesCheckPrefix(int romType) {
@@ -518,12 +518,17 @@ public class Gen3Constants {
 
         // non-bad items
         // ban specific pokemon hold items, berries, apricorns, mail
-        nonBadItems = allowedItems.copy();
-        nonBadItems.banSingles(Gen3Items.lightBall, Gen3Items.oranBerry, Gen3Items.soulDew);
-        nonBadItems.banRange(Gen3Items.orangeMail, 12); // mail
-        nonBadItems.banRange(Gen3Items.figyBerry, 33); // berries
-        nonBadItems.banRange(Gen3Items.luckyPunch, 4); // pokemon specific
-        nonBadItems.banRange(Gen3Items.redScarf, 5); // contest scarves
+        nonBadItemsRSE = allowedItems.copy();
+        nonBadItemsRSE.banSingles(Gen3Items.lightBall, Gen3Items.oranBerry, Gen3Items.soulDew);
+        nonBadItemsRSE.banRange(Gen3Items.orangeMail, 12); // mail
+        nonBadItemsRSE.banRange(Gen3Items.figyBerry, 33); // berries
+        nonBadItemsRSE.banRange(Gen3Items.luckyPunch, 4); // pokemon specific
+        nonBadItemsRSE.banRange(Gen3Items.redScarf, 5); // contest scarves
+
+        // FRLG-exclusive bad items
+        // Ban Shoal items and Shards, since they don't do anything
+        nonBadItemsFRLG = nonBadItemsRSE.copy();
+        nonBadItemsFRLG.banRange(Gen3Items.shoalSalt, 6);
 
         regularShopItems = new ArrayList<>();
 
@@ -538,6 +543,14 @@ public class Gen3Constants {
         opShopItems.addAll(IntStream.rangeClosed(Gen3Items.tinyMushroom,Gen3Items.bigMushroom).boxed().collect(Collectors.toList()));
         opShopItems.addAll(IntStream.rangeClosed(Gen3Items.pearl,Gen3Items.nugget).boxed().collect(Collectors.toList()));
         opShopItems.add(Gen3Items.luckyEgg);
+    }
+
+    public static ItemList getNonBadItems(int romType) {
+        if (romType == Gen3Constants.RomType_FRLG) {
+            return nonBadItemsFRLG;
+        } else {
+            return nonBadItemsRSE;
+        }
     }
 
     public static void trainerTagsRS(List<Trainer> trs, int romType) {
