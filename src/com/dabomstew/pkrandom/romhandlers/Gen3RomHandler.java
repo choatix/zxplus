@@ -237,7 +237,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
                                     current.tableFile = otherEntry.tableFile;
                                 }
                             }
-                        } else if (r[0].endsWith("Locator")) {
+                        } else if (r[0].endsWith("Locator") || r[0].endsWith("Prefix")) {
                             current.strings.put(r[0], r[1]);
                         } else {
                             if (r[1].startsWith("[") && r[1].endsWith("]")) {
@@ -791,6 +791,24 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             int pkoffs = offs + i * Gen3Constants.baseStatsEntrySize;
             loadBasicPokeStats(pk, pkoffs);
         }
+
+        // In these games, the alternate formes of Deoxys have hardcoded stats that are used 99% of the time;
+        // the only times these hardcoded stats are ignored are during Link Battles. Since not many people
+        // are using the randomizer to battle against others, let's just always use these stats.
+        if (romEntry.romType == Gen3Constants.RomType_FRLG || romEntry.romType == Gen3Constants.RomType_Em) {
+            String deoxysStatPrefix = romEntry.strings.get("DeoxysStatPrefix");
+            int offset = find(deoxysStatPrefix);
+            if (offset > 0) {
+                offset += deoxysStatPrefix.length() / 2; // because it was a prefix
+                Pokemon deoxys = pokes[Species.deoxys];
+                deoxys.hp = readWord(offset);
+                deoxys.attack = readWord(offset + 2);
+                deoxys.defense = readWord(offset + 4);
+                deoxys.speed = readWord(offset + 6);
+                deoxys.spatk = readWord(offset + 8);
+                deoxys.spdef = readWord(offset + 10);
+            }
+        }
     }
 
     private void savePokemonStats() {
@@ -805,6 +823,24 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             writeFixedLengthString(pk.name, stringOffset, nameLen);
             saveBasicPokeStats(pk, offs2 + i * Gen3Constants.baseStatsEntrySize);
         }
+
+        // Make sure to write to the hardcoded Deoxys stat location, since otherwise it will just have vanilla
+        // stats no matter what settings the user selected.
+        if (romEntry.romType == Gen3Constants.RomType_FRLG || romEntry.romType == Gen3Constants.RomType_Em) {
+            String deoxysStatPrefix = romEntry.strings.get("DeoxysStatPrefix");
+            int offset = find(deoxysStatPrefix);
+            if (offset > 0) {
+                offset += deoxysStatPrefix.length() / 2; // because it was a prefix
+                Pokemon deoxys = pokes[Species.deoxys];
+                writeWord(offset, deoxys.hp);
+                writeWord(offset + 2, deoxys.attack);
+                writeWord(offset + 4, deoxys.defense);
+                writeWord(offset + 6, deoxys.speed);
+                writeWord(offset + 8, deoxys.spatk);
+                writeWord(offset + 10, deoxys.spdef);
+            }
+        }
+
         writeEvolutions();
     }
 
