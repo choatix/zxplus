@@ -1466,7 +1466,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                     for (int trno = 0; trno < 17; trno++) {
                         Trainer tr = new Trainer();
                         tr.poketype = 3; // have held items and custom moves
-                        tr.offset = 0;
+                        int nameAndClassIndex = Gen5Constants.bw2DriftveilTrainerOffsets.get(trno);
+                        tr.fullDisplayName = tclasses.get(Gen5Constants.normalTrainerClassLength + nameAndClassIndex) + " " + tnames.get(Gen5Constants.normalTrainerNameLength + nameAndClassIndex);
                         int pokemonNum = 6;
                         if (trno < 2) {
                             pokemonNum = 3;
@@ -3280,6 +3281,10 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     public List<String> getTrainerNames() {
         List<String> tnames = getStrings(false, romEntry.getInt("TrainerNamesTextOffset"));
         tnames.remove(0); // blank one
+        if (romEntry.romType == Gen5Constants.Type_BW2) {
+            List<String> pwtNames = getStrings(false, romEntry.getInt("PWTTrainerNamesTextOffset"));
+            tnames.addAll(pwtNames);
+        }
         // Tack the mugshot names on the end
         List<String> mnames = getStrings(false, romEntry.getInt("TrainerMugshotsTextOffset"));
         for (String mname : mnames) {
@@ -3314,10 +3319,25 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         setStrings(false, romEntry.getInt("TrainerMugshotsTextOffset"), mnames);
 
         // Now save the rest of trainer names
-        List<String> newTNames = new ArrayList<>(trainerNames);
-        newTNames.add(0, tnames.get(0)); // the 0-entry, preserve it
-        setStrings(false, romEntry.getInt("TrainerNamesTextOffset"), newTNames);
-
+        if (romEntry.romType == Gen5Constants.Type_BW2) {
+            List<String> pwtNames = getStrings(false, romEntry.getInt("PWTTrainerNamesTextOffset"));
+            List<String> newTNames = new ArrayList<>();
+            List<String> newPWTNames = new ArrayList<>();
+            newTNames.add(0, tnames.get(0)); // the 0-entry, preserve it
+            for (int i = 1; i < tnames.size() + pwtNames.size(); i++) {
+                if (i < tnames.size()) {
+                    newTNames.add(trainerNames.get(i - 1));
+                } else {
+                    newPWTNames.add(trainerNames.get(i - 1));
+                }
+            }
+            setStrings(false, romEntry.getInt("TrainerNamesTextOffset"), newTNames);
+            setStrings(false, romEntry.getInt("PWTTrainerNamesTextOffset"), newPWTNames);
+        } else {
+            List<String> newTNames = new ArrayList<>(trainerNames);
+            newTNames.add(0, tnames.get(0)); // the 0-entry, preserve it
+            setStrings(false, romEntry.getInt("TrainerNamesTextOffset"), newTNames);
+        }
     }
 
     @Override
@@ -3333,12 +3353,32 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
 
     @Override
     public List<String> getTrainerClassNames() {
-        return getStrings(false, romEntry.getInt("TrainerClassesTextOffset"));
+        List<String> classNames = getStrings(false, romEntry.getInt("TrainerClassesTextOffset"));
+        if (romEntry.romType == Gen5Constants.Type_BW2) {
+            classNames.addAll(getStrings(false, romEntry.getInt("PWTTrainerClassesTextOffset")));
+        }
+        return classNames;
     }
 
     @Override
     public void setTrainerClassNames(List<String> trainerClassNames) {
-        setStrings(false, romEntry.getInt("TrainerClassesTextOffset"), trainerClassNames);
+        if (romEntry.romType == Gen5Constants.Type_BW2) {
+            List<String> newTClasses = new ArrayList<>();
+            List<String> newPWTClasses = new ArrayList<>();
+            List<String> classNames = getStrings(false, romEntry.getInt("TrainerClassesTextOffset"));
+            List<String> pwtClassNames = getStrings(false, romEntry.getInt("PWTTrainerClassesTextOffset"));
+            for (int i = 0; i < classNames.size() + pwtClassNames.size(); i++) {
+                if (i < classNames.size()) {
+                    newTClasses.add(trainerClassNames.get(i));
+                } else {
+                    newPWTClasses.add(trainerClassNames.get(i));
+                }
+            }
+            setStrings(false, romEntry.getInt("TrainerClassesTextOffset"), newTClasses);
+            setStrings(false, romEntry.getInt("PWTTrainerClassesTextOffset"), newPWTClasses);
+        } else {
+            setStrings(false, romEntry.getInt("TrainerClassesTextOffset"), trainerClassNames);
+        }
     }
 
     @Override

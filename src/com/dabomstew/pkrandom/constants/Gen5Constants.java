@@ -258,6 +258,11 @@ public class Gen5Constants {
             766, 767, 768, 769, 770, 771, 772, 773, 774, 775, 776, 786, 787, 788,
             789, 797, 798, 799, 800, 801, 802, 803, 804, 805, 806,
             807, 808, 809, 810, 811, 812);
+
+    public static final List<Integer> bw2DriftveilTrainerOffsets = Arrays.asList(56, 57, 0, 1, 2, 3, 4, 68, 69, 70,
+            71, 72, 73, 74, 75, 76, 77);
+
+    public static final int normalTrainerNameLength = 813, normalTrainerClassLength = 236;
     
 //    public static final Map<Integer, String> bw1ShopIndex = new HashMap<Integer, String>() {1:"Check"};
 
