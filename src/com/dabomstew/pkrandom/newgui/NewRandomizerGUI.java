@@ -2540,6 +2540,18 @@ public class NewRandomizerGUI {
             romSupportLabel.setText(bundle.getString("GUI.romSupportPrefix") + " "
                     + this.romHandler.getSupportLevel());
 
+            if (!romHandler.isRomValid()) {
+                romNameLabel.setForeground(Color.RED);
+                romCodeLabel.setForeground(Color.RED);
+                romSupportLabel.setForeground(Color.RED);
+                romSupportLabel.setText("<html>" + bundle.getString("GUI.romSupportPrefix") + " <b>Unofficial ROM</b>");
+                showInvalidRomPopup();
+            } else {
+                romNameLabel.setForeground(Color.BLACK);
+                romCodeLabel.setForeground(Color.BLACK);
+                romSupportLabel.setForeground(Color.BLACK);
+            }
+
             limitPokemonCheckBox.setVisible(true);
             limitPokemonCheckBox.setEnabled(true);
             limitPokemonButton.setVisible(true);
@@ -2888,13 +2900,6 @@ public class NewRandomizerGUI {
             romNameLabel.setText(romHandler.getROMName() + " (" + romHandler.getGameUpdateVersion() + ")");
         } else {
             romNameLabel.setText(romHandler.getROMName());
-        }
-        if (!romHandler.isRomValid()) {
-            romNameLabel.setForeground(Color.RED);
-            romNameLabel.setText(romNameLabel.getText() + " [Bad CRC32]");
-            showInvalidRomPopup();
-        } else {
-            romNameLabel.setForeground(Color.BLACK);
         }
     }
 
