@@ -1022,6 +1022,7 @@ public class Gen7Constants {
         nonBadItems.banRange(Items.cameruptite, 4); // Mega Stones, part 3
         nonBadItems.banRange(Items.fightingMemory,17); // Memories
         nonBadItems.banRange(Items.relicCopper,7); // relic items
+        nonBadItems.banSingles(Items.shoalSalt, Items.shoalShell); // Shoal items; have no purpose and sell for $10.
 
         regularShopItemsSM = new ArrayList<>();
 

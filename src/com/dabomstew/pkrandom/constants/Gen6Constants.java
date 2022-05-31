@@ -953,6 +953,7 @@ public class Gen6Constants {
         nonBadItemsXY.banRange(Items.redScarf, 5); // contest scarves
         nonBadItemsXY.banRange(Items.relicCopper,7); // relic items
         nonBadItemsXY.banRange(Items.richMulch,4); // more mulch
+        nonBadItemsXY.banRange(Items.shoalSalt, 6); // Shoal items and Shards; they serve no purpose in XY
 
         nonBadItemsORAS = allowedItemsORAS.copy();
 

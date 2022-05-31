@@ -495,7 +495,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         loadedWildMapNames = false;
 
         allowedItems = Gen5Constants.allowedItems.copy();
-        nonBadItems = Gen5Constants.nonBadItems.copy();
+        nonBadItems = Gen5Constants.getNonBadItems(romEntry.romType).copy();
         regularShopItems = Gen5Constants.regularShopItems;
         opShopItems = Gen5Constants.opShopItems;
 
@@ -2436,16 +2436,16 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             removeFreeLuckyEgg();
         } else if (tweak == MiscTweak.BAN_BIG_MANIAC_ITEMS) {
             // BalmMushroom, Big Nugget, Pearl String, Comet Shard
-            allowedItems.banRange(0x244, 4);
-            nonBadItems.banRange(0x244, 4);
+            allowedItems.banRange(Items.balmMushroom, 4);
+            nonBadItems.banRange(Items.balmMushroom, 4);
 
             // Relics
-            allowedItems.banRange(0x24B, 4);
-            nonBadItems.banRange(0x24B, 4);
+            allowedItems.banRange(Items.relicVase, 4);
+            nonBadItems.banRange(Items.relicVase, 4);
 
             // Rare berries
-            allowedItems.banRange(0xCE, 7);
-            nonBadItems.banRange(0xCE, 7);
+            allowedItems.banRange(Items.lansatBerry, 7);
+            nonBadItems.banRange(Items.lansatBerry, 7);
         } else if (tweak == MiscTweak.BALANCE_STATIC_LEVELS) {
             byte[] fossilFile = scriptNarc.files.get(Gen5Constants.fossilPokemonFile);
             writeWord(fossilFile,Gen5Constants.fossilPokemonLevelOffset,20);
