@@ -1120,11 +1120,9 @@ public class Randomizer {
 
         log.println("--Trainers Pokemon--");
         List<Trainer> trainers = romHandler.getTrainers();
-        int idx = 0;
         for (Trainer t : trainers) {
-            idx++;
-            log.print("#" + idx + " ");
-            String originalTrainerName = originalTrainerNames.get(idx);
+            log.print("#" + t.index + " ");
+            String originalTrainerName = originalTrainerNames.get(t.index);
             String currentTrainerName = "";
             if (t.fullDisplayName != null) {
                 currentTrainerName = t.fullDisplayName;
@@ -1138,7 +1136,7 @@ public class Randomizer {
                     log.printf("(%s)", currentTrainerName);
                 }
             }
-            if (t.offset != idx && t.offset != 0) {
+            if (t.offset != 0) {
                 log.printf("@%X", t.offset);
             }
             log.print(" - ");

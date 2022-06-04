@@ -1874,7 +1874,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 byte[] trpoke = trpokes.files.get(i).get(0);
                 Trainer tr = new Trainer();
                 tr.poketype = isORAS ? readWord(trainer,0) : trainer[0] & 0xFF;
-                tr.offset = i;
+                tr.index = i;
                 tr.trainerclass = isORAS ? readWord(trainer,2) : trainer[1] & 0xFF;
                 int offset = isORAS ? 6 : 2;
                 int battleType = trainer[offset] & 0xFF;

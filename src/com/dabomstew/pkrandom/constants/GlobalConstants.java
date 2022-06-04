@@ -221,4 +221,6 @@ public class GlobalConstants {
 
     public static final int HIGHEST_POKEMON_GEN = 8;
 
+    // Eevee has 8 potential evolutions
+    public static final int LARGEST_NUMBER_OF_SPLIT_EVOS = 8;
 }

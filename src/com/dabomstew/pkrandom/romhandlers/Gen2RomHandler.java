@@ -1147,12 +1147,15 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         List<String> tcnames = this.getTrainerClassNames();
 
         List<Trainer> allTrainers = new ArrayList<>();
+        int index = 0;
         for (int i = 0; i < traineramount; i++) {
             int offs = pointers[i];
             int limit = trainerclasslimits[i];
             for (int trnum = 0; trnum < limit; trnum++) {
+                index++;
                 Trainer tr = new Trainer();
                 tr.offset = offs;
+                tr.index = index;
                 tr.trainerclass = i;
                 String name = readVariableLengthString(offs, false);
                 tr.name = name;

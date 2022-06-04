@@ -1274,13 +1274,16 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         List<String> tcnames = getTrainerClassesForText();
 
         List<Trainer> allTrainers = new ArrayList<>();
+        int index = 0;
         for (int i = 1; i <= traineramount; i++) {
             int offs = pointers[i];
             int limit = trainerclasslimits[i];
             String tcname = tcnames.get(i - 1);
             for (int trnum = 0; trnum < limit; trnum++) {
+                index++;
                 Trainer tr = new Trainer();
                 tr.offset = offs;
+                tr.index = index;
                 tr.trainerclass = i;
                 tr.fullDisplayName = tcname;
                 int dataType = rom[offs] & 0xFF;

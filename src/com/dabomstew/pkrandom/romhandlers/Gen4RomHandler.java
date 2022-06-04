@@ -2811,7 +2811,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 Trainer tr = new Trainer();
                 tr.poketype = trainer[0] & 0xFF;
                 tr.trainerclass = trainer[1] & 0xFF;
-                tr.offset = i;
+                tr.index = i;
                 int numPokes = trainer[3] & 0xFF;
                 int pokeOffs = 0;
                 tr.fullDisplayName = tclasses.get(tr.trainerclass) + " " + tnames.get(i - 1);
@@ -2925,7 +2925,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                         // If we set this flag for partner trainers (e.g., Cheryl), then the double wild battles
                         // will turn into trainer battles with glitchy trainers.
                         boolean excludedPartnerTrainer = romEntry.romType != Gen4Constants.Type_HGSS &&
-                                Gen4Constants.partnerTrainerIndices.contains(tr.offset);
+                                Gen4Constants.partnerTrainerIndices.contains(tr.index);
                         if (trainer[16] == 0 && !excludedPartnerTrainer) {
                             trainer[16] |= 3;
                         }

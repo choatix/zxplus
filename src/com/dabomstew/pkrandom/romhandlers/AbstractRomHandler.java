@@ -54,6 +54,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     private List<Pokemon> alreadyPicked = new ArrayList<>();
     private Map<Pokemon, Integer> placementHistory = new HashMap<>();
     private Map<Integer, Integer> itemPlacementHistory = new HashMap<>();
+    private int fullyEvolvedRandomSeed;
     boolean isORAS = false;
     boolean isSM = false;
     int perfectAccuracy = 100;
@@ -63,6 +64,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     public AbstractRomHandler(Random random, PrintStream logStream) {
         this.random = random;
         this.cosmeticRandom = RandomSource.cosmeticInstance();
+        this.fullyEvolvedRandomSeed = random.nextInt(GlobalConstants.LARGEST_NUMBER_OF_SPLIT_EVOS);
         this.logStream = logStream;
     }
 
@@ -1797,14 +1799,23 @@ public abstract class AbstractRomHandler implements RomHandler {
                 }
             }
 
-            int trainerIndex = currentTrainers.indexOf(t) + 1;
+            List<Pokemon> evolvesIntoTheWrongType = new ArrayList<>();
+            if (typeForTrainer != null) {
+                List<Pokemon> pokemonOfType = includeFormes ? pokemonOfTypeInclFormes(typeForTrainer, noLegendaries) :
+                        pokemonOfType(typeForTrainer, noLegendaries);
+                for (Pokemon pk : pokemonOfType) {
+                    if (!pokemonOfType.contains(fullyEvolve(pk, t.index))) {
+                        evolvesIntoTheWrongType.add(pk);
+                    }
+                }
+            }
 
             List<TrainerPokemon> trainerPokemonList = new ArrayList<>(t.pokemon);
 
             // Elite Four Unique Pokemon related
             boolean eliteFourTrackPokemon = false;
             boolean eliteFourRival = false;
-            if (eliteFourUniquePokemon && eliteFourIndices.contains(trainerIndex)) {
+            if (eliteFourUniquePokemon && eliteFourIndices.contains(t.index)) {
                 eliteFourTrackPokemon = true;
 
                 // Sort Pokemon list back to front, and then put highest level Pokemon first
@@ -1836,6 +1847,9 @@ public abstract class AbstractRomHandler implements RomHandler {
                 if (eliteFourSetUniquePokemon) {
                     bannedList.addAll(bannedFromUniqueList);
                 }
+                if (willForceEvolve) {
+                    bannedList.addAll(evolvesIntoTheWrongType);
+                }
 
                 Pokemon newPK = pickTrainerPokeReplacement(
                                 oldPK,
@@ -1843,7 +1857,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                                 typeForTrainer,
                                 noLegendaries,
                                 wgAllowed,
-                                distributionSetting || (mainPlaythroughSetting && mainPlaythroughTrainers.contains(t.offset)),
+                                distributionSetting || (mainPlaythroughSetting && mainPlaythroughTrainers.contains(t.index)),
                                 swapThisMegaEvo,
                                 abilitiesAreRandomized,
                                 includeFormes,
@@ -1851,7 +1865,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                         );
 
                 // Chosen Pokemon is locked in past here
-                if (distributionSetting || (mainPlaythroughSetting && mainPlaythroughTrainers.contains(t.offset))) {
+                if (distributionSetting || (mainPlaythroughSetting && mainPlaythroughTrainers.contains(t.index))) {
                     setPlacementHistory(newPK);
                 }
                 tp.absolutePokeNumber = newPK.number;
@@ -1998,7 +2012,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         for (Trainer t : currentTrainers) {
             for (TrainerPokemon tp : t.pokemon) {
                 if (tp.level >= minLevel) {
-                    Pokemon newPokemon = fullyEvolve(tp.pokemon);
+                    Pokemon newPokemon = fullyEvolve(tp.pokemon, t.index);
                     if (newPokemon != tp.pokemon) {
                         tp.pokemon = newPokemon;
                         tp.absolutePokeNumber = newPokemon.number;
@@ -5984,7 +5998,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         }
     }
 
-    private Pokemon fullyEvolve(Pokemon pokemon) {
+    private Pokemon fullyEvolve(Pokemon pokemon, int trainerIndex) {
         Set<Pokemon> seenMons = new HashSet<>();
         seenMons.add(pokemon);
 
@@ -6008,8 +6022,11 @@ public abstract class AbstractRomHandler implements RomHandler {
                 break;
             }
 
-            // pick a random evolution to continue from
-            pokemon = pokemon.evolutionsFrom.get(random.nextInt(pokemon.evolutionsFrom.size())).to;
+            // We want to make split evolutions deterministic, but still random on a seed-to-seed basis.
+            // Therefore, we take a random value (which is generated once per seed) and add it to the trainer's
+            // index to get a pseudorandom number that can be used to decide which split to take.
+            int evolutionIndex = (this.fullyEvolvedRandomSeed + trainerIndex) % pokemon.evolutionsFrom.size();
+            pokemon = pokemon.evolutionsFrom.get(evolutionIndex).to;
             seenMons.add(pokemon);
         }
 

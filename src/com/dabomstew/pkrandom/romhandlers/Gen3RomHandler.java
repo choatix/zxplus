@@ -1816,6 +1816,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             int trOffset = baseOffset + i * entryLen;
             Trainer tr = new Trainer();
             tr.offset = trOffset;
+            tr.index = i;
             int trainerclass = rom[trOffset + 1] & 0xFF;
             tr.trainerclass = (rom[trOffset + 2] & 0x80) > 0 ? 1 : 0;
 

@@ -1403,7 +1403,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                 byte[] trpoke = trpokes.files.get(i);
                 Trainer tr = new Trainer();
                 tr.poketype = trainer[0] & 0xFF;
-                tr.offset = i;
+                tr.index = i;
                 tr.trainerclass = trainer[1] & 0xFF;
                 int numPokes = trainer[3] & 0xFF;
                 int pokeOffs = 0;

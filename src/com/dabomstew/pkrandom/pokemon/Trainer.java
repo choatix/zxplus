@@ -29,6 +29,7 @@ import java.util.List;
 
 public class Trainer implements Comparable<Trainer> {
     public int offset;
+    public int index;
     public List<TrainerPokemon> pokemon = new ArrayList<>();
     public String tag;
     public boolean importantTrainer;
@@ -50,7 +51,9 @@ public class Trainer implements Comparable<Trainer> {
         if (trainerclass != 0) {
             sb.append("(").append(trainerclass).append(") - ");
         }
-        sb.append(String.format("%x", offset));
+        if (offset > 0) {
+            sb.append(String.format("%x", offset));
+        }
         sb.append(" => ");
         boolean first = true;
         for (TrainerPokemon p : pokemon) {
@@ -71,7 +74,7 @@ public class Trainer implements Comparable<Trainer> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + offset;
+        result = prime * result + index;
         return result;
     }
 
@@ -84,12 +87,12 @@ public class Trainer implements Comparable<Trainer> {
         if (getClass() != obj.getClass())
             return false;
         Trainer other = (Trainer) obj;
-        return offset == other.offset;
+        return index == other.index;
     }
 
     @Override
     public int compareTo(Trainer o) {
-        return offset - o.offset;
+        return index - o.index;
     }
 
     public boolean isBoss() {
