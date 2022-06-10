@@ -40,6 +40,8 @@ public class Trainer implements Comparable<Trainer> {
     public String fullDisplayName;
     public MultiBattleStatus multiBattleStatus = MultiBattleStatus.NEVER;
     public int forceStarterPosition = -1;
+    // Certain trainers (e.g., trainers in the PWT in BW2) require unique held items for all of their Pokemon to prevent a game crash.
+    public boolean requiresUniqueHeldItems;
 
     public String toString() {
         StringBuilder sb = new StringBuilder("[");
@@ -125,6 +127,20 @@ public class Trainer implements Comparable<Trainer> {
     public boolean pokemonHaveCustomMoves() {
         // This flag seems consistent for all gens
         return (this.poketype & 1) == 1;
+    }
+
+    public boolean pokemonHaveUniqueHeldItems() {
+        List<Integer> heldItemsForThisTrainer = new ArrayList<>();
+        for (TrainerPokemon poke : this.pokemon) {
+            if (poke.heldItem > 0) {
+                if (heldItemsForThisTrainer.contains(poke.heldItem)) {
+                    return false;
+                } else {
+                    heldItemsForThisTrainer.add(poke.heldItem);
+                }
+            }
+        }
+        return true;
     }
 
     public enum MultiBattleStatus {

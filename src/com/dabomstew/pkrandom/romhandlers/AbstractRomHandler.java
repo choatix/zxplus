@@ -1962,6 +1962,11 @@ public abstract class AbstractRomHandler implements RomHandler {
             } else {
                 for (TrainerPokemon tp : t.pokemon) {
                     randomizeHeldItem(tp, settings, moves, movesets);
+                    if (t.requiresUniqueHeldItems) {
+                        while (!t.pokemonHaveUniqueHeldItems()) {
+                            randomizeHeldItem(tp, settings, moves, movesets);
+                        }
+                    }
                 }
             }
         }

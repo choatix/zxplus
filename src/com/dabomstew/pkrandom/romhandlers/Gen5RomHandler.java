@@ -1468,6 +1468,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
                         tr.poketype = 3; // have held items and custom moves
                         int nameAndClassIndex = Gen5Constants.bw2DriftveilTrainerOffsets.get(trno);
                         tr.fullDisplayName = tclasses.get(Gen5Constants.normalTrainerClassLength + nameAndClassIndex) + " " + tnames.get(Gen5Constants.normalTrainerNameLength + nameAndClassIndex);
+                        tr.requiresUniqueHeldItems = true;
                         int pokemonNum = 6;
                         if (trno < 2) {
                             pokemonNum = 3;
