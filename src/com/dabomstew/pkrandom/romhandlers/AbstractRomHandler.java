@@ -3187,25 +3187,65 @@ public abstract class AbstractRomHandler implements RomHandler {
 
     @Override
     public void customStarters(Settings settings) {
+        boolean abilitiesUnchanged = settings.getAbilitiesMod() == Settings.AbilitiesMod.UNCHANGED;
         int[] customStarters = settings.getCustomStarters();
         boolean allowAltFormes = settings.isAllowStarterAltFormes();
+        boolean banIrregularAltFormes = settings.isBanIrregularAltFormes();
 
         List<Pokemon> romPokemon = getPokemonInclFormes()
                 .stream()
                 .filter(pk -> pk == null || !pk.actuallyCosmetic)
                 .collect(Collectors.toList());
 
+        List<Pokemon> banned = getBannedFormesForPlayerPokemon();
         pickedStarters = new ArrayList<>();
-        Pokemon pkmn1 = romPokemon.get(customStarters[0]);
-        pickedStarters.add(pkmn1);
-        Pokemon pkmn2 = romPokemon.get(customStarters[1]);
-        pickedStarters.add(pkmn2);
+        if (abilitiesUnchanged) {
+            List<Pokemon> abilityDependentFormes = getAbilityDependentFormes();
+            banned.addAll(abilityDependentFormes);
+        }
+        if (banIrregularAltFormes) {
+            banned.addAll(getIrregularFormes());
+        }
+        // loop to add chosen pokemon to banned, preventing it from being a random option.
+        for (int i = 0; i < customStarters.length; i = i + 1){
+            if (!(customStarters[i] - 1 == 0)){
+                banned.add(romPokemon.get(customStarters[i] - 1));
+            }
+        }
+        if (customStarters[0] - 1 == 0){
+            Pokemon pkmn = allowAltFormes ? randomPokemonInclFormes() : randomPokemon();
+            while (pickedStarters.contains(pkmn) || banned.contains(pkmn) || pkmn.actuallyCosmetic) {
+                pkmn = allowAltFormes ? randomPokemonInclFormes() : randomPokemon();
+            }
+            pickedStarters.add(pkmn);
+        } else {
+            Pokemon pkmn1 = romPokemon.get(customStarters[0] - 1);
+            pickedStarters.add(pkmn1);
+        }
+        if (customStarters[1] - 1 == 0){
+            Pokemon pkmn = allowAltFormes ? randomPokemonInclFormes() : randomPokemon();
+            while (pickedStarters.contains(pkmn) || banned.contains(pkmn) || pkmn.actuallyCosmetic) {
+                pkmn = allowAltFormes ? randomPokemonInclFormes() : randomPokemon();
+            }
+            pickedStarters.add(pkmn);
+        } else {
+            Pokemon pkmn2 = romPokemon.get(customStarters[1] - 1);
+            pickedStarters.add(pkmn2);
+        }
 
         if (isYellow()) {
             setStarters(pickedStarters);
         } else {
-            Pokemon pkmn3 = romPokemon.get(customStarters[2]);
-            pickedStarters.add(pkmn3);
+            if (customStarters[2] - 1 == 0){
+                Pokemon pkmn = allowAltFormes ? randomPokemonInclFormes() : randomPokemon();
+                while (pickedStarters.contains(pkmn) || banned.contains(pkmn) || pkmn.actuallyCosmetic) {
+                    pkmn = allowAltFormes ? randomPokemonInclFormes() : randomPokemon();
+                }
+                pickedStarters.add(pkmn);
+            } else {
+                Pokemon pkmn3 = romPokemon.get(customStarters[2] - 1);
+                pickedStarters.add(pkmn3);
+            }
             if (starterCount() > 3) {
                 for (int i = 3; i < starterCount(); i++) {
                     Pokemon pkmn = random2EvosPokemon(allowAltFormes);

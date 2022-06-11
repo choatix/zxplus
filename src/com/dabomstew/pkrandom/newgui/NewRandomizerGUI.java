@@ -3610,17 +3610,20 @@ public class NewRandomizerGUI {
                                 .filter(pk -> pk == null || !pk.actuallyCosmetic)
                                 .collect(Collectors.toList()) :
                         romHandler.getPokemon();
-        String[] pokeNames = new String[allPokes.size() - 1];
+        String[] pokeNames = new String[allPokes.size()];
+        pokeNames[0] = "Random";
         for (int i = 1; i < allPokes.size(); i++) {
-            pokeNames[i - 1] = allPokes.get(i).fullName();
+            pokeNames[i] = allPokes.get(i).fullName();
+
         }
+
         spComboBox1.setModel(new DefaultComboBoxModel<>(pokeNames));
-        spComboBox1.setSelectedIndex(allPokes.indexOf(currentStarters.get(0)) - 1);
+        spComboBox1.setSelectedIndex(allPokes.indexOf(currentStarters.get(0)));
         spComboBox2.setModel(new DefaultComboBoxModel<>(pokeNames));
-        spComboBox2.setSelectedIndex(allPokes.indexOf(currentStarters.get(1)) - 1);
+        spComboBox2.setSelectedIndex(allPokes.indexOf(currentStarters.get(1)));
         if (!romHandler.isYellow()) {
             spComboBox3.setModel(new DefaultComboBoxModel<>(pokeNames));
-            spComboBox3.setSelectedIndex(allPokes.indexOf(currentStarters.get(2)) - 1);
+            spComboBox3.setSelectedIndex(allPokes.indexOf(currentStarters.get(2)));
         }
 
         String[] baseStatGenerationNumbers = new String[Math.min(3, GlobalConstants.HIGHEST_POKEMON_GEN - romHandler.generationOfPokemon())];
