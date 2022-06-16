@@ -291,6 +291,11 @@ public class SettingsUpdater {
             FileFunctions.writeFullIntBigEndian(dataBlock, 28, genRestrictions);
         }
 
+        if (oldVersion < 319) {
+            // 50 elite four unique pokemon (3 bits)
+            insertExtraByte(50, (byte) 0);
+        }
+
         // fix checksum
         CRC32 checksum = new CRC32();
         checksum.update(dataBlock, 0, actualDataLength - 8);
