@@ -510,6 +510,7 @@ public abstract class AbstractRomHandler implements RomHandler {
         boolean banBadAbilities = settings.isBanBadAbilities();
         boolean megaEvolutionSanity = settings.isAbilitiesFollowMegaEvolutions();
         boolean weighDuplicatesTogether = settings.isWeighDuplicateAbilitiesTogether();
+        boolean ensureTwoAbilities = settings.isEnsureTwoAbilities();
         boolean doubleBattleMode = settings.isDoubleBattleMode();
 
         // Abilities don't exist in some games...
@@ -561,7 +562,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     pk.ability1 = pickRandomAbility(maxAbility, bannedAbilities, weighDuplicatesTogether);
 
                     // Second ability?
-                    if (AbstractRomHandler.this.random.nextDouble() < 0.5) {
+                    if (ensureTwoAbilities || AbstractRomHandler.this.random.nextDouble() < 0.5) {
                         // Yes, second ability
                         pk.ability2 = pickRandomAbility(maxAbility, bannedAbilities, weighDuplicatesTogether,
                                 pk.ability1);
@@ -600,7 +601,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     pk.ability1 = this.pickRandomAbility(maxAbility, bannedAbilities, weighDuplicatesTogether);
 
                     // Second ability?
-                    if (this.random.nextDouble() < 0.5) {
+                    if (ensureTwoAbilities || this.random.nextDouble() < 0.5) {
                         // Yes, second ability
                         pk.ability2 = this.pickRandomAbility(maxAbility, bannedAbilities, weighDuplicatesTogether,
                                 pk.ability1);
