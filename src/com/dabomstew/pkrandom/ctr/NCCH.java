@@ -23,6 +23,7 @@ package com.dabomstew.pkrandom.ctr;
 
 import com.dabomstew.pkrandom.FileFunctions;
 import com.dabomstew.pkrandom.SysConstants;
+import com.dabomstew.pkrandom.exceptions.CannotWriteToLocationException;
 import com.dabomstew.pkrandom.exceptions.EncryptedROMException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import cuecompressors.BLZCoder;
@@ -249,8 +250,12 @@ public class NCCH {
     public void saveAsNCCH(String filename, String gameAcronym, long seed) throws IOException, NoSuchAlgorithmException {
         this.reopenROM();
 
-        // Initialise new ROM
-        RandomAccessFile fNew = new RandomAccessFile(filename, "rw");
+        // Initialize new ROM
+        File file = new File(filename);
+        if (!file.canWrite()) {
+            throw new CannotWriteToLocationException("The randomizer cannot write to this location: " + filename);
+        }
+        RandomAccessFile fNew = new RandomAccessFile(file, "rw");
 
         // Read the header and exheader and write it to the output ROM
         byte[] header = new byte[header_and_exheader_size];

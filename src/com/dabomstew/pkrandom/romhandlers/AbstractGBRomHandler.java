@@ -35,6 +35,7 @@ import java.nio.file.Paths;
 import java.util.Random;
 
 import com.dabomstew.pkrandom.FileFunctions;
+import com.dabomstew.pkrandom.exceptions.CannotWriteToLocationException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 
 public abstract class AbstractGBRomHandler extends AbstractRomHandler {
@@ -70,7 +71,11 @@ public abstract class AbstractGBRomHandler extends AbstractRomHandler {
     public boolean saveRomFile(String filename, long seed) {
         savingRom();
         try {
-            FileOutputStream fos = new FileOutputStream(filename);
+            File file = new File(filename);
+            if (!file.canWrite()) {
+                throw new CannotWriteToLocationException("The randomizer cannot write to this location: " + filename);
+            }
+            FileOutputStream fos = new FileOutputStream(file);
             fos.write(rom);
             fos.close();
             return true;

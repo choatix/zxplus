@@ -9,6 +9,7 @@ import com.dabomstew.pkrandom.SysConstants;
 import com.dabomstew.pkrandom.FileFunctions;
 import com.dabomstew.pkrandom.RomFunctions;
 
+import com.dabomstew.pkrandom.exceptions.CannotWriteToLocationException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import cuecompressors.BLZCoder;
 
@@ -229,7 +230,11 @@ public class NDSRom {
     public void saveTo(String filename) throws IOException {
         this.reopenROM();
 
-        // Initialise new ROM
+        // Initialize new ROM
+        File file = new File(filename);
+        if (!file.canWrite()) {
+            throw new CannotWriteToLocationException("The randomizer cannot write to this location: " + filename);
+        }
         RandomAccessFile fNew = new RandomAccessFile(filename, "rw");
 
         int headersize = readFromFile(this.baseRom, 0x84, 4);
