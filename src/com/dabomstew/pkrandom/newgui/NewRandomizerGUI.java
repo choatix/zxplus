@@ -3418,7 +3418,7 @@ public class NewRandomizerGUI {
             tpHighestLevelGetsItemCheckBox.setEnabled(false);
         }
 
-        if (!spUnchangedRadioButton.isSelected() || !isTrainerSetting(TRAINER_UNCHANGED)) {
+        if (!peRandomEveryLevelRadioButton.isSelected() && (!spUnchangedRadioButton.isSelected() || !isTrainerSetting(TRAINER_UNCHANGED))) {
             tpRivalCarriesStarterCheckBox.setEnabled(true);
         } else {
             tpRivalCarriesStarterCheckBox.setEnabled(false);
