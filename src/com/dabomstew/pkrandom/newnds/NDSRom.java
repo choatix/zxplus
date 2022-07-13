@@ -231,10 +231,6 @@ public class NDSRom {
         this.reopenROM();
 
         // Initialize new ROM
-        File file = new File(filename);
-        if (!file.canWrite()) {
-            throw new CannotWriteToLocationException("The randomizer cannot write to this location: " + filename);
-        }
         RandomAccessFile fNew = new RandomAccessFile(filename, "rw");
 
         int headersize = readFromFile(this.baseRom, 0x84, 4);

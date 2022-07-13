@@ -71,15 +71,14 @@ public abstract class AbstractGBRomHandler extends AbstractRomHandler {
     public boolean saveRomFile(String filename, long seed) {
         savingRom();
         try {
-            File file = new File(filename);
-            if (!file.canWrite()) {
-                throw new CannotWriteToLocationException("The randomizer cannot write to this location: " + filename);
-            }
-            FileOutputStream fos = new FileOutputStream(file);
+            FileOutputStream fos = new FileOutputStream(filename);
             fos.write(rom);
             fos.close();
             return true;
         } catch (IOException ex) {
+            if (ex.getMessage().contains("Access is denied")) {
+                throw new CannotWriteToLocationException("The randomizer cannot write to this location: " + filename);
+            }
             return false;
         }
     }

@@ -251,11 +251,7 @@ public class NCCH {
         this.reopenROM();
 
         // Initialize new ROM
-        File file = new File(filename);
-        if (!file.canWrite()) {
-            throw new CannotWriteToLocationException("The randomizer cannot write to this location: " + filename);
-        }
-        RandomAccessFile fNew = new RandomAccessFile(file, "rw");
+        RandomAccessFile fNew = new RandomAccessFile(filename, "rw");
 
         // Read the header and exheader and write it to the output ROM
         byte[] header = new byte[header_and_exheader_size];
