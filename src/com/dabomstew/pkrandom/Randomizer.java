@@ -245,6 +245,9 @@ public class Randomizer {
 
         if (settings.isMakeEvolutionsEasier()) {
             log.println("--Making Evolutions Easier--");
+            if (!(romHandler instanceof Gen1RomHandler)) {
+                log.println("Friendship evolutions now take 160 happiness (was 220).");
+            }
             logUpdatedEvolutions(log, romHandler.getEasierEvoUpdates(), null);
         }
 
