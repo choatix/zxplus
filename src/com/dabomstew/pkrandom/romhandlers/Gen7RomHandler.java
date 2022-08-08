@@ -1141,7 +1141,6 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                 se.pkmn = pokemon;
                 se.forme = forme;
                 se.level = giftsFile[offset + 3];
-                se.heldItem = FileFunctions.read2ByteInt(giftsFile, offset + 8);
                 starters.add(se);
             }
         } catch (IOException e) {
@@ -1254,13 +1253,35 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
 
     @Override
     public List<Integer> getStarterHeldItems() {
-        // do nothing
-        return new ArrayList<>();
+        List<Integer> starterHeldItems = new ArrayList<>();
+        try {
+            GARCArchive staticGarc = readGARC(romEntry.getFile("StaticPokemon"), true);
+            byte[] giftsFile = staticGarc.files.get(0).get(0);
+            for (int i = 0; i < 3; i++) {
+                int offset = i * 0x14;
+                int item = FileFunctions.read2ByteInt(giftsFile, offset + 8);
+                starterHeldItems.add(item);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+        return starterHeldItems;
     }
 
     @Override
     public void setStarterHeldItems(List<Integer> items) {
-        // do nothing
+        try {
+            GARCArchive staticGarc = readGARC(romEntry.getFile("StaticPokemon"), true);
+            byte[] giftsFile = staticGarc.files.get(0).get(0);
+            for (int i = 0; i < 3; i++) {
+                int offset = i * 0x14;
+                int item = items.get(i);
+                FileFunctions.write2ByteInt(giftsFile, offset + 8, item);
+            }
+            writeGARC(romEntry.getFile("StaticPokemon"), staticGarc);
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
     }
 
     @Override

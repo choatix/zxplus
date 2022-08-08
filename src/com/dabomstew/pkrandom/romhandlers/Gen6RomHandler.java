@@ -1071,11 +1071,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 se.pkmn = pokemon;
                 se.forme = forme;
                 se.level = staticCRO[offset+i*size + 5];
-                int heldItem = FileFunctions.readFullInt(staticCRO,offset+i*size + 12);
-                if (heldItem < 0) {
-                    heldItem = 0;
-                }
-                se.heldItem = heldItem;
                 starters.add(se);
             }
         } catch (IOException e) {
@@ -1123,11 +1118,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 writeWord(staticCRO,offset+i*size,newStatic.pkmn.number);
                 staticCRO[offset+i*size + 4] = (byte)newStatic.forme;
 //                staticCRO[offset+i*size + 5] = (byte)newStatic.level;
-                if (newStatic.heldItem == 0) {
-                    writeWord(staticCRO,offset+i*size + 12,-1);
-                } else {
-                    writeWord(staticCRO,offset+i*size + 12,newStatic.heldItem);
-                }
                 writeWord(displayCRO,displayOffset+displayIndex*0x54,newStatic.pkmn.number);
                 displayCRO[displayOffset+displayIndex*0x54+2] = (byte)newStatic.forme;
                 if (displayIndex < 3) {
@@ -1171,13 +1161,60 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
 
     @Override
     public List<Integer> getStarterHeldItems() {
-        // do nothing
-        return new ArrayList<>();
+        List<Integer> starterHeldItems = new ArrayList<>();
+        try {
+            byte[] staticCRO = readFile(romEntry.getFile("StaticPokemon"));
+
+            List<Integer> starterIndices =
+                    Arrays.stream(romEntry.arrayEntries.get("StarterIndices")).boxed().collect(Collectors.toList());
+
+            // Gift Pokemon
+            int count = Gen6Constants.getGiftPokemonCount(romEntry.romType);
+            int size = Gen6Constants.getGiftPokemonSize(romEntry.romType);
+            int offset = romEntry.getInt("GiftPokemonOffset");
+            for (int i = 0; i < count; i++) {
+                if (!starterIndices.contains(i)) continue;
+                int heldItem = FileFunctions.readFullInt(staticCRO,offset+i*size + 12);
+                if (heldItem < 0) {
+                    heldItem = 0;
+                }
+                starterHeldItems.add(heldItem);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+
+        return starterHeldItems;
     }
 
     @Override
     public void setStarterHeldItems(List<Integer> items) {
-        // do nothing
+        try {
+            byte[] staticCRO = readFile(romEntry.getFile("StaticPokemon"));
+
+            List<Integer> starterIndices =
+                    Arrays.stream(romEntry.arrayEntries.get("StarterIndices")).boxed().collect(Collectors.toList());
+
+            // Gift Pokemon
+            int count = Gen6Constants.getGiftPokemonCount(romEntry.romType);
+            int size = Gen6Constants.getGiftPokemonSize(romEntry.romType);
+            int offset = romEntry.getInt("GiftPokemonOffset");
+
+            Iterator<Integer> itemsIter = items.iterator();
+
+            for (int i = 0; i < count; i++) {
+                if (!starterIndices.contains(i)) continue;
+                int item = itemsIter.next();
+                if (item == 0) {
+                    FileFunctions.writeFullInt(staticCRO,offset+i*size + 12,-1);
+                } else {
+                    FileFunctions.writeFullInt(staticCRO,offset+i*size + 12,item);
+                }
+            }
+            writeFile(romEntry.getFile("StaticPokemon"),staticCRO);
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
     }
 
     @Override
@@ -2341,9 +2378,9 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 staticCRO[offset+i*size + 4] = (byte)se.forme;
                 staticCRO[offset+i*size + 5] = (byte)se.level;
                 if (se.heldItem == 0) {
-                    writeWord(staticCRO,offset+i*size + 12,-1);
+                    FileFunctions.writeFullInt(staticCRO,offset+i*size + 12,-1);
                 } else {
-                    writeWord(staticCRO,offset+i*size + 12,se.heldItem);
+                    FileFunctions.writeFullInt(staticCRO,offset+i*size + 12,se.heldItem);
                 }
             }
             writeFile(romEntry.getFile("StaticPokemon"),staticCRO);

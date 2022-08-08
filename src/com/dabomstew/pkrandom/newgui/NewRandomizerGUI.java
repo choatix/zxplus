@@ -2759,7 +2759,7 @@ public class NewRandomizerGUI {
             }
             populateDropdowns();
 
-            boolean hasStarterHeldItems = (pokemonGeneration == 2 || pokemonGeneration == 3);
+            boolean hasStarterHeldItems = (pokemonGeneration != 1 && pokemonGeneration != 4 && pokemonGeneration != 5);
             spRandomizeStarterHeldItemsCheckBox.setEnabled(hasStarterHeldItems);
             spRandomizeStarterHeldItemsCheckBox.setVisible(hasStarterHeldItems);
             spBanBadItemsCheckBox.setEnabled(false);
