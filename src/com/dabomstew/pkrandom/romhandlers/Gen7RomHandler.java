@@ -502,6 +502,16 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
                 }
             }
         }
+
+        // The above code will add all alternate cosmetic forms to realCosmeticFormNumbers as necessary, but it will
+        // NOT add the base form. For example, if we are currently looking at Mimikyu, it will add Totem Mimikyu to
+        // the list of realCosmeticFormNumbers, but it will not add normal-sized Mimikyu. Without any corrections,
+        // this will make base Mimikyu impossible to randomly select. The simplest way to fix this is to just add
+        // the base form to the realCosmeticFormNumbers here if that list was populated above.
+        if (pkmn.realCosmeticFormNumbers.size() > 0) {
+            pkmn.realCosmeticFormNumbers.add(0);
+            pkmn.cosmeticForms += 1;
+        }
     }
 
     private String[] readPokemonNames() {
