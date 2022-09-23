@@ -991,6 +991,12 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
+    public boolean supportsStarterHeldItems() {
+        // No held items in Gen 1
+        return false;
+    }
+
+    @Override
     public List<Integer> getStarterHeldItems() {
         // do nothing
         return new ArrayList<>();

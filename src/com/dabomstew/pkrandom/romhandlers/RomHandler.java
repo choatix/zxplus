@@ -128,6 +128,8 @@ public interface RomHandler {
 
     List<Pokemon> getPickedStarters();
 
+    boolean supportsStarterHeldItems();
+
     List<Integer> getStarterHeldItems();
 
     void setStarterHeldItems(List<Integer> items);

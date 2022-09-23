@@ -1262,6 +1262,11 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public boolean supportsStarterHeldItems() {
+        return true;
+    }
+
+    @Override
     public List<Integer> getStarterHeldItems() {
         List<Integer> starterHeldItems = new ArrayList<>();
         try {

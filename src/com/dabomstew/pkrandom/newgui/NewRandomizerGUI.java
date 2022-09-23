@@ -2759,11 +2759,11 @@ public class NewRandomizerGUI {
             }
             populateDropdowns();
 
-            boolean hasStarterHeldItems = (pokemonGeneration != 1 && pokemonGeneration != 4 && pokemonGeneration != 5);
-            spRandomizeStarterHeldItemsCheckBox.setEnabled(hasStarterHeldItems);
-            spRandomizeStarterHeldItemsCheckBox.setVisible(hasStarterHeldItems);
+            boolean supportsStarterHeldItems = romHandler.supportsStarterHeldItems();
+            spRandomizeStarterHeldItemsCheckBox.setEnabled(supportsStarterHeldItems);
+            spRandomizeStarterHeldItemsCheckBox.setVisible(supportsStarterHeldItems);
             spBanBadItemsCheckBox.setEnabled(false);
-            spBanBadItemsCheckBox.setVisible(hasStarterHeldItems);
+            spBanBadItemsCheckBox.setVisible(supportsStarterHeldItems);
 
             stpUnchangedRadioButton.setEnabled(true);
             stpUnchangedRadioButton.setSelected(true);

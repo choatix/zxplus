@@ -1567,14 +1567,25 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
+    public boolean supportsStarterHeldItems() {
+        return romEntry.romType == Gen4Constants.Type_DP || romEntry.romType == Gen4Constants.Type_Plat;
+    }
+
+    @Override
     public List<Integer> getStarterHeldItems() {
-        // do nothing
-        return new ArrayList<>();
+        int starterScriptNumber = romEntry.getInt("StarterPokemonScriptOffset");
+        int starterHeldItemOffset = romEntry.getInt("StarterPokemonHeldItemOffset");
+        byte[] file = scriptNarc.files.get(starterScriptNumber);
+        int item = FileFunctions.read2ByteInt(file, starterHeldItemOffset);
+        return Arrays.asList(item);
     }
 
     @Override
     public void setStarterHeldItems(List<Integer> items) {
-        // do nothing
+        int starterScriptNumber = romEntry.getInt("StarterPokemonScriptOffset");
+        int starterHeldItemOffset = romEntry.getInt("StarterPokemonHeldItemOffset");
+        byte[] file = scriptNarc.files.get(starterScriptNumber);
+        FileFunctions.write2ByteInt(file, starterHeldItemOffset, items.get(0));
     }
 
     @Override
