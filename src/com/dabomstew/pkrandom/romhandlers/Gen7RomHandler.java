@@ -955,7 +955,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             }
 
             // Write Nincada's new extra evolution in the new free space.
-            writeLong(code, offset + 120, extraEvolution.number);
+            writeLong(code, offset + 120, extraEvolution.getBaseNumber());
 
             // Second parameter of pml::pokepara::CoreParam::ChangeMonsNo is the
             // new forme number
