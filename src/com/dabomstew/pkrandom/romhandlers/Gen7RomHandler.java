@@ -927,7 +927,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         int offset = find(code, Gen7Constants.ninjaskSpeciesPrefix);
         if (offset > 0) {
             offset += Gen7Constants.ninjaskSpeciesPrefix.length() / 2; // because it was a prefix
-            FileFunctions.writeFullInt(code, offset, primaryEvolution.number);
+            FileFunctions.writeFullInt(code, offset, primaryEvolution.getBaseNumber());
         }
 
         // In the game's executable, there's a hardcoded value to indicate what "extra"
