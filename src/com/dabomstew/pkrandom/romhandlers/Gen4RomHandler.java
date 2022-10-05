@@ -5262,6 +5262,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         if (romEntry.tweakFiles.get("FastDistortionWorldTweak") != null) {
             available |= MiscTweak.FAST_DISTORTION_WORLD.getValue();
         }
+        if (romEntry.romType == Gen4Constants.Type_Plat || romEntry.romType == Gen4Constants.Type_HGSS) {
+            available |= MiscTweak.UPDATE_ROTOM_FORME_TYPING.getValue();
+        }
         return available;
     }
 
@@ -5286,6 +5289,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             updateTypeEffectiveness();
         } else if (tweak == MiscTweak.FAST_DISTORTION_WORLD) {
             applyFastDistortionWorld();
+        } else if (tweak == MiscTweak.UPDATE_ROTOM_FORME_TYPING) {
+            updateRotomFormeTyping();
         }
     }
 
@@ -5515,6 +5520,14 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         spearPillarPortalScript = expandedSpearPillarPortalScript;
         genericIPSPatch(spearPillarPortalScript, "FastDistortionWorldTweak");
         scriptNarc.files.set(Gen4Constants.ptSpearPillarPortalScriptFile, spearPillarPortalScript);
+    }
+
+    private void updateRotomFormeTyping() {
+        pokes[Species.Gen4Formes.rotomH].secondaryType = Type.FIRE;
+        pokes[Species.Gen4Formes.rotomW].secondaryType = Type.WATER;
+        pokes[Species.Gen4Formes.rotomFr].secondaryType = Type.ICE;
+        pokes[Species.Gen4Formes.rotomFa].secondaryType = Type.FLYING;
+        pokes[Species.Gen4Formes.rotomM].secondaryType = Type.GRASS;
     }
 
     @Override

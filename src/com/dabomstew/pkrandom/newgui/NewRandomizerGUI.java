@@ -298,6 +298,7 @@ public class NewRandomizerGUI {
     private JComboBox tpComboBox;
     private JCheckBox tpBetterMovesetsCheckBox;
     private JCheckBox paEnsureTwoAbilitiesCheckbox;
+    private JCheckBox miscUpdateRotomFormeTypingCheckBox;
 
     private static JFrame frame;
 
