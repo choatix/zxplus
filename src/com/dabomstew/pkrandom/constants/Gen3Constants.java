@@ -164,6 +164,8 @@ public class Gen3Constants {
 
     public static final String friendshipValueForEvoLocator = "DB2900D8";
 
+    public static final String catchFailBranchLocator = "FE2E2FD90020";
+
     public static final int unhackedMaxPokedex = 411, unhackedRealPokedex = 386, hoennPokesStart = 252;
 
     public static final int evolutionMethodCount = 15;

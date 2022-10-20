@@ -4112,6 +4112,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         if (romEntry.romType == Gen3Constants.RomType_FRLG) {
             available |= MiscTweak.BALANCE_STATIC_LEVELS.getValue();
         }
+        available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
         return available;
     }
 
@@ -4141,6 +4142,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             }
         } else if (tweak == MiscTweak.UPDATE_TYPE_EFFECTIVENESS) {
             updateTypeEffectiveness();
+        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
+            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -4326,6 +4329,23 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             }
             rom[currentOffset + 2] = effectivenessInternal;
             currentOffset += 3;
+        }
+    }
+
+    private void enableGuaranteedPokemonCatching() {
+        int offset = find(rom, Gen3Constants.catchFailBranchLocator);
+        if (offset > 0) {
+            // In Cmd_handleballthrow, the middle of the function checks if the odds of catching a Pokemon
+            // is greater than 254; if it is, then the Pokemon is automatically caught. In ASM, this is
+            // represented by:
+            // cmp r6, #0xFE
+            // bls oddsLessThanOrEqualTo254
+            // The below code just nops these two instructions so that we *always* act like our odds are 255,
+            // and Pokemon are automatically caught no matter what.
+            rom[offset] = 0x00;
+            rom[offset + 1] = 0x00;
+            rom[offset + 2] = 0x00;
+            rom[offset + 3] = 0x00;
         }
     }
 
