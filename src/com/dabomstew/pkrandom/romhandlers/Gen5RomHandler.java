@@ -2426,6 +2426,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         if (romEntry.romType == Gen5Constants.Type_BW2) {
             available |= MiscTweak.FORCE_CHALLENGE_MODE.getValue();
         }
+        available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
         return available;
     }
 
@@ -2461,6 +2462,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             updateTypeEffectiveness();
         } else if (tweak == MiscTweak.FORCE_CHALLENGE_MODE) {
             forceChallengeMode();
+        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
+            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -2636,6 +2639,29 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             arm9[offset + 1] = 0x20;
             arm9[offset + 2] = 0x70;
             arm9[offset + 3] = 0x47;
+        }
+    }
+
+    private void enableGuaranteedPokemonCatching() {
+        try {
+            byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
+            int offset = find(battleOverlay, Gen5Constants.perfectOddsBranchLocator);
+            if (offset > 0) {
+                // The game checks to see if your odds are greater then or equal to 255 using the following
+                // code. Note that they compare to 0xFF000 instead of 0xFF; it looks like all catching code
+                // probabilities are shifted like this?
+                // mov r0, #0xFF
+                // lsl r0, r0, #0xC
+                // cmp r7, r0
+                // blt oddsLessThanOrEqualTo254
+                // The below code just nops the branch out so it always acts like our odds are 255, and
+                // Pokemon are automatically caught no matter what.
+                battleOverlay[offset] = 0x00;
+                battleOverlay[offset + 1] = 0x00;
+                writeOverlay(romEntry.getInt("BattleOvlNumber"), battleOverlay);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
         }
     }
 
