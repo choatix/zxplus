@@ -4333,7 +4333,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     private void enableGuaranteedPokemonCatching() {
-        int offset = find(rom, Gen3Constants.catchFailBranchLocator);
+        int offset = find(rom, Gen3Constants.perfectOddsBranchLocator);
         if (offset > 0) {
             // In Cmd_handleballthrow, the middle of the function checks if the odds of catching a Pokemon
             // is greater than 254; if it is, then the Pokemon is automatically caught. In ASM, this is

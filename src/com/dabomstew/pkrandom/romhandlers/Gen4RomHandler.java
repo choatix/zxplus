@@ -5536,7 +5536,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     private void enableGuaranteedPokemonCatching() {
         try {
             byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
-            int offset = find(battleOverlay, Gen4Constants.catchFailBranchLocator);
+            int offset = find(battleOverlay, Gen4Constants.perfectOddsBranchLocator);
             if (offset > 0) {
                 // In Cmd_handleballthrow (name taken from pokeemerald decomp), the middle of the function checks
                 // if the odds of catching a Pokemon is greater than 254; if it is, then the Pokemon is automatically

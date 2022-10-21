@@ -2397,6 +2397,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         available |= MiscTweak.BAN_LUCKY_EGG.getValue();
         available |= MiscTweak.SOS_BATTLES_FOR_ALL.getValue();
         available |= MiscTweak.RETAIN_ALT_FORMES.getValue();
+        available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
         return available;
     }
 
@@ -2404,20 +2405,19 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     public void applyMiscTweak(MiscTweak tweak) {
         if (tweak == MiscTweak.FASTEST_TEXT) {
             applyFastestText();
-        }
-        if (tweak == MiscTweak.BAN_LUCKY_EGG) {
+        } else if (tweak == MiscTweak.BAN_LUCKY_EGG) {
             allowedItems.banSingles(Items.luckyEgg);
             nonBadItems.banSingles(Items.luckyEgg);
-        }
-        if (tweak == MiscTweak.SOS_BATTLES_FOR_ALL) {
+        } else if (tweak == MiscTweak.SOS_BATTLES_FOR_ALL) {
             positiveCallRates();
-        }
-        if (tweak == MiscTweak.RETAIN_ALT_FORMES) {
+        } else if (tweak == MiscTweak.RETAIN_ALT_FORMES) {
             try {
                 patchFormeReversion();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
+            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -2451,6 +2451,29 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             if (pk.callRate <= 0) {
                 pk.callRate = 5;
             }
+        }
+    }
+
+    private void enableGuaranteedPokemonCatching() {
+        try {
+            byte[] battleCRO = readFile(romEntry.getFile("Battle"));
+            int offset = find(battleCRO, Gen7Constants.perfectOddsBranchLocator);
+            if (offset > 0) {
+                // The game checks to see if your odds are greater then or equal to 255 using the following
+                // code. Note that they compare to 0xFF000 instead of 0xFF; it looks like all catching code
+                // probabilities are shifted like this?
+                // cmp r7, #0xFF000
+                // blt oddsLessThanOrEqualTo254
+                // The below code just nops the branch out so it always acts like our odds are 255, and
+                // Pokemon are automatically caught no matter what.
+                battleCRO[offset] = 0x00;
+                battleCRO[offset + 1] = 0x00;
+                battleCRO[offset + 2] = 0x00;
+                battleCRO[offset + 3] = 0x00;
+                writeFile(romEntry.getFile("Battle"), battleCRO);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
         }
     }
 
