@@ -5265,6 +5265,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         if (romEntry.romType == Gen4Constants.Type_Plat || romEntry.romType == Gen4Constants.Type_HGSS) {
             available |= MiscTweak.UPDATE_ROTOM_FORME_TYPING.getValue();
         }
+        available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
         return available;
     }
 
@@ -5291,6 +5292,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             applyFastDistortionWorld();
         } else if (tweak == MiscTweak.UPDATE_ROTOM_FORME_TYPING) {
             updateRotomFormeTyping();
+        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
+            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -5528,6 +5531,29 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         pokes[Species.Gen4Formes.rotomFr].secondaryType = Type.ICE;
         pokes[Species.Gen4Formes.rotomFa].secondaryType = Type.FLYING;
         pokes[Species.Gen4Formes.rotomM].secondaryType = Type.GRASS;
+    }
+
+    private void enableGuaranteedPokemonCatching() {
+        try {
+            byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
+            int offset = find(battleOverlay, Gen4Constants.catchFailBranchLocator);
+            if (offset > 0) {
+                // In Cmd_handleballthrow (name taken from pokeemerald decomp), the middle of the function checks
+                // if the odds of catching a Pokemon is greater than 254; if it is, then the Pokemon is automatically
+                // caught. In ASM, this is represented by:
+                // cmp r1, #0xFF
+                // bcc oddsLessThanOrEqualTo254
+                // The below code just nops these two instructions so that we *always* act like our odds are 255,
+                // and Pokemon are automatically caught no matter what.
+                battleOverlay[offset] = 0x00;
+                battleOverlay[offset + 1] = 0x00;
+                battleOverlay[offset + 2] = 0x00;
+                battleOverlay[offset + 3] = 0x00;
+                writeOverlay(romEntry.getInt("BattleOvlNumber"), battleOverlay);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
     }
 
     @Override
