@@ -80,6 +80,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         private List<TMTextEntry> tmTexts = new ArrayList<>();
         private Map<String, Integer> entries = new HashMap<>();
         private Map<String, int[]> arrayEntries = new HashMap<>();
+        private Map<String, String> strings = new HashMap<>();
         private List<StaticPokemon> staticPokemon = new ArrayList<>();
 
         private int getValue(String key) {
@@ -87,6 +88,13 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                 entries.put(key, 0);
             }
             return entries.get(key);
+        }
+
+        private String getString(String key) {
+            if (!strings.containsKey(key)) {
+                strings.put(key, "");
+            }
+            return strings.get(key);
         }
     }
 
@@ -166,6 +174,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                                     boolean cTT = (current.getValue("CopyTMText") == 1);
                                     current.arrayEntries.putAll(otherEntry.arrayEntries);
                                     current.entries.putAll(otherEntry.entries);
+                                    current.strings.putAll(otherEntry.strings);
                                     if (cSP) {
                                         current.staticPokemon.addAll(otherEntry.staticPokemon);
                                         current.entries.put("StaticPokemonSupport", 1);
@@ -180,6 +189,8 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                                     current.extraTableFile = otherEntry.extraTableFile;
                                 }
                             }
+                        } else if (r[0].endsWith("Locator") || r[0].endsWith("Prefix")) {
+                            current.strings.put(r[0], r[1]);
                         } else {
                             if (r[1].startsWith("[") && r[1].endsWith("]")) {
                                 String[] offsets = r[1].substring(1, r[1].length() - 1).split(",");
@@ -2215,6 +2226,9 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             available |= MiscTweak.RANDOMIZE_CATCHING_TUTORIAL.getValue();
         }
         available |= MiscTweak.BAN_LUCKY_EGG.getValue();
+        if (romEntry.strings.containsKey("GuaranteedCatchPrefix")) {
+            available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
+        }
         return available;
     }
 
@@ -2233,6 +2247,8 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             nonBadItems.banSingles(Gen2Items.luckyEgg);
         } else if (tweak == MiscTweak.UPDATE_TYPE_EFFECTIVENESS) {
             updateTypeEffectiveness();
+        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
+            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -2357,6 +2373,25 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             }
             rom[currentOffset + 2] = effectivenessInternal;
             currentOffset += 3;
+        }
+    }
+
+    private void enableGuaranteedPokemonCatching() {
+        String prefix = romEntry.getString("GuaranteedCatchPrefix");
+        int offset = find(rom, prefix);
+        if (offset > 0) {
+            offset += prefix.length() / 2; // because it was a prefix
+
+            // The game guarantees that the catching tutorial always succeeds in catching by running
+            // the following code:
+            // ld a, [wBattleType]
+            // cp BATTLETYPE_TUTORIAL
+            // jp z, .catch_without_fail
+            // By making the jump here unconditional, we can ensure that catching always succeeds no
+            // matter the battle type. We check that the original condition is present just for safety.
+            if (rom[offset] == (byte)0xCA) {
+                rom[offset] = (byte)0xC3;
+            }
         }
     }
 
