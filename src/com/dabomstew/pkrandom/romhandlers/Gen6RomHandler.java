@@ -2622,6 +2622,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         available |= MiscTweak.BAN_LUCKY_EGG.getValue();
         available |= MiscTweak.RETAIN_ALT_FORMES.getValue();
         available |= MiscTweak.NATIONAL_DEX_AT_START.getValue();
+        available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
         return available;
     }
 
@@ -2640,6 +2641,8 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             }
         } else if (tweak == MiscTweak.NATIONAL_DEX_AT_START) {
             patchForNationalDex();
+        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
+            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -2728,6 +2731,30 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
                 // wrote above.
                 FileFunctions.writeFullIntBigEndian(code, offset + 208, 0xD2FFFFEA);
             }
+        }
+    }
+
+    // TODO: Battle CRO for XY
+    private void enableGuaranteedPokemonCatching() {
+        try {
+            byte[] battleCRO = readFile(romEntry.getFile("Battle"));
+            int offset = find(battleCRO, Gen6Constants.perfectOddsBranchLocator);
+            if (offset > 0) {
+                // The game checks to see if your odds are greater then or equal to 255 using the following
+                // code. Note that they compare to 0xFF000 instead of 0xFF; it looks like all catching code
+                // probabilities are shifted like this?
+                // cmp r6, #0xFF000
+                // blt oddsLessThanOrEqualTo254
+                // The below code just nops the branch out so it always acts like our odds are 255, and
+                // Pokemon are automatically caught no matter what.
+                battleCRO[offset] = 0x00;
+                battleCRO[offset + 1] = 0x00;
+                battleCRO[offset + 2] = 0x00;
+                battleCRO[offset + 3] = 0x00;
+                writeFile(romEntry.getFile("Battle"), battleCRO);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
         }
     }
 
@@ -4092,6 +4119,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
             long expectedCRC32 = romEntry.files.get(fileKey).expectedCRC32s[index];
             long actualCRC32 = actualFileCRC32s.get(fileKey);
             if (expectedCRC32 != actualCRC32) {
+                System.out.println(actualCRC32);
                 return false;
             }
         }
