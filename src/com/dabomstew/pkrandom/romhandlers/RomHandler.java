@@ -237,6 +237,8 @@ public interface RomHandler {
 
     void minimumCatchRate(int rateNonLegendary, int rateLegendary);
 
+    void enableGuaranteedPokemonCatching();
+
     // ===============
     // Trainer Pokemon
     // ===============

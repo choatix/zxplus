@@ -299,7 +299,6 @@ public class NewRandomizerGUI {
     private JCheckBox tpBetterMovesetsCheckBox;
     private JCheckBox paEnsureTwoAbilitiesCheckbox;
     private JCheckBox miscUpdateRotomFormeTypingCheckBox;
-    private JCheckBox miscGuaranteedPokemonCatchingCheckBox;
 
     private static JFrame frame;
 

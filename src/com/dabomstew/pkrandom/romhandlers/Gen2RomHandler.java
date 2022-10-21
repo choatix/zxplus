@@ -2226,9 +2226,6 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             available |= MiscTweak.RANDOMIZE_CATCHING_TUTORIAL.getValue();
         }
         available |= MiscTweak.BAN_LUCKY_EGG.getValue();
-        if (romEntry.strings.containsKey("GuaranteedCatchPrefix")) {
-            available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
-        }
         return available;
     }
 
@@ -2247,8 +2244,6 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             nonBadItems.banSingles(Gen2Items.luckyEgg);
         } else if (tweak == MiscTweak.UPDATE_TYPE_EFFECTIVENESS) {
             updateTypeEffectiveness();
-        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
-            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -2376,7 +2371,8 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         }
     }
 
-    private void enableGuaranteedPokemonCatching() {
+    @Override
+    public void enableGuaranteedPokemonCatching() {
         String prefix = romEntry.getString("GuaranteedCatchPrefix");
         int offset = find(rom, prefix);
         if (offset > 0) {

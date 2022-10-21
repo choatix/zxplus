@@ -2107,7 +2107,6 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
             available |= MiscTweak.RANDOMIZE_CATCHING_TUTORIAL.getValue();
         }
 
-        available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
         return available;
     }
 
@@ -2131,8 +2130,6 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
             updateTypeEffectiveness();
         } else if (tweak == MiscTweak.RANDOMIZE_CATCHING_TUTORIAL) {
             randomizeCatchingTutorial();
-        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
-            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -2177,7 +2174,8 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         }
     }
 
-    private void enableGuaranteedPokemonCatching() {
+    @Override
+    public void enableGuaranteedPokemonCatching() {
         int offset = find(rom, Gen1Constants.guaranteedCatchPrefix);
         if (offset > 0) {
             offset += Gen1Constants.guaranteedCatchPrefix.length() / 2; // because it was a prefix

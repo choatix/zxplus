@@ -4112,7 +4112,6 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         if (romEntry.romType == Gen3Constants.RomType_FRLG) {
             available |= MiscTweak.BALANCE_STATIC_LEVELS.getValue();
         }
-        available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
         return available;
     }
 
@@ -4142,8 +4141,6 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
             }
         } else if (tweak == MiscTweak.UPDATE_TYPE_EFFECTIVENESS) {
             updateTypeEffectiveness();
-        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
-            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -4332,7 +4329,8 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         }
     }
 
-    private void enableGuaranteedPokemonCatching() {
+    @Override
+    public void enableGuaranteedPokemonCatching() {
         int offset = find(rom, Gen3Constants.perfectOddsBranchLocator);
         if (offset > 0) {
             // In Cmd_handleballthrow, the middle of the function checks if the odds of catching a Pokemon

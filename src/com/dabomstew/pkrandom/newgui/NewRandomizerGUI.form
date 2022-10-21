@@ -2429,7 +2429,7 @@
                     <properties>
                       <enabled value="false"/>
                       <majorTickSpacing value="1"/>
-                      <maximum value="4"/>
+                      <maximum value="5"/>
                       <minimum value="1"/>
                       <paintLabels value="true"/>
                       <snapToTicks value="true"/>
@@ -3607,17 +3607,6 @@
                       <enabled value="false"/>
                       <text resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="CodeTweaks.updateRotomFormeTyping.name"/>
                       <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="CodeTweaks.updateRotomFormeTyping.toolTipText"/>
-                    </properties>
-                  </component>
-                  <component id="c40e" class="javax.swing.JCheckBox" binding="miscGuaranteedPokemonCatchingCheckBox">
-                    <constraints>
-                      <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                      <gridbag weightx="0.0" weighty="0.0"/>
-                    </constraints>
-                    <properties>
-                      <enabled value="false"/>
-                      <text resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="CodeTweaks.guaranteedPokemonCatching.name"/>
-                      <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="CodeTweaks.guaranteedPokemonCatching.toolTipText"/>
                     </properties>
                   </component>
                 </children>

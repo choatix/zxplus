@@ -67,32 +67,6 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         super(random, logStream);
     }
 
-    @Override
-    public void changeCatchRates(Settings settings) {
-        int minimumCatchRateLevel = settings.getMinimumCatchRateLevel();
-
-        int normalMin, legendaryMin;
-        switch (minimumCatchRateLevel) {
-            case 1:
-            default:
-                normalMin = 50;
-                legendaryMin = 25;
-                break;
-            case 2:
-                normalMin = 100;
-                legendaryMin = 45;
-                break;
-            case 3:
-                normalMin = 180;
-                legendaryMin = 75;
-                break;
-            case 4:
-                normalMin = legendaryMin = 255;
-                break;
-        }
-        minimumCatchRate(normalMin, legendaryMin);
-    }
-
     private static class OffsetWithinEntry {
         private int entry;
         private int offset;
@@ -2426,7 +2400,6 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         if (romEntry.romType == Gen5Constants.Type_BW2) {
             available |= MiscTweak.FORCE_CHALLENGE_MODE.getValue();
         }
-        available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
         return available;
     }
 
@@ -2462,8 +2435,6 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             updateTypeEffectiveness();
         } else if (tweak == MiscTweak.FORCE_CHALLENGE_MODE) {
             forceChallengeMode();
-        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
-            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -2642,7 +2613,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         }
     }
 
-    private void enableGuaranteedPokemonCatching() {
+    @Override
+    public void enableGuaranteedPokemonCatching() {
         try {
             byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
             int offset = find(battleOverlay, Gen5Constants.perfectOddsBranchLocator);

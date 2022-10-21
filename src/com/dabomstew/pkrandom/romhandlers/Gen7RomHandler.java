@@ -2397,7 +2397,6 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         available |= MiscTweak.BAN_LUCKY_EGG.getValue();
         available |= MiscTweak.SOS_BATTLES_FOR_ALL.getValue();
         available |= MiscTweak.RETAIN_ALT_FORMES.getValue();
-        available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
         return available;
     }
 
@@ -2416,8 +2415,6 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
-            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -2454,7 +2451,7 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         }
     }
 
-    private void enableGuaranteedPokemonCatching() {
+    public void enableGuaranteedPokemonCatching() {
         try {
             byte[] battleCRO = readFile(romEntry.getFile("Battle"));
             int offset = find(battleCRO, Gen7Constants.perfectOddsBranchLocator);

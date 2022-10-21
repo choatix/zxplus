@@ -61,7 +61,6 @@ public class MiscTweak implements Comparable<MiscTweak> {
     public static final MiscTweak FASTER_HP_AND_EXP_BARS = new MiscTweak(1 << 19, "fasterHpAndExpBars", 0);
     public static final MiscTweak FAST_DISTORTION_WORLD = new MiscTweak(1 << 20, "fastDistortionWorld", 0);
     public static final MiscTweak UPDATE_ROTOM_FORME_TYPING = new MiscTweak(1 << 21, "updateRotomFormeTyping", 0);
-    public static final MiscTweak GUARANTEED_POKEMON_CATCHING = new MiscTweak(1 << 22, "guaranteedPokemonCatching", 0);
     /* @formatter:on */
 
     private final int value;

@@ -5795,26 +5795,30 @@ public abstract class AbstractRomHandler implements RomHandler {
     public void changeCatchRates(Settings settings) {
         int minimumCatchRateLevel = settings.getMinimumCatchRateLevel();
 
-        int normalMin, legendaryMin;
-        switch (minimumCatchRateLevel) {
-            case 1:
-            default:
-                normalMin = 75;
-                legendaryMin = 37;
-                break;
-            case 2:
-                normalMin = 128;
-                legendaryMin = 64;
-                break;
-            case 3:
-                normalMin = 200;
-                legendaryMin = 100;
-                break;
-            case 4:
-                normalMin = legendaryMin = 255;
-                break;
+        if (minimumCatchRateLevel == 5) {
+            enableGuaranteedPokemonCatching();
+        } else {
+            int normalMin, legendaryMin;
+            switch (minimumCatchRateLevel) {
+                case 1:
+                default:
+                    normalMin = 75;
+                    legendaryMin = 37;
+                    break;
+                case 2:
+                    normalMin = 128;
+                    legendaryMin = 64;
+                    break;
+                case 3:
+                    normalMin = 200;
+                    legendaryMin = 100;
+                    break;
+                case 4:
+                    normalMin = legendaryMin = 255;
+                    break;
+            }
+            minimumCatchRate(normalMin, legendaryMin);
         }
-        minimumCatchRate(normalMin, legendaryMin);
     }
 
     @Override

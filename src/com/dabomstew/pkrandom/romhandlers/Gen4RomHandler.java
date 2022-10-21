@@ -5265,7 +5265,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         if (romEntry.romType == Gen4Constants.Type_Plat || romEntry.romType == Gen4Constants.Type_HGSS) {
             available |= MiscTweak.UPDATE_ROTOM_FORME_TYPING.getValue();
         }
-        available |= MiscTweak.GUARANTEED_POKEMON_CATCHING.getValue();
         return available;
     }
 
@@ -5292,8 +5291,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             applyFastDistortionWorld();
         } else if (tweak == MiscTweak.UPDATE_ROTOM_FORME_TYPING) {
             updateRotomFormeTyping();
-        } else if (tweak == MiscTweak.GUARANTEED_POKEMON_CATCHING) {
-            enableGuaranteedPokemonCatching();
         }
     }
 
@@ -5533,7 +5530,8 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         pokes[Species.Gen4Formes.rotomM].secondaryType = Type.GRASS;
     }
 
-    private void enableGuaranteedPokemonCatching() {
+    @Override
+    public void enableGuaranteedPokemonCatching() {
         try {
             byte[] battleOverlay = readOverlay(romEntry.getInt("BattleOvlNumber"));
             int offset = find(battleOverlay, Gen4Constants.perfectOddsBranchLocator);
