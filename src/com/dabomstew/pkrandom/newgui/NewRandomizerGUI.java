@@ -299,6 +299,7 @@ public class NewRandomizerGUI {
     private JCheckBox tpBetterMovesetsCheckBox;
     private JCheckBox paEnsureTwoAbilitiesCheckbox;
     private JCheckBox miscUpdateRotomFormeTypingCheckBox;
+    private JCheckBox miscDisableLowHPMusicCheckBox;
 
     private static JFrame frame;
 

@@ -2400,6 +2400,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         if (romEntry.romType == Gen5Constants.Type_BW2) {
             available |= MiscTweak.FORCE_CHALLENGE_MODE.getValue();
         }
+        available |= MiscTweak.DISABLE_LOW_HP_MUSIC.getValue();
         return available;
     }
 
@@ -2435,6 +2436,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             updateTypeEffectiveness();
         } else if (tweak == MiscTweak.FORCE_CHALLENGE_MODE) {
             forceChallengeMode();
+        } else if (tweak == MiscTweak.DISABLE_LOW_HP_MUSIC) {
+            disableLowHpMusic();
         }
     }
 
@@ -2610,6 +2613,26 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
             arm9[offset + 1] = 0x20;
             arm9[offset + 2] = 0x70;
             arm9[offset + 3] = 0x47;
+        }
+    }
+
+    private void disableLowHpMusic() {
+        try {
+            byte[] lowHealthMusicOverlay = readOverlay(romEntry.getInt("LowHealthMusicOvlNumber"));
+            int offset = find(lowHealthMusicOverlay, Gen5Constants.lowHealthMusicLocator);
+            if (offset > 0) {
+                // The game calls a function that returns 2 if the Pokemon has low HP. The ASM looks like this:
+                // bl funcThatReturns2IfThePokemonHasLowHp
+                // cmp r0, #0x2
+                // bne pokemonDoesNotHaveLowHp
+                // mov r7, #0x1
+                // The offset variable is currently pointing at the bne instruction. If we change that bne to an unconditional
+                // branch, the game will never think the player's Pokemon has low HP (for the purposes of changing the music).
+                lowHealthMusicOverlay[offset + 1] = (byte)0xE0;
+                writeOverlay(romEntry.getInt("LowHealthMusicOvlNumber"), lowHealthMusicOverlay);
+            }
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
         }
     }
 
