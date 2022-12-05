@@ -3320,6 +3320,45 @@ public abstract class AbstractRomHandler implements RomHandler {
                 updateMovePower(moves, Moves.multiAttack, 120);
             }
         }
+
+        if (generation >= 9 && generationOfPokemon() < 9) {
+            // Gen 1
+            // Recover 5 PP
+            updateMovePP(moves, Moves.recover, 5);
+            // Soft-Boiled 5 PP
+            updateMovePP(moves, Moves.softBoiled, 5);
+            // Rest 5 PP
+            updateMovePP(moves, Moves.rest, 5);
+
+            if (generationOfPokemon() >= 2) {
+                // Milk Drink 5 PP
+                updateMovePP(moves, Moves.milkDrink, 5);
+            }
+
+            if (generationOfPokemon() >= 3) {
+                // Slack Off 5 PP
+                updateMovePP(moves, Moves.slackOff, 5);
+            }
+
+            if (generationOfPokemon() >= 4) {
+                // Roost 5 PP
+                updateMovePP(moves, Moves.roost, 5);
+            }
+            
+            if (generationOfPokemon() >= 7) {
+                // Shore Up 5 PP
+                updateMovePP(moves, Moves.shoreUp, 5);
+            }
+
+            if (generationOfPokemon() >= 8) {
+                // Grassy Glide 60 Power
+                updateMovePower(moves, Moves.grassyGlide, 60);
+                // Wicked Blow 75 Power
+                updateMovePower(moves, Moves.wickedBlow, 75);
+                // Glacial Lance 120 Power
+                updateMovePower(moves, Moves.glacialLance, 120);
+            }
+        }
     }
 
     private Map<Integer, boolean[]> moveUpdates;
