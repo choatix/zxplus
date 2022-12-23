@@ -539,6 +539,12 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
                 (romEntry.romType == Gen4Constants.Type_Plat && romEntry.tweakFiles.containsKey("NewRoamerSubroutineTweak")) ||
                 (romEntry.romType == Gen4Constants.Type_HGSS && romEntry.tweakFiles.containsKey("NewRoamerSubroutineTweak"));
 
+        try {
+            computeCRC32sForRom();
+        } catch (IOException e) {
+            throw new RandomizerIOException(e);
+        }
+
         // We want to guarantee that the catching tutorial in HGSS has Ethan/Lyra's new Pokemon. We also
         // want to allow the option of randomizing the enemy Pokemon too. Unfortunately, the latter can
         // occur *before* the former, but there's no guarantee that it will even happen. Since we *know*
@@ -547,12 +553,6 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
             int extendBy = romEntry.getInt("Arm9ExtensionSize");
             arm9 = extendARM9(arm9, extendBy, romEntry.getString("TCMCopyingPrefix"), Gen4Constants.arm9Offset);
             genericIPSPatch(arm9, "NewCatchingTutorialSubroutineTweak");
-        }
-
-        try {
-            computeCRC32sForRom();
-        } catch (IOException e) {
-            throw new RandomizerIOException(e);
         }
     }
 
@@ -5660,6 +5660,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     @Override
     public boolean isRomValid() {
         if (romEntry.arm9ExpectedCRC32 != actualArm9CRC32) {
+            System.out.println(actualArm9CRC32);
             return false;
         }
 
