@@ -332,7 +332,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         // VietCrystal: exclude Burn Heal, Calcium, TwistedSpoon, and Elixir
         // crashes your game if used, glitches out your inventory if carried
         if (isVietCrystal) {
-            allowedItems.banSingles(Gen2Items.burnHeal, Gen2Items.calcium, Gen2Items.elixer, Gen2Items.TwistedSpoon);
+            allowedItems.banSingles(Gen2Items.burnHeal, Gen2Items.calcium, Gen2Items.elixer, Gen2Items.twistedSpoon);
         }
     }
 
