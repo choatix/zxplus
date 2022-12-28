@@ -1791,7 +1791,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         if (romEntry.romType == Gen3Constants.RomType_FRLG) {
             // Ban Unown in FRLG because the game crashes if it is encountered outside of Tanoby Ruins.
             // See GenerateWildMon in wild_encounter.c in pokefirered
-            return Collections.singletonList(pokes[Species.unown]);
+            return new ArrayList<>(Collections.singletonList(pokes[Species.unown]));
         }
         return new ArrayList<>();
     }

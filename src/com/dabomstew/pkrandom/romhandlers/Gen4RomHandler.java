@@ -3105,7 +3105,7 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     public List<Pokemon> bannedForWildEncounters() {
         if (romEntry.romType == Gen4Constants.Type_HGSS) {
             // Ban Unown in HGSS because they don't show up unless you complete a puzzle in the Ruins of Alph.
-            return Collections.singletonList(pokes[Species.unown]);
+            return new ArrayList<>(Collections.singletonList(pokes[Species.unown]));
         }
         return new ArrayList<>();
     }
