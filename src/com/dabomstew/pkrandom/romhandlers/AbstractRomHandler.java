@@ -716,7 +716,6 @@ public abstract class AbstractRomHandler implements RomHandler {
         }
         // Assume EITHER catch em all OR type themed OR match strength for now
         if (catchEmAll) {
-
             List<Pokemon> allPokes;
             if (allowAltFormes) {
                 allPokes = noLegendaries ? new ArrayList<>(noLegendaryListInclFormes) : new ArrayList<>(
@@ -735,6 +734,13 @@ public abstract class AbstractRomHandler implements RomHandler {
                     pickablePokemon.removeAll(area.bannedPokemon);
                 }
                 for (Encounter enc : area.encounters) {
+                    // In Catch 'Em All mode, don't randomize encounters for Pokemon that are banned for
+                    // wild encounters. Otherwise, it may be impossible to obtain this Pokemon unless it
+                    // randomly appears as a static or unless it becomes a random evolution.
+                    if (banned.contains(enc.pokemon)) {
+                        continue;
+                    }
+
                     // Pick a random pokemon
                     if (pickablePokemon.size() == 0) {
                         // Only banned pokes are left, ignore them and pick
@@ -935,7 +941,6 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
             allPokes.removeAll(banned);
             for (EncounterSet area : scrambledEncounters) {
-                // Poke-set
                 Set<Pokemon> inArea = pokemonInArea(area);
                 // Build area map using catch em all
                 Map<Pokemon, Pokemon> areaMap = new TreeMap<>();
@@ -989,6 +994,12 @@ public abstract class AbstractRomHandler implements RomHandler {
                     }
                 }
                 for (Encounter enc : area.encounters) {
+                    // In Catch 'Em All mode, don't randomize encounters for Pokemon that are banned for
+                    // wild encounters. Otherwise, it may be impossible to obtain this Pokemon unless it
+                    // randomly appears as a static or unless it becomes a random evolution.
+                    if (banned.contains(enc.pokemon)) {
+                        continue;
+                    }
                     // Apply the map
                     enc.pokemon = areaMap.get(enc.pokemon);
                     setFormeForEncounter(enc, enc.pokemon);
