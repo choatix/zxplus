@@ -2698,7 +2698,7 @@ public class NewRandomizerGUI {
 
             pbsStandardizeEXPCurvesCheckBox.setEnabled(true);
             pbsLegendariesSlowRadioButton.setSelected(true);
-            pbsUpdateBaseStatsCheckBox.setEnabled(pokemonGeneration < 8);
+            pbsUpdateBaseStatsCheckBox.setEnabled(pokemonGeneration < GlobalConstants.HIGHEST_POKEMON_GEN);
             pbsFollowMegaEvosCheckBox.setVisible(romHandler.hasMegaEvolutions());
             pbsUpdateComboBox.setVisible(pokemonGeneration < 8);
             ExpCurve[] expCurves = getEXPCurvesForGeneration(pokemonGeneration);
@@ -3756,8 +3756,8 @@ public class NewRandomizerGUI {
             spComboBox3.setSelectedIndex(allPokes.indexOf(currentStarters.get(2)));
         }
 
-        String[] baseStatGenerationNumbers = new String[Math.min(3, GlobalConstants.HIGHEST_POKEMON_GEN - romHandler.generationOfPokemon())];
-        int j = Math.max(6,romHandler.generationOfPokemon() + 1);
+        String[] baseStatGenerationNumbers = new String[Math.min(4, GlobalConstants.HIGHEST_POKEMON_GEN - romHandler.generationOfPokemon())];
+        int j = Math.max(6, romHandler.generationOfPokemon() + 1);
         for (int i = 0; i < baseStatGenerationNumbers.length; i++) {
             baseStatGenerationNumbers[i] = String.valueOf(j);
             j++;
