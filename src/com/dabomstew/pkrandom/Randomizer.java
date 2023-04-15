@@ -298,7 +298,7 @@ public class Randomizer {
         if (settings.getMovesetsMod() != Settings.MovesetsMod.UNCHANGED &&
                 settings.getMovesetsMod() != Settings.MovesetsMod.METRONOME_ONLY) {
             romHandler.randomizeMovesLearnt(settings);
-            romHandler.randomizeEggMoves(settings);
+            //romHandler.randomizeEggMoves(settings);
             movesetsChanged = true;
         }
 
@@ -756,9 +756,13 @@ public class Randomizer {
                 continue;
             }
             StringBuilder evoStr = new StringBuilder();
-            try {
+            var hasEvolution = !pkmn.evolutionsFrom.isEmpty();
+            if(hasEvolution)
+            {
                 evoStr.append(" -> ").append(pkmn.evolutionsFrom.get(0).to.fullName());
-            } catch (Exception e) {
+            }
+            else
+            {
                 evoStr.append(" (no evolution)");
             }
 
@@ -802,10 +806,18 @@ public class Randomizer {
                 }
             }
             List<Integer> eggMove = eggMoves.get(pkmn.number);
+            eggMove = null; // If not shuffled (disabled atm) this doesn't work!
             if (eggMove != null && eggMove.size() != 0) {
                 sb.append("Egg Moves:").append(System.getProperty("line.separator"));
                 for (Integer move : eggMove) {
-                    sb.append(" - ").append(moves.get(move).name).append(System.getProperty("line.separator"));
+                    //sb.append(" - ").append(moves.get(move).name).append(System.getProperty("line.separator"));
+
+                    var check_egg_move = moves.get(move);
+                    if(check_egg_move!=null)
+                    {
+                        sb.append(" - ").append(check_egg_move.name).append(System.getProperty("line.separator"));
+                    }
+
                 }
             }
 
