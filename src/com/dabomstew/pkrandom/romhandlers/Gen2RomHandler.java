@@ -83,6 +83,8 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         private Map<String, String> strings = new HashMap<>();
         private List<StaticPokemon> staticPokemon = new ArrayList<>();
 
+        private boolean allowUnown = false;
+
         private int getValue(String key) {
             if (!entries.containsKey(key)) {
                 entries.put(key, 0);
@@ -191,7 +193,11 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                             }
                         } else if (r[0].endsWith("Locator") || r[0].endsWith("Prefix")) {
                             current.strings.put(r[0], r[1]);
-                        } else {
+                        } else if (r[0].equals("AllowUnown"))
+                        {
+                            current.allowUnown = parseRIInt(r[1]) == 1;
+                        }
+                        else {
                             if (r[1].startsWith("[") && r[1].endsWith("]")) {
                                 String[] offsets = r[1].substring(1, r[1].length() - 1).split(",");
                                 if (offsets.length == 1 && offsets[0].trim().isEmpty()) {
@@ -1562,8 +1568,15 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
 
     @Override
     public List<Pokemon> bannedForWildEncounters() {
-        // Ban Unown because they don't show up unless you complete a puzzle in the Ruins of Alph.
-        return new ArrayList<>(Collections.singletonList(pokes[Species.unown]));
+
+        var returnList = new ArrayList<Pokemon>();
+        if(!romEntry.allowUnown)
+        {
+            // Ban Unown because they don't show up unless you complete a puzzle in the Ruins of Alph.
+            returnList.add(pokes[Species.unown]);
+        }
+
+        return returnList;
     }
 
     @Override
@@ -1727,6 +1740,13 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             rom[offset] = mvList.next().byteValue();
         }
 
+        mvList = moves.iterator();
+        int offset = romEntry.getValue("TMMovesOffset");
+        offset += Gen2Constants.tmCount + Gen2Constants.hmCount;
+        for (int i = 1; i <= 3; i++) {
+            rom[offset + (i - 1)] = mvList.next().byteValue();
+        }
+
         // Construct a new menu
         if (romEntry.getValue("MoveTutorMenuOffset") > 0 && romEntry.getValue("MoveTutorMenuNewSpace") > 0) {
             String[] moveNames = readMoveNames();
@@ -1773,13 +1793,14 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         for (Map.Entry<Pokemon, boolean[]> compatEntry : compatData.entrySet()) {
             Pokemon pkmn = compatEntry.getKey();
             boolean[] flags = compatEntry.getValue();
-            int baseStatsOffset = romEntry.getValue("PokemonStatsOffset") + (pkmn.number - 1)
-                    * Gen2Constants.baseStatsEntrySize;
+            int baseStatsOffset = romEntry.getValue("PokemonStatsOffset") +
+                    ((pkmn.number - 1) * Gen2Constants.baseStatsEntrySize);
             int origMtByte = rom[baseStatsOffset + Gen2Constants.bsMTCompatOffset] & 0xFF;
             int mtByte = origMtByte & 0x01;
             for (int j = 1; j <= 3; j++) {
                 mtByte |= flags[j] ? (1 << j) : 0;
             }
+
             rom[baseStatsOffset + Gen2Constants.bsMTCompatOffset] = (byte) mtByte;
         }
     }

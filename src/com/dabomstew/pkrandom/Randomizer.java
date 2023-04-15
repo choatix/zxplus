@@ -298,7 +298,8 @@ public class Randomizer {
         if (settings.getMovesetsMod() != Settings.MovesetsMod.UNCHANGED &&
                 settings.getMovesetsMod() != Settings.MovesetsMod.METRONOME_ONLY) {
             romHandler.randomizeMovesLearnt(settings);
-            //romHandler.randomizeEggMoves(settings);
+            //TODO: Check egg moves handling
+            romHandler.randomizeEggMoves(settings);
             movesetsChanged = true;
         }
 
@@ -806,7 +807,8 @@ public class Randomizer {
                 }
             }
             List<Integer> eggMove = eggMoves.get(pkmn.number);
-            eggMove = null; // If not shuffled (disabled atm) this doesn't work!
+            //TODO: Re-enable egg move shuffling
+            //eggMove = null; // If not shuffled (disabled atm) this doesn't work!
             if (eggMove != null && eggMove.size() != 0) {
                 sb.append("Egg Moves:").append(System.getProperty("line.separator"));
                 for (Integer move : eggMove) {

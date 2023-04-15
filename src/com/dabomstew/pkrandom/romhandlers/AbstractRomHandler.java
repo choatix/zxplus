@@ -737,6 +737,9 @@ public abstract class AbstractRomHandler implements RomHandler {
                     // In Catch 'Em All mode, don't randomize encounters for Pokemon that are banned for
                     // wild encounters. Otherwise, it may be impossible to obtain this Pokemon unless it
                     // randomly appears as a static or unless it becomes a random evolution.
+
+                    // TODO: This code prevents Unown wild mons from being present
+                    // Add as a configuration
                     if (banned.contains(enc.pokemon)) {
                         continue;
                     }
@@ -997,6 +1000,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     // In Catch 'Em All mode, don't randomize encounters for Pokemon that are banned for
                     // wild encounters. Otherwise, it may be impossible to obtain this Pokemon unless it
                     // randomly appears as a static or unless it becomes a random evolution.
+                    // TODO: This code prevents Unown wild mons from being present
                     if (banned.contains(enc.pokemon)) {
                         continue;
                     }
@@ -4860,6 +4864,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     public void copyMoveTutorCompatibilityToCosmeticFormes() {
         Map<Pokemon, boolean[]> compat = this.getMoveTutorCompatibility();
 
+        // TODO: These functions should limit to cosmetic formes, rather than writing everything
         for (Map.Entry<Pokemon, boolean[]> compatEntry : compat.entrySet()) {
             Pokemon pkmn = compatEntry.getKey();
             boolean[] flags = compatEntry.getValue();
