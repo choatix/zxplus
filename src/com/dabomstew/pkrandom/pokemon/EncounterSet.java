@@ -36,6 +36,7 @@ public class EncounterSet {
     public Set<Pokemon> bannedPokemon = new HashSet<>();
     public String displayName;
     public int offset;
+    public boolean reasonable = true;
 
     public String toString() {
         return "Encounter [Rate = " + rate + ", Encounters = " + encounters + "]";

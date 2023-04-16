@@ -126,7 +126,7 @@ public class Gen1Pokemon extends Pokemon {
     }
 
     @Override
-    protected int bst() {
+    public int bst() {
         return hp + attack + defense + special + speed;
     }
 

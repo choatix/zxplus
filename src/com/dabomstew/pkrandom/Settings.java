@@ -68,7 +68,7 @@ public class Settings {
     private boolean dualTypeOnly;
 
     public enum BaseStatisticsMod {
-        UNCHANGED, SHUFFLE, RANDOM,
+        UNCHANGED, SHUFFLE, RANDOM, RANDOMBST, RANDOMBSTPERC, EQUALIZE,
     }
 
     public enum ExpCurveMod {
@@ -84,6 +84,9 @@ public class Settings {
     private boolean standardizeEXPCurves;
     private ExpCurve selectedEXPCurve;
     private ExpCurveMod expCurveMod = ExpCurveMod.LEGENDARIES;
+    private int baseStatRange = 0;
+    private boolean dontRandomizeRatio;
+    private boolean evosBuffStats;
 
     public enum AbilitiesMod {
         UNCHANGED, RANDOMIZE
@@ -100,7 +103,7 @@ public class Settings {
     private boolean ensureTwoAbilities;
 
     public enum StartersMod {
-        UNCHANGED, CUSTOM, COMPLETELY_RANDOM, RANDOM_WITH_TWO_EVOLUTIONS
+        UNCHANGED, CUSTOM, COMPLETELY_RANDOM, RANDOM_WITH_TWO_EVOLUTIONS, RANDOM_WITH_ONE_EVOLUTION, RANDOM_WITH_NO_EVOLUTIONS
     }
 
     private StartersMod startersMod = StartersMod.UNCHANGED;
@@ -113,6 +116,8 @@ public class Settings {
     private boolean limitMainGameLegendaries;
     private boolean limit600;
     private boolean banBadRandomStarterHeldItems;
+    private boolean banLegendaryStarters;
+    private boolean onlyLegendaryStarters;
 
     public enum TypesMod {
         UNCHANGED, RANDOM_FOLLOW_EVOLUTIONS, COMPLETELY_RANDOM
@@ -211,6 +216,8 @@ public class Settings {
     private boolean wildLevelsModified;
     private int wildLevelModifier = 0;
     private boolean allowWildAltFormes;
+    private boolean condenseEncounterSlots;
+    private boolean catchEmAllReasonableSlotsOnly;
 
     public enum StaticPokemonMod {
         UNCHANGED, RANDOM_MATCHING, COMPLETELY_RANDOM, SIMILAR_STRENGTH
@@ -409,7 +416,7 @@ public class Settings {
                 trainersMod == TrainersMod.MAINPLAYTHROUGH,
                 trainersMod == TrainersMod.TYPE_THEMED,
                 trainersMod == TrainersMod.TYPE_THEMED_ELITE4_GYMS));
-        
+
         // 14 trainer pokemon force evolutions
         out.write((trainersForceFullyEvolved ? 0x80 : 0) | trainersForceFullyEvolvedLevel);
 
@@ -476,9 +483,9 @@ public class Settings {
         out.write(makeByteSelected(evolutionsMod == EvolutionsMod.UNCHANGED, evolutionsMod == EvolutionsMod.RANDOM,
                 evosSimilarStrength, evosSameTyping, evosMaxThreeStages, evosForceChange, evosAllowAltFormes,
                 evolutionsMod == EvolutionsMod.RANDOM_EVERY_LEVEL));
-        
+
         // 27 pokemon trainer misc
-        out.write(makeByteSelected(trainersUsePokemonOfSimilarStrength, 
+        out.write(makeByteSelected(trainersUsePokemonOfSimilarStrength,
                 rivalCarriesStarterThroughout,
                 trainersMatchTypingDistribution,
                 trainersBlockLegendaries,
@@ -507,6 +514,13 @@ public class Settings {
 
         // 36 trainer pokemon level modifier
         out.write((trainersLevelModified ? 0x80 : 0) | (trainersLevelModifier+50));
+
+        // @ 36 base stats range slider value
+        out.write(baseStatRange);
+
+        // @ 37 wild pokemon 3
+        // new in 174
+        out.write(makeByteSelected(condenseEncounterSlots, catchEmAllReasonableSlotsOnly));
 
         // 37 shop items
         out.write(makeByteSelected(shopItemsMod == ShopItemsMod.RANDOM, shopItemsMod == ShopItemsMod.SHUFFLE,
@@ -619,13 +633,12 @@ public class Settings {
         settings.setMakeEvolutionsEasier(restoreState(data[0], 5));
         settings.setRemoveTimeBasedEvolutions(restoreState(data[0], 6));
 
-        settings.setBaseStatisticsMod(restoreEnum(BaseStatisticsMod.class, data[1], 3, // UNCHANGED
-                2, // SHUFFLE
-                1 // RANDOM
-        ));
+        settings.setBaseStatisticsMod(restoreEnumByOrdinal(BaseStatisticsMod.class, data[1], 1, 3));
         settings.setStandardizeEXPCurves(restoreState(data[1], 4));
         settings.setBaseStatsFollowEvolutions(restoreState(data[1], 0));
         settings.setUpdateBaseStats(restoreState(data[1], 5));
+        settings.setDontRandomizeRatio(restoreState(data[1], 6));
+        settings.setEvosBuffStats(restoreState(data[1], 7));
         settings.setBaseStatsFollowMegaEvolutions(restoreState(data[1],6));
         settings.setAssignEvoStatsRandomly(restoreState(data[1],7));
 
@@ -656,6 +669,8 @@ public class Settings {
         settings.setRandomizeStartersHeldItems(restoreState(data[4], 4));
         settings.setBanBadRandomStarterHeldItems(restoreState(data[4], 5));
         settings.setAllowStarterAltFormes(restoreState(data[4],6));
+        settings.setBanLegendaryStarters(restoreState(data[4], 5));
+        settings.setOnlyLegendaryStarters(restoreState(data[4], 6));
 
         settings.setCustomStarters(new int[] { FileFunctions.read2ByteInt(data, 5) + 1,
                 FileFunctions.read2ByteInt(data, 7) + 1, FileFunctions.read2ByteInt(data, 9) + 1 });
@@ -676,7 +691,7 @@ public class Settings {
         settings.setTrainersMod(restoreEnum(TrainersMod.class, data[13], 0, // UNCHANGED
                 1, // RANDOM
                 2, // DISTRIBUTED
-                3, // MAINPLAYTHROUGH 
+                3, // MAINPLAYTHROUGH
                 4, // TYPE_THEMED
                 5 // TYPE_THEMED_ELITE4_GYMS
         ));
@@ -705,14 +720,14 @@ public class Settings {
         settings.setStaticPokemonMod(restoreEnum(StaticPokemonMod.class, data[17], 0, // UNCHANGED
                 1, // RANDOM_MATCHING
                 2, // COMPLETELY_RANDOM
-                3  // SIMILAR_STRENGTH 
+                3  // SIMILAR_STRENGTH
         ));
-        
+
         settings.setLimitMainGameLegendaries(restoreState(data[17], 4));
         settings.setLimit600(restoreState(data[17], 5));
         settings.setAllowStaticAltFormes(restoreState(data[17], 6));
         settings.setSwapStaticMegaEvos(restoreState(data[17], 7));
-        
+
         settings.setTmsMod(restoreEnum(TMsMod.class, data[18], 4, // UNCHANGED
                 3 // RANDOM
         ));
@@ -720,7 +735,7 @@ public class Settings {
                 1, // RANDOM_PREFER_TYPE
                 0, // COMPLETELY_RANDOM
                 7 // FULL
-        )); 
+        ));
         settings.setTmLevelUpMoveSanity(restoreState(data[18], 5));
         settings.setKeepFieldMoveTMs(restoreState(data[18], 6));
 
@@ -755,7 +770,7 @@ public class Settings {
         settings.setRandomizeInGameTradesNicknames(restoreState(data[23], 4));
         settings.setRandomizeInGameTradesOTs(restoreState(data[23], 5));
 
-        settings.setFieldItemsMod(restoreEnum(FieldItemsMod.class, data[24],  
+        settings.setFieldItemsMod(restoreEnum(FieldItemsMod.class, data[24],
                 2,  // UNCHANGED
                 1,  // SHUFFLE
                 0,  // RANDOM
@@ -803,6 +818,13 @@ public class Settings {
 
         settings.setCurrentMiscTweaks(codeTweaks);
 
+        settings.setTrainersLevelModified(restoreState(data[35], 7));
+        settings.setTrainersLevelModifier((data[35] & 0x7F) - 50);
+
+        settings.setBaseStatRange(data[36] & 0xFF);
+
+        settings.setCondenseEncounterSlots(restoreState(data[37], 0));
+        settings.setCatchEmAllReasonableSlotsOnly(restoreState(data[37], 1));
         settings.setTrainersLevelModified(restoreState(data[36], 7));
         settings.setTrainersLevelModifier((data[36] & 0x7F) - 50);
         //settings.setTrainersLevelModifier((data[36] & 0x7F));
@@ -1235,6 +1257,33 @@ public class Settings {
         this.updateBaseStatsToGeneration = generation;
     }
 
+    public int getBaseStatRange() {
+    	return baseStatRange;
+    }
+
+    public Settings setBaseStatRange(int baseStatRange) {
+    	this.baseStatRange = baseStatRange;
+    	return this;
+    }
+
+    public boolean isDontRandomizeRatio() {
+    	return dontRandomizeRatio;
+    }
+
+    public Settings setDontRandomizeRatio(boolean DontRandomizeRatio) {
+    	this.dontRandomizeRatio = DontRandomizeRatio;
+    	return this;
+    }
+
+    public boolean isEvosBuffStats() {
+    	return evosBuffStats;
+    }
+
+    public Settings setEvosBuffStats(boolean evosBuffStats) {
+    	this.evosBuffStats = evosBuffStats;
+    	return this;
+    }
+
     public AbilitiesMod getAbilitiesMod() {
         return abilitiesMod;
     }
@@ -1353,7 +1402,25 @@ public class Settings {
         this.allowStarterAltFormes = allowStarterAltFormes;
     }
 
-    
+
+    public boolean isBanLegendaryStarters() {
+    	return banLegendaryStarters;
+    }
+
+    public Settings setBanLegendaryStarters(boolean banLegendaryStarters) {
+    	this.banLegendaryStarters = banLegendaryStarters;
+    	return this;
+    }
+
+    public boolean isOnlyLegendaryStarters() {
+    	return onlyLegendaryStarters;
+    }
+
+    public Settings setOnlyLegendaryStarters(boolean onlyLegendaryStarters) {
+    	this.onlyLegendaryStarters = onlyLegendaryStarters;
+    	return this;
+    }
+
     public TypesMod getTypesMod() {
         return typesMod;
     }
@@ -1578,7 +1645,7 @@ public class Settings {
         this.trainersEnforceDistribution = trainersEnforceDistribution;
         return this;
     }
-    
+
     public boolean isTrainersEnforceMainPlaythrough() {
         return trainersEnforceMainPlaythrough;
     }
@@ -1588,7 +1655,7 @@ public class Settings {
         return this;
     }
 
-    
+
     public boolean isTrainersBlockEarlyWonderGuard() {
         return trainersBlockEarlyWonderGuard;
     }
@@ -2267,7 +2334,7 @@ public class Settings {
     public void setBalanceShopPrices(boolean balanceShopPrices) {
         this.balanceShopPrices = balanceShopPrices;
     }
-   
+
     public boolean isGuaranteeEvolutionItems() {
         return guaranteeEvolutionItems;
     }
@@ -2302,6 +2369,24 @@ public class Settings {
 
     public void setBanBadRandomPickupItems(boolean banBadRandomPickupItems) {
         this.banBadRandomPickupItems = banBadRandomPickupItems;
+    }
+
+    public boolean isCondenseEncounterSlots() {
+        return condenseEncounterSlots;
+    }
+
+    public Settings setCondenseEncounterSlots(boolean condenseEncounterSlots) {
+        this.condenseEncounterSlots = condenseEncounterSlots;
+        return this;
+    }
+
+    public boolean isCatchEmAllReasonableSlotsOnly() {
+        return catchEmAllReasonableSlotsOnly;
+    }
+
+    public Settings setCatchEmAllReasonableSlotsOnly(boolean catchEmAllReasonableSlotsOnly) {
+        this.catchEmAllReasonableSlotsOnly = catchEmAllReasonableSlotsOnly;
+        return this;
     }
 
     private static int makeByteSelected(boolean... bools) {
@@ -2345,6 +2430,17 @@ public class Settings {
             i++;
         }
         return getEnum(clazz, bools);
+    }
+
+    public static <E extends Enum<E>> E restoreEnumByOrdinal(Class<E> clazz, byte b, int offset, int bits) {
+        int mask = ((1 << bits) - 1) << offset;
+        int value = (b & mask) >>> offset;
+        try {
+            return ((E[]) clazz.getMethod("values").invoke(null))[value];
+        } catch (Exception e) {
+            throw new IllegalArgumentException(String.format("Unable to parse enum of type %s", clazz.getSimpleName()),
+                    e);
+        }
     }
 
     @SuppressWarnings("unchecked")

@@ -197,6 +197,20 @@ public class Randomizer {
                 romHandler.randomizePokemonStats(settings);
                 pokemonTraitsChanged = true;
                 break;
+            case RANDOMBST:
+                romHandler.randomizePokemonBaseStats(settings.isBaseStatsFollowEvolutions(),
+                        settings.isDontRandomizeRatio(), settings.isEvosBuffStats());
+                pokemonTraitsChanged = true;
+                break;
+            case RANDOMBSTPERC:
+                romHandler.randomizePokemonBaseStatsPerc(settings.isBaseStatsFollowEvolutions(),
+                        settings.getBaseStatRange(), settings.isDontRandomizeRatio());
+                pokemonTraitsChanged = true;
+                break;
+            case EQUALIZE:
+                romHandler.equalizePokemonStats(settings.isBaseStatsFollowEvolutions(), settings.isDontRandomizeRatio());
+                pokemonTraitsChanged = true;
+                break;
             default:
                 break;
         }
@@ -216,8 +230,8 @@ public class Randomizer {
 
         for (Pokemon pkmn : romHandler.getPokemon()) {
             if (pkmn != null) {
-                checkValue = addToCV(checkValue, pkmn.hp, pkmn.attack, pkmn.defense, pkmn.speed, pkmn.spatk,
-                        pkmn.spdef, pkmn.ability1, pkmn.ability2, pkmn.ability3);
+                checkValue = addToCV(checkValue, pkmn.hp, pkmn.attack, pkmn.defense, pkmn.speed, pkmn.spatk, pkmn.spdef,
+                        pkmn.ability1, pkmn.ability2, pkmn.ability3);
             }
         }
 
@@ -602,7 +616,8 @@ public class Randomizer {
 
         boolean useTimeBasedEncounters = settings.isUseTimeBasedEncounters() ||
                 (settings.getWildPokemonMod() == Settings.WildPokemonMod.UNCHANGED && settings.isWildLevelsModified());
-        List<EncounterSet> encounters = romHandler.getEncounters(useTimeBasedEncounters);
+        boolean condenseSlots = settings.isCondenseEncounterSlots();
+        List<EncounterSet> encounters = romHandler.getEncounters(useTimeBasedEncounters, condenseSlots);
         for (EncounterSet es : encounters) {
             for (Encounter e : es.encounters) {
                 checkValue = addToCV(checkValue, e.level, e.pokemon.number);
@@ -1100,7 +1115,8 @@ public class Randomizer {
         log.println("--Wild Pokemon--");
         boolean useTimeBasedEncounters = settings.isUseTimeBasedEncounters() ||
                 (settings.getWildPokemonMod() == Settings.WildPokemonMod.UNCHANGED && settings.isWildLevelsModified());
-        List<EncounterSet> encounters = romHandler.getEncounters(useTimeBasedEncounters);
+        boolean condenseSlots = settings.isCondenseEncounterSlots();
+        List<EncounterSet> encounters = romHandler.getEncounters(useTimeBasedEncounters, condenseSlots);
         int idx = 0;
         for (EncounterSet es : encounters) {
             idx++;
@@ -1291,7 +1307,7 @@ public class Randomizer {
                 log.printf("- %5s", itemNames[shopItemID]);
                 log.println();
             }
-            
+
             log.println();
         }
         log.println();
@@ -1345,7 +1361,7 @@ public class Randomizer {
         return trainerNames;
     }
 
-    
+
     private static int addToCV(int checkValue, int... values) {
         for (int value : values) {
             checkValue = Integer.rotateLeft(checkValue, 3);

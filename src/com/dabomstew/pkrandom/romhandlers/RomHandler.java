@@ -150,6 +150,21 @@ public interface RomHandler {
     // Update base stats to specified generation
     void updatePokemonStats(Settings settings);
 
+    //Randomizes pokemon base stats to be between existing observed base stat totals seen from other pokemon
+    //(see tooltips for details)
+    public void randomizePokemonBaseStats(boolean evolutionSanity, boolean randomizeRatio, boolean evosBuffStats);
+
+    //Randomizes pokemon base stats up to +or- the given percentage.
+    //(see tooltips for details)
+    public void randomizePokemonBaseStatsPerc(boolean evolutionSanity, int percent, boolean randomizeRatio);
+
+    //Equalizes Pokemon Stats so all pokemon will have the same base stat total
+    //(see tooltips for details)
+    public void equalizePokemonStats(boolean evolutionSanity, boolean randomizeRatio);
+
+    // Update base stats to gen6
+    public void updatePokemonStats();
+
     Map<Integer,StatChange> getUpdatedPokemonStats(int generation);
 
     void standardizeEXPCurves(Settings settings);
@@ -174,6 +189,13 @@ public interface RomHandler {
     // Give a random Pokemon who has 2 evolution stages
     // Should make a good starter Pokemon
     Pokemon random2EvosPokemon(boolean allowAltFormes);
+    public Pokemon random2EvosPokemon();
+
+    //Give a random Pokemon who has 1 evolution stage
+    public Pokemon random1EvosPokemon();
+
+    //Give a random Pokemon who has no evolution stages
+    public Pokemon random0EvosPokemon(boolean banLegend, boolean onlyLegend);
 
     // =============
     // Pokemon Types
@@ -213,9 +235,9 @@ public interface RomHandler {
     // Wild Pokemon
     // ============
 
-    List<EncounterSet> getEncounters(boolean useTimeOfDay);
+    List<EncounterSet> getEncounters(boolean useTimeOfDay, boolean condenseSlots);
 
-    void setEncounters(boolean useTimeOfDay, List<EncounterSet> encounters);
+    void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encounters);
 
     void randomEncounters(Settings settings);
 
@@ -234,6 +256,8 @@ public interface RomHandler {
     void randomizeWildHeldItems(Settings settings);
 
     void changeCatchRates(Settings settings);
+
+    public boolean canCondenseEncounterSlots();
 
     void minimumCatchRate(int rateNonLegendary, int rateLegendary);
 
@@ -449,7 +473,10 @@ public interface RomHandler {
         SAME_LENGTH, MAX_LENGTH, MAX_LENGTH_WITH_CLASS
     }
 
-    TrainerNameMode trainerNameMode();
+    public TrainerNameMode trainerNameMode();
+
+    // Banned characters in trainer names
+    public List<Character> getBannedTrainerNameCharacters();
 
     // Returns this with or without the class
     int maxTrainerNameLength();
@@ -507,13 +534,13 @@ public interface RomHandler {
 
     List<Integer> getRequiredFieldTMs();
 
-    List<Integer> getCurrentFieldTMs();
+    public List<FieldTM> getCurrentFieldTMs();
 
     void setFieldTMs(List<Integer> fieldTMs);
 
     // Everything else
 
-    List<Integer> getRegularFieldItems();
+    public List<ItemLocation> getRegularFieldItems();
 
     void setRegularFieldItems(List<Integer> items);
 

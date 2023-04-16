@@ -5,9 +5,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import com.dabomstew.pkrandom.SysConstants;
 import com.dabomstew.pkrandom.FileFunctions;
 import com.dabomstew.pkrandom.RomFunctions;
+import com.dabomstew.pkrandom.SysConstants;
 
 import com.dabomstew.pkrandom.exceptions.CannotWriteToLocationException;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
@@ -127,8 +127,8 @@ public class NDSRom {
         Map<Integer, String> directoryPaths = new HashMap<>();
         directoryPaths.put(0xF000, "");
         int dircount = readFromFile(baseRom, fntOffset + 0x6, 2);
-        files = new HashMap<>();
-        filesByID = new HashMap<>();
+        files = new TreeMap<String, NDSFile>();
+        filesByID = new HashMap<Integer, NDSFile>();
 
         // read fnt table
         baseRom.seek(fntOffset);
@@ -503,8 +503,8 @@ public class NDSRom {
             // Any extras?
             while ((readFromByteArr(arm9, arm9.length - 12, 4) == 0xDEC00621)
                     || ((readFromByteArr(arm9, arm9.length - 12, 4) == 0
-                            && readFromByteArr(arm9, arm9.length - 8, 4) == 0 && readFromByteArr(arm9, arm9.length - 4,
-                            4) == 0))) {
+                            && readFromByteArr(arm9, arm9.length - 8, 4) == 0
+                            && readFromByteArr(arm9, arm9.length - 4, 4) == 0))) {
                 if (!arm9_has_footer) {
                     arm9_has_footer = true;
                     arm9_footer = new byte[0];
@@ -708,6 +708,10 @@ public class NDSRom {
         if (offset >= 0)
             file.seek(offset);
         file.write(buf);
+    }
+
+    public Iterable<String> filenames() {
+        return this.files.keySet();
     }
 
 }

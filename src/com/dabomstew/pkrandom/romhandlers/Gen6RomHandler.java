@@ -1160,6 +1160,11 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public Pokemon random2EvosPokemon() {
+        return null;
+    }
+
+    @Override
     public boolean supportsStarterHeldItems() {
         return true;
     }
@@ -1223,11 +1228,16 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
+    public void updatePokemonStats() {
+
+    }
+
+    @Override
     public List<Move> getMoves() {
         return Arrays.asList(moves);
     }
 
-    @Override
+
     public List<EncounterSet> getEncounters(boolean useTimeOfDay) {
         if (!loadedWildMapNames) {
             loadWildMapNames();
@@ -1513,7 +1523,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         return es;
     }
 
-    @Override
     public void setEncounters(boolean useTimeOfDay, List<EncounterSet> encountersList) {
         try {
             if (romEntry.romType == Gen6Constants.Type_ORAS) {
@@ -3550,6 +3559,16 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         return true;
     }
 
+    @Override
+    public List<EncounterSet> getEncounters(boolean useTimeOfDay, boolean condenseSlots) {
+        return null;
+    }
+
+    @Override
+    public void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encounters) {
+
+    }
+
     private int tmFromIndex(int index) {
 
         if (index >= Gen6Constants.tmBlockOneOffset
@@ -3574,14 +3593,15 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
-    public List<Integer> getCurrentFieldTMs() {
+    public List<FieldTM> getCurrentFieldTMs() {
         List<Integer> fieldItems = this.getFieldItems();
-        List<Integer> fieldTMs = new ArrayList<>();
+        List<FieldTM> fieldTMs = new ArrayList<>();
+
 
         ItemList allowedItems = Gen6Constants.getAllowedItems(romEntry.romType);
         for (int item : fieldItems) {
-            if (allowedItems.isTM(item)) {
-                fieldTMs.add(tmFromIndex(item));
+            if (Gen4Constants.allowedItems.isTM(item)) {
+                fieldTMs.add(new FieldTM("Unknown", item - Gen4Constants.tmItemOffset + 1));
             }
         }
 
@@ -3607,14 +3627,14 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
     }
 
     @Override
-    public List<Integer> getRegularFieldItems() {
+    public List<ItemLocation> getRegularFieldItems() {
         List<Integer> fieldItems = this.getFieldItems();
-        List<Integer> fieldRegItems = new ArrayList<>();
+        List<ItemLocation> fieldRegItems = new ArrayList<>();
 
         ItemList allowedItems = Gen6Constants.getAllowedItems(romEntry.romType);
         for (int item : fieldItems) {
             if (allowedItems.isAllowed(item) && !(allowedItems.isTM(item))) {
-                fieldRegItems.add(item);
+                fieldRegItems.add(new ItemLocation("Unknown", item));
             }
         }
 

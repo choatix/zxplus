@@ -44,6 +44,7 @@ import pptxt.PPTxtHandler;
 import com.dabomstew.pkrandom.exceptions.RandomizerIOException;
 import com.dabomstew.pkrandom.newnds.NARCArchive;
 import compressors.DSDecmp;
+import pptxt.PPTxtHandler;
 
 public class Gen5RomHandler extends AbstractDSRomHandler {
 
@@ -96,7 +97,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         private List<StaticPokemon> staticPokemonFakeBall = new ArrayList<>();
         private List<RoamingPokemon> roamingPokemon = new ArrayList<>();
         private List<TradeScript> tradeScripts = new ArrayList<>();
-        
+
 
         private int getInt(String key) {
             if (!numbers.containsKey(key)) {
@@ -400,7 +401,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     private long actualArm9CRC32;
     private Map<Integer, Long> actualOverlayCRC32s;
     private Map<String, Long> actualFileCRC32s;
-    
+
     private NARCArchive pokeNarc, moveNarc, stringsNarc, storyTextNarc, scriptNarc, shopNarc;
 
     @Override
@@ -465,7 +466,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
         else if (romEntry.romType == Gen5Constants.Type_BW2) {
             shopNames = Gen5Constants.bw2ShopNames;
         }
-        
+
         loadedWildMapNames = false;
 
         allowedItems = Gen5Constants.allowedItems.copy();
@@ -987,6 +988,11 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
+    public Pokemon random2EvosPokemon() {
+        return null;
+    }
+
+    @Override
     public boolean supportsStarterHeldItems() {
         return false;
     }
@@ -1000,6 +1006,11 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     @Override
     public void setStarterHeldItems(List<Integer> items) {
         // do nothing
+    }
+
+    @Override
+    public void updatePokemonStats() {
+
     }
 
     private void replaceStarterFiles(NARCArchive starterNARC, NARCArchive pokespritesNARC, int starterIndex,
@@ -1018,7 +1029,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public List<EncounterSet> getEncounters(boolean useTimeOfDay) {
+    public List<EncounterSet> getEncounters(boolean useTimeOfDay, boolean condenseSlots) {
         if (!loadedWildMapNames) {
             loadWildMapNames();
         }
@@ -1094,7 +1105,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public void setEncounters(boolean useTimeOfDay, List<EncounterSet> encountersList) {
+    public void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encountersList) {
         try {
             NARCArchive encounterNARC = readNARC(romEntry.getFile("WildPokemon"));
             Iterator<EncounterSet> encounters = encountersList.iterator();
@@ -3538,7 +3549,7 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     public String[] getItemNames() {
         return itemNames.toArray(new String[0]);
     }
-    
+
     @Override
     public String abilityName(int number) {
         return abilityNames.get(number);
@@ -3732,13 +3743,13 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public List<Integer> getCurrentFieldTMs() {
+    public List<FieldTM> getCurrentFieldTMs() {
         List<Integer> fieldItems = this.getFieldItems();
-        List<Integer> fieldTMs = new ArrayList<>();
+        List<FieldTM> fieldTMs = new ArrayList<FieldTM>();
 
         for (int item : fieldItems) {
             if (Gen5Constants.allowedItems.isTM(item)) {
-                fieldTMs.add(tmFromIndex(item));
+                fieldTMs.add(new FieldTM("Unknown", tmFromIndex(item)));
             }
         }
 
@@ -3763,13 +3774,13 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public List<Integer> getRegularFieldItems() {
+    public List<ItemLocation> getRegularFieldItems() {
         List<Integer> fieldItems = this.getFieldItems();
-        List<Integer> fieldRegItems = new ArrayList<>();
+        List<ItemLocation> fieldRegItems = new ArrayList<ItemLocation>();
 
         for (int item : fieldItems) {
             if (Gen5Constants.allowedItems.isAllowed(item) && !(Gen5Constants.allowedItems.isTM(item))) {
-                fieldRegItems.add(item);
+                fieldRegItems.add(new ItemLocation("Unknown", item));
             }
         }
 

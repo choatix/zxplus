@@ -31,6 +31,9 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 import java.util.zip.CRC32;
 
+import com.dabomstew.pkrandom.Settings.BaseStatisticsMod;
+import com.dabomstew.pkrandom.Settings.StartersMod;
+
 public class SettingsUpdater {
 
     private byte[] dataBlock;
@@ -231,6 +234,44 @@ public class SettingsUpdater {
             
             // add space for the trainer level modifier
             insertExtraByte(35, (byte) 50); // 50 in the settings file = +0% after adjustment
+        }
+
+        if(oldVersion < 173) {
+            // 172 to 173: rejig base stats/starter bytes to allow for more values in less space
+            // also add 1 more byte for base stat % slider
+
+            // base stat conversion
+            int baseStatValue = BaseStatisticsMod.UNCHANGED.ordinal();
+            if((dataBlock[1] & 0x02) != 0) {
+                baseStatValue = BaseStatisticsMod.RANDOM.ordinal();
+            }
+            if((dataBlock[1] & 0x04) != 0) {
+                baseStatValue = BaseStatisticsMod.SHUFFLE.ordinal();
+            }
+            // keep bits 0, 4, 5 and write in the new value for base stats
+            dataBlock[1] = (byte) ((dataBlock[1] & 0x31) | (baseStatValue << 1));
+
+            // starter conversion
+            int starterValue = StartersMod.UNCHANGED.ordinal();
+            if((dataBlock[4] & 0x01) != 0) {
+                starterValue = StartersMod.CUSTOM.ordinal();
+            }
+            if((dataBlock[4] & 0x02) != 0) {
+                starterValue = StartersMod.COMPLETELY_RANDOM.ordinal();
+            }
+            if((dataBlock[4] & 0x08) != 0) {
+                starterValue = StartersMod.RANDOM_WITH_TWO_EVOLUTIONS.ordinal();
+            }
+            // new starter byte: startervalue in bits 0-2, move 4-5 down to 3-4, zero the rest
+            dataBlock[4] = (byte) (starterValue | ((dataBlock[4] & 0x30) >>> 1));
+
+            // add the extra base stat slider byte
+            insertExtraByte(36, (byte) 0);
+        }
+
+        if(oldVersion < 174) {
+            // add the extra wild pokemon byte, turn cea reasonable slots only on if cea on
+            insertExtraByte(37, (byte) ((dataBlock[15] & 1) << 1));
         }
 
         if (oldVersion < 300) {

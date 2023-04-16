@@ -660,6 +660,8 @@ public class Gen4Constants {
     public static final String[] dpptWaterSlotSetNames = new String[] { "Surfing", "Filler", "Old Rod", "Good Rod",
             "Super Rod" };
 
+    public static final int hgssNationalParkDexIndex = 6;
+
     public static final String[] hgssTimeOfDayNames = new String[] { "Morning", "Day", "Night" };
 
     public static final String[] hgssNonGrassSetNames = new String[] { "", "Surfing", "Rock Smash", "Old Rod",

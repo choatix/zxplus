@@ -133,7 +133,6 @@ public class Gen5Constants {
 
     public static final List<Integer> uselessAbilities = Arrays.asList(Abilities.forecast, Abilities.multitype,
             Abilities.flowerGift, Abilities.zenMode);
-
     public static final int normalItemSetVarCommand = 0x28, hiddenItemSetVarCommand = 0x2A, normalItemVarSet = 0x800C,
             hiddenItemVarSet = 0x8000;
 
