@@ -513,14 +513,14 @@ public class Settings {
         }
 
         // 36 trainer pokemon level modifier
-        out.write((trainersLevelModified ? 0x80 : 0) | (trainersLevelModifier+50));
+        //out.write((trainersLevelModified ? 0x80 : 0) | (trainersLevelModifier+50));
 
         // @ 36 base stats range slider value
         out.write(baseStatRange);
 
         // @ 37 wild pokemon 3
         // new in 174
-        out.write(makeByteSelected(condenseEncounterSlots, catchEmAllReasonableSlotsOnly));
+        //out.write(makeByteSelected(condenseEncounterSlots, catchEmAllReasonableSlotsOnly));
 
         // 37 shop items
         out.write(makeByteSelected(shopItemsMod == ShopItemsMod.RANDOM, shopItemsMod == ShopItemsMod.SHUFFLE,
@@ -596,6 +596,11 @@ public class Settings {
         // 50 elite four unique pokemon (3 bits) + catch rate level (3 bits)
         out.write(eliteFourUniquePokemonNumber | ((minimumCatchRateLevel - 1) << 3));
 
+        // 51 Settings added in speedchoice (missing in changed UI?
+        out.write(makeByteSelected(banLegendaryStarters, onlyLegendaryStarters, condenseEncounterSlots,
+                catchEmAllReasonableSlotsOnly, dontRandomizeRatio, evosBuffStats));
+
+
         try {
             byte[] romName = this.romName.getBytes("US-ASCII");
             out.write(romName.length);
@@ -637,11 +642,8 @@ public class Settings {
         settings.setStandardizeEXPCurves(restoreState(data[1], 4));
         settings.setBaseStatsFollowEvolutions(restoreState(data[1], 0));
         settings.setUpdateBaseStats(restoreState(data[1], 5));
-        settings.setDontRandomizeRatio(restoreState(data[1], 6));
-        settings.setEvosBuffStats(restoreState(data[1], 7));
         settings.setBaseStatsFollowMegaEvolutions(restoreState(data[1],6));
         settings.setAssignEvoStatsRandomly(restoreState(data[1],7));
-
         settings.setTypesMod(restoreEnum(TypesMod.class, data[2], 2, // UNCHANGED
                 0, // RANDOM_FOLLOW_EVOLUTIONS
                 1 // COMPLETELY_RANDOM
@@ -669,8 +671,6 @@ public class Settings {
         settings.setRandomizeStartersHeldItems(restoreState(data[4], 4));
         settings.setBanBadRandomStarterHeldItems(restoreState(data[4], 5));
         settings.setAllowStarterAltFormes(restoreState(data[4],6));
-        settings.setBanLegendaryStarters(restoreState(data[4], 5));
-        settings.setOnlyLegendaryStarters(restoreState(data[4], 6));
 
         settings.setCustomStarters(new int[] { FileFunctions.read2ByteInt(data, 5) + 1,
                 FileFunctions.read2ByteInt(data, 7) + 1, FileFunctions.read2ByteInt(data, 9) + 1 });
@@ -822,12 +822,11 @@ public class Settings {
         settings.setTrainersLevelModifier((data[35] & 0x7F) - 50);
 
         settings.setBaseStatRange(data[36] & 0xFF);
-
-        settings.setCondenseEncounterSlots(restoreState(data[37], 0));
-        settings.setCatchEmAllReasonableSlotsOnly(restoreState(data[37], 1));
+        settings.setBaseStatRange(data[36] & 0xFF);
         settings.setTrainersLevelModified(restoreState(data[36], 7));
         settings.setTrainersLevelModifier((data[36] & 0x7F) - 50);
-        //settings.setTrainersLevelModifier((data[36] & 0x7F));
+        settings.setTrainersLevelModifier((data[36] & 0x7F));
+
         settings.setShopItemsMod(restoreEnum(ShopItemsMod.class,data[37],
                 2,
                 1,
@@ -892,6 +891,14 @@ public class Settings {
 
         settings.setEliteFourUniquePokemonNumber(data[50] & 0x7);
         settings.setMinimumCatchRateLevel(((data[50] & 0x38) >> 3) + 1);
+
+        // Speedchoice options
+        settings.setBanLegendaryStarters(restoreState(data[51], 1));
+        settings.setOnlyLegendaryStarters(restoreState(data[51], 2));
+        settings.setCondenseEncounterSlots(restoreState(data[51], 3));
+        settings.setCatchEmAllReasonableSlotsOnly(restoreState(data[51], 4));
+        settings.setDontRandomizeRatio(restoreState(data[51], 5));
+        settings.setEvosBuffStats(restoreState(data[51], 6));
 
         int romNameLength = data[LENGTH_OF_SETTINGS_DATA] & 0xFF;
         String romName = new String(data, LENGTH_OF_SETTINGS_DATA + 1, romNameLength, "US-ASCII");
