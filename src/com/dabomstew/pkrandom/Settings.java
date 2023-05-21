@@ -379,8 +379,10 @@ public class Settings {
                 randomizeTrainerClassNames, makeEvolutionsEasier, removeTimeBasedEvolutions));
 
         // 1: pokemon base stats & abilities
-        out.write(makeByteSelected(baseStatsFollowEvolutions, baseStatisticsMod == BaseStatisticsMod.RANDOM,
-                baseStatisticsMod == BaseStatisticsMod.SHUFFLE, baseStatisticsMod == BaseStatisticsMod.UNCHANGED,
+        out.write(makeByteSelected(baseStatsFollowEvolutions,
+                // 3 bytes to represent enum,
+                (baseStatisticsMod.ordinal() & 1) != 0,
+                (baseStatisticsMod.ordinal() & 2) != 0, (baseStatisticsMod.ordinal() & 4) != 0,
                 standardizeEXPCurves, updateBaseStats, baseStatsFollowMegaEvolutions, assignEvoStatsRandomly));
 
         // 2: pokemon types & more general options
@@ -906,9 +908,9 @@ public class Settings {
         settings.setDontRandomizeRatio(restoreState(data[51], 5));
         settings.setEvosBuffStats(restoreState(data[51], 6));
 
-        settings.setUseMovesetTemplates(restoreState(data[52], 2));
-        settings.setTrainerLevelChangeForBossFights(restoreState(data[52], 3));
-        settings.setTrainerLevelChangeForImportantFights(restoreState(data[52], 4));
+        settings.setUseMovesetTemplates(restoreState(data[52], 0));
+        settings.setTrainerLevelChangeForBossFights(restoreState(data[52], 1));
+        settings.setTrainerLevelChangeForImportantFights(restoreState(data[52], 2));
 
         int romNameLength = data[LENGTH_OF_SETTINGS_DATA] & 0xFF;
         String romName = new String(data, LENGTH_OF_SETTINGS_DATA + 1, romNameLength, "US-ASCII");
@@ -956,7 +958,7 @@ public class Settings {
             return removedCodeTweaks;
         }
 
-        public TweakForROMFeedback setRemovedCodeTweaks(boolean removedCodeTweaks) {;
+        public TweakForROMFeedback setRemovedCodeTweaks(boolean removedCodeTweaks) {
             this.removedCodeTweaks = removedCodeTweaks;
             return this;
         }

@@ -311,7 +311,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
         try {
             return Integer.parseInt(off, radix);
         } catch (NumberFormatException ex) {
-            System.err.println("invalid base " + radix + "number " + off);
+            System.err.println("invalid base " + radix + " number " + off);
             return 0;
         }
     }

@@ -318,7 +318,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         try {
             return Integer.parseInt(off, radix);
         } catch (NumberFormatException ex) {
-            System.err.println("invalid base " + radix + "number " + off);
+            System.err.println("invalid base " + radix + " number " + off);
             return 0;
         }
     }
@@ -1396,7 +1396,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             pointer += offs - initial_offs;
         }
 
-        System.out.println(String.format("%x", pointer));
+        //System.out.println(String.format("%x", pointer));
 
         if(bankOf(offs) != bankOf(traineroffset)) {
             throw new IllegalStateException("Trainer data overflowed into next bank: " + String.format("%x", pointer));
