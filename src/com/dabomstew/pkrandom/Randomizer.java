@@ -497,6 +497,16 @@ public class Randomizer {
             trainersChanged = true;
             trainerMovesetsChanged = true;
         }
+        else
+        {
+            var trainers = romHandler.getTrainers();
+            for (Trainer t : trainers) {
+                for (TrainerPokemon tpk : t.pokemon) {
+                    tpk.resetMoves = true;
+                }
+            }
+            romHandler.setTrainers(trainers, settings.isDoubleBattleMode());
+        }
 
         if (settings.isRandomizeHeldItemsForBossTrainerPokemon()
                 || settings.isRandomizeHeldItemsForImportantTrainerPokemon()
