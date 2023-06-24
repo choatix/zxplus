@@ -822,7 +822,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             List<EncounterSet> collapsedEncounters = collapseAreasORAS(currentEncounters);
             area1to1EncountersImpl(collapsedEncounters, settings);
             enhanceRandomEncountersORAS(collapsedEncounters, settings);
-            setEncounters(useTimeOfDay, condenseSlots, currentEncounters);
+            setEncounters(settings, currentEncounters);
             return;
         }
 
@@ -1030,7 +1030,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
         }
 
-        setEncounters(useTimeOfDay, condenseSlots, currentEncounters);
+        setEncounters(settings, currentEncounters);
     }
 
     @Override
@@ -1042,11 +1042,11 @@ public abstract class AbstractRomHandler implements RomHandler {
         if (isORAS) {
             List<EncounterSet> collapsedEncounters = collapseAreasORAS(currentEncounters);
             area1to1EncountersImpl(collapsedEncounters, settings);
-            setEncounters(useTimeOfDay, condenseSlots, currentEncounters);
+            setEncounters(settings, currentEncounters);
             return;
         } else {
             area1to1EncountersImpl(currentEncounters, settings);
-            setEncounters(useTimeOfDay, condenseSlots, currentEncounters);
+            setEncounters(settings, currentEncounters);
         }
     }
 
@@ -1414,7 +1414,7 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
         }
 
-        setEncounters(useTimeOfDay, false, currentEncounters);
+        setEncounters(settings, currentEncounters);
 
     }
 
@@ -1431,7 +1431,7 @@ public abstract class AbstractRomHandler implements RomHandler {
                     enc.maxLevel = Math.min(100, (int) Math.round(enc.maxLevel * (1 + levelModifier / 100.0)));
                 }
             }
-            setEncounters(true, true, currentEncounters);
+            setEncounters(settings, currentEncounters);
         }
     }
 

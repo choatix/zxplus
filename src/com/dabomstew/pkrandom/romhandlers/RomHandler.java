@@ -237,7 +237,7 @@ public interface RomHandler {
 
     List<EncounterSet> getEncounters(boolean useTimeOfDay, boolean condenseSlots);
 
-    void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encounters);
+    void setEncounters(Settings settings, List<EncounterSet> encounters);
 
     void randomEncounters(Settings settings);
 

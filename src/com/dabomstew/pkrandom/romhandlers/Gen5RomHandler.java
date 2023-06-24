@@ -1105,7 +1105,8 @@ public class Gen5RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encountersList) {
+    public void setEncounters(Settings settings, List<EncounterSet> encountersList) {
+        boolean useTimeOfDay = settings.isUseTimeBasedEncounters();
         try {
             NARCArchive encounterNARC = readNARC(romEntry.getFile("WildPokemon"));
             Iterator<EncounterSet> encounters = encountersList.iterator();

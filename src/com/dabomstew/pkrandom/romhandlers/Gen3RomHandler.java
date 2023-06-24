@@ -1827,7 +1827,7 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
     }
 
     @Override
-    public void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encounters) {
+    public void setEncounters(Settings settings, List<EncounterSet> encounters) {
         // Support Deoxys/Mew catches in E/FR/LG
         attemptObedienceEvolutionPatches();
 

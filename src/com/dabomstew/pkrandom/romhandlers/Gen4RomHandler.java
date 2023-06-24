@@ -2142,7 +2142,10 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     }
 
     @Override
-    public void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encounters) {
+    public void setEncounters(Settings settings, List<EncounterSet> encounters) {
+        boolean useTimeOfDay = settings.isUseTimeBasedEncounters();
+        boolean condenseSlots = settings.isCondenseEncounterSlots();
+
         try {
             if (romEntry.romType == Gen4Constants.Type_HGSS) {
                 setEncountersHGSS(useTimeOfDay, encounters);

@@ -1183,7 +1183,7 @@ public class Gen1RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
-    public void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encounters) {
+    public void setEncounters(Settings settings, List<EncounterSet> encounters) {
         Iterator<EncounterSet> encsetit = encounters.iterator();
 
         // grass & water

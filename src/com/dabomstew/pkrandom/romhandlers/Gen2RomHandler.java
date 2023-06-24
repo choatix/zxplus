@@ -1115,17 +1115,17 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
     }
 
     @Override
-    public void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encounters) {
+    public void setEncounters(Settings settings, List<EncounterSet> encounters) {
         if (!havePatchedFleeing) {
             patchFleeing();
         }
         int offset = romEntry.getValue("WildPokemonOffset");
         Iterator<EncounterSet> areas = encounters.iterator();
-        offset = writeLandEncounters(offset, areas, useTimeOfDay); // Johto
+        offset = writeLandEncounters(offset, areas, settings); // Johto
         offset = writeSeaEncounters(offset, areas); // Johto
-        offset = writeLandEncounters(offset, areas, useTimeOfDay); // Kanto
+        offset = writeLandEncounters(offset, areas, settings); // Kanto
         offset = writeSeaEncounters(offset, areas); // Kanto
-        offset = writeLandEncounters(offset, areas, useTimeOfDay); // Specials
+        offset = writeLandEncounters(offset, areas, settings); // Specials
         offset = writeSeaEncounters(offset, areas); // Specials
 
         // Fishing Data
@@ -1136,7 +1136,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             for (int i = 0; i < Gen2Constants.pokesPerFishingGroup; i++) {
                 offset++;
                 if (rom[offset] == 0) {
-                    if (!useTimeOfDay) {
+                    if (!settings.isUseTimeBasedEncounters()) {
                         // overwrite with a static encounter
                         Encounter enc = encs.next();
                         rom[offset++] = (byte) enc.pokemon.number;
@@ -1152,7 +1152,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                 }
             }
         }
-        if (useTimeOfDay) {
+        if (settings.isUseTimeBasedEncounters()) {
             for (int k = 0; k < Gen2Constants.timeSpecificFishingGroupCount; k++) {
                 EncounterSet es = areas.next();
                 Iterator<Encounter> encs = es.encounters.iterator();
@@ -1193,9 +1193,9 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
 
     }
 
-    private int writeLandEncounters(int offset, Iterator<EncounterSet> areas, boolean useTimeOfDay) {
+    private int writeLandEncounters(int offset, Iterator<EncounterSet> areas, Settings settings) {
         while ((rom[offset] & 0xFF) != 0xFF) {
-            if (useTimeOfDay) {
+            if (settings.isUseTimeBasedEncounters()) {
                 for (int i = 0; i < 3; i++) {
                     EncounterSet encset = areas.next();
                     Iterator<Encounter> encountersHere = encset.encounters.iterator();
@@ -1212,7 +1212,14 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                     Iterator<Encounter> encountersHere = encset.encounters.iterator();
                     for (int j = 0; j < Gen2Constants.landEncounterSlots; j++) {
                         Encounter enc = encountersHere.next();
-                        rom[offset + 5 + (i * Gen2Constants.landEncounterSlots * 2) + (j * 2)] = (byte) enc.level;
+
+                        // Special case for time-based encounters where level has not shifted
+                        // Don't set the level, to allow alternate times to day to keep their level
+                        if(settings.isWildLevelsModified())
+                        {
+                            rom[offset + 5 + (i * Gen2Constants.landEncounterSlots * 2) + (j * 2)] = (byte) enc.level;
+                        }
+
                         rom[offset + 5 + (i * Gen2Constants.landEncounterSlots * 2) + (j * 2) + 1] = (byte) enc.pokemon.number;
                     }
                 }

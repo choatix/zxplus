@@ -1424,7 +1424,8 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
         }
     }
 
-    public void setEncounters(boolean useTimeOfDay, List<EncounterSet> encountersList) {
+    public void setEncounters(Settings settings, List<EncounterSet> encountersList) {
+        boolean useTimeOfDay = settings.isUseTimeBasedEncounters();
         Iterator<EncounterSet> encounters = encountersList.iterator();
         for (AreaData areaData : areaDataList) {
             if (!areaData.hasTables) {
@@ -3158,11 +3159,6 @@ public class Gen7RomHandler extends Abstract3DSRomHandler {
     @Override
     public List<EncounterSet> getEncounters(boolean useTimeOfDay, boolean condenseSlots) {
         return null;
-    }
-
-    @Override
-    public void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encounters) {
-
     }
 
     private int tmFromIndex(int index) {

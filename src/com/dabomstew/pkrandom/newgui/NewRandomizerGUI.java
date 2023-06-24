@@ -303,6 +303,10 @@ public class NewRandomizerGUI {
     private JCheckBox paEnsureTwoAbilitiesCheckbox;
     private JCheckBox miscUpdateRotomFormeTypingCheckBox;
     private JCheckBox miscDisableLowHPMusicCheckBox;
+    private JRadioButton pbsRandomBSTRadioButton;
+    private JRadioButton pbsEqualizeBSTRadioButton;
+    private JRadioButton pbsRandomBSTPercentRadioButton;
+    private JSlider pbsRandomBSTPercentSlider;
 
     private static JFrame frame;
 
@@ -352,7 +356,10 @@ public class NewRandomizerGUI {
     public NewRandomizerGUI() {
         ToolTipManager.sharedInstance().setInitialDelay(400);
         ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
-        bundle = ResourceBundle.getBundle("com/dabomstew/pkrandom/newgui/Bundle");
+
+        bundle = ResourceBundle.getBundle("com.dabomstew.pkrandom.newgui.Bundle", Locale.getDefault(), new PersonalCustomBundleLoader());
+
+        //bundle = ResourceBundle.getBundle("com/dabomstew/pkrandom/newgui/Bundle");
         testForRequiredConfigs();
         checkHandlers = new RomHandler.Factory[] { new Gen1RomHandler.Factory(), new Gen2RomHandler.Factory(),
                 new Gen3RomHandler.Factory(), new Gen4RomHandler.Factory(), new Gen5RomHandler.Factory(),
@@ -417,6 +424,9 @@ public class NewRandomizerGUI {
         pbsUnchangedRadioButton.addActionListener(e -> enableOrDisableSubControls());
         pbsShuffleRadioButton.addActionListener(e -> enableOrDisableSubControls());
         pbsRandomRadioButton.addActionListener(e -> enableOrDisableSubControls());
+        pbsRandomBSTPercentRadioButton.addActionListener(e -> enableOrDisableSubControls());
+        pbsRandomBSTRadioButton.addActionListener(e -> enableOrDisableSubControls());
+        pbsEqualizeBSTRadioButton.addActionListener(e -> enableOrDisableSubControls());
         pbsFollowMegaEvosCheckBox.addActionListener(e -> enableOrDisableSubControls());
         pbsFollowEvolutionsCheckBox.addActionListener(e -> enableOrDisableSubControls());
         pbsStandardizeEXPCurvesCheckBox.addActionListener(e -> enableOrDisableSubControls());
@@ -1465,6 +1475,11 @@ public class NewRandomizerGUI {
         pbsRandomRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.RANDOM);
         pbsShuffleRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.SHUFFLE);
         pbsUnchangedRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.UNCHANGED);
+        pbsRandomBSTRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.RANDOMBST);
+        pbsRandomBSTPercentRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.RANDOMBSTPERC);
+        pbsEqualizeBSTRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.EQUALIZE);
+        tpForceFullyEvolvedAtSlider.setValue(settings.getBaseStatRange());
+
         pbsFollowEvolutionsCheckBox.setSelected(settings.isBaseStatsFollowEvolutions());
         pbsUpdateBaseStatsCheckBox.setSelected(settings.isUpdateBaseStats());
         pbsUpdateComboBox.setSelectedIndex(Math.max(0,settings.getUpdateBaseStatsToGeneration() - (Math.max(6,romHandler.generationOfPokemon()+1))));
@@ -1718,8 +1733,31 @@ public class NewRandomizerGUI {
         settings.setRandomizeTrainerNames(tpRandomizeTrainerNamesCheckBox.isSelected());
         settings.setRandomizeTrainerClassNames(tpRandomizeTrainerClassNamesCheckBox.isSelected());
 
-        settings.setBaseStatisticsMod(pbsUnchangedRadioButton.isSelected(), pbsShuffleRadioButton.isSelected(),
-                pbsRandomRadioButton.isSelected());
+        var baseStatsSetting = Settings.BaseStatisticsMod.UNCHANGED;
+        if(pbsShuffleRadioButton.isSelected())
+        {
+            baseStatsSetting = Settings.BaseStatisticsMod.SHUFFLE;
+        }
+        else if(pbsRandomRadioButton.isSelected())
+        {
+            baseStatsSetting = Settings.BaseStatisticsMod.RANDOM;
+        }
+        else if(pbsRandomBSTRadioButton.isSelected())
+        {
+            baseStatsSetting = Settings.BaseStatisticsMod.RANDOMBST;
+        }
+        else if(pbsRandomBSTPercentRadioButton.isSelected())
+        {
+            baseStatsSetting = Settings.BaseStatisticsMod.RANDOMBSTPERC;
+        }
+        else if(pbsEqualizeBSTRadioButton.isSelected())
+        {
+            baseStatsSetting = Settings.BaseStatisticsMod.EQUALIZE;
+        }
+
+        settings.setBaseStatisticsMod(baseStatsSetting);
+        settings.setBaseStatRange(pbsRandomBSTPercentSlider.getValue());
+
         settings.setBaseStatsFollowEvolutions(pbsFollowEvolutionsCheckBox.isSelected());
         settings.setUpdateBaseStats(pbsUpdateBaseStatsCheckBox.isSelected() && pbsUpdateBaseStatsCheckBox.isVisible());
         settings.setUpdateBaseStatsToGeneration(pbsUpdateComboBox.getSelectedIndex() + (Math.max(6,romHandler.generationOfPokemon()+1)));
@@ -2046,6 +2084,17 @@ public class NewRandomizerGUI {
         pbsRandomRadioButton.setVisible(true);
         pbsRandomRadioButton.setEnabled(false);
         pbsRandomRadioButton.setSelected(false);
+
+        pbsRandomBSTRadioButton.setVisible(true);
+        pbsRandomBSTRadioButton.setEnabled(false);
+        pbsRandomBSTRadioButton.setSelected(false);
+        pbsRandomBSTPercentRadioButton.setVisible(true);
+        pbsRandomBSTPercentRadioButton.setEnabled(false);
+        pbsRandomBSTPercentRadioButton.setSelected(false);
+        pbsEqualizeBSTRadioButton.setVisible(true);
+        pbsEqualizeBSTRadioButton.setEnabled(false);
+        pbsEqualizeBSTRadioButton.setSelected(false);
+
         pbsLegendariesSlowRadioButton.setVisible(true);
         pbsLegendariesSlowRadioButton.setEnabled(false);
         pbsLegendariesSlowRadioButton.setSelected(false);
@@ -2713,6 +2762,10 @@ public class NewRandomizerGUI {
             pbsShuffleRadioButton.setEnabled(true);
             pbsRandomRadioButton.setEnabled(true);
 
+            pbsRandomBSTRadioButton.setEnabled(true);
+            pbsRandomBSTPercentRadioButton.setEnabled(true);
+            pbsEqualizeBSTRadioButton.setEnabled(true);
+
             pbsStandardizeEXPCurvesCheckBox.setEnabled(true);
             pbsLegendariesSlowRadioButton.setSelected(true);
             pbsUpdateBaseStatsCheckBox.setEnabled(pokemonGeneration < GlobalConstants.HIGHEST_POKEMON_GEN);
@@ -3151,6 +3204,15 @@ public class NewRandomizerGUI {
         } else {
             pbsAssignEvoStatsRandomlyCheckBox.setEnabled(false);
             pbsAssignEvoStatsRandomlyCheckBox.setSelected(false);
+        }
+
+        if(pbsRandomBSTPercentRadioButton.isSelected())
+        {
+            pbsRandomBSTPercentSlider.setEnabled(true);
+        }
+        else
+        {
+            pbsRandomBSTPercentSlider.setEnabled(false);
         }
 
         if (pbsStandardizeEXPCurvesCheckBox.isSelected()) {

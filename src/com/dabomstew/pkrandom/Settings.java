@@ -518,14 +518,7 @@ public class Settings {
         }
 
         // 36 trainer pokemon level modifier
-        //out.write((trainersLevelModified ? 0x80 : 0) | (trainersLevelModifier+50));
-
-        // @ 36 base stats range slider value
-        out.write(baseStatRange);
-
-        // @ 37 wild pokemon 3
-        // new in 174
-        //out.write(makeByteSelected(condenseEncounterSlots, catchEmAllReasonableSlotsOnly));
+        out.write((trainersLevelModified ? 0x80 : 0) | (trainersLevelModifier+50));
 
         // 37 shop items
         out.write(makeByteSelected(shopItemsMod == ShopItemsMod.RANDOM, shopItemsMod == ShopItemsMod.SHUFFLE,
@@ -608,6 +601,9 @@ public class Settings {
         // 52: Moveset and similar changes here
         out.write(makeByteSelected(useMovesetTemplates,
                 trainersLevelBossFights, trainersLevelImportantFights));
+
+        // 53: Base Stat Range
+        out.write(baseStatRange);
 
         try {
             byte[] romName = this.romName.getBytes("US-ASCII");
@@ -829,8 +825,8 @@ public class Settings {
         settings.setTrainersLevelModified(restoreState(data[35], 7));
         settings.setTrainersLevelModifier((data[35] & 0x7F) - 50);
 
-        settings.setBaseStatRange(data[36] & 0xFF);
-        settings.setBaseStatRange(data[36] & 0xFF);
+        //settings.setBaseStatRange(data[36] & 0xFF);
+        //settings.setBaseStatRange(data[36] & 0xFF);
         settings.setTrainersLevelModified(restoreState(data[36], 7));
         settings.setTrainersLevelModifier((data[36] & 0x7F) - 50);
         settings.setTrainersLevelModifier((data[36] & 0x7F));
@@ -911,6 +907,8 @@ public class Settings {
         settings.setUseMovesetTemplates(restoreState(data[52], 0));
         settings.setTrainerLevelChangeForBossFights(restoreState(data[52], 1));
         settings.setTrainerLevelChangeForImportantFights(restoreState(data[52], 2));
+
+        settings.setBaseStatRange(data[53] & 0xFF);
 
         int romNameLength = data[LENGTH_OF_SETTINGS_DATA] & 0xFF;
         String romName = new String(data, LENGTH_OF_SETTINGS_DATA + 1, romNameLength, "US-ASCII");
@@ -1220,12 +1218,7 @@ public class Settings {
     public BaseStatisticsMod getBaseStatisticsMod() {
         return baseStatisticsMod;
     }
-
-    public void setBaseStatisticsMod(boolean... bools) {
-        setBaseStatisticsMod(getEnum(BaseStatisticsMod.class, bools));
-    }
-
-    private void setBaseStatisticsMod(BaseStatisticsMod baseStatisticsMod) {
+    public void setBaseStatisticsMod(BaseStatisticsMod baseStatisticsMod) {
         this.baseStatisticsMod = baseStatisticsMod;
     }
 

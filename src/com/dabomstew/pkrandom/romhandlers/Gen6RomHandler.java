@@ -1523,7 +1523,7 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         return es;
     }
 
-    public void setEncounters(boolean useTimeOfDay, List<EncounterSet> encountersList) {
+    public void setEncounters(Settings settings, List<EncounterSet> encountersList) {
         try {
             if (romEntry.romType == Gen6Constants.Type_ORAS) {
                 setEncountersORAS(encountersList);
@@ -3564,10 +3564,6 @@ public class Gen6RomHandler extends Abstract3DSRomHandler {
         return null;
     }
 
-    @Override
-    public void setEncounters(boolean useTimeOfDay, boolean condenseSlots, List<EncounterSet> encounters) {
-
-    }
 
     private int tmFromIndex(int index) {
 
