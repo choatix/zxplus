@@ -368,7 +368,7 @@
                       <paintLabels value="true"/>
                       <paintTicks value="true"/>
                       <snapToTicks value="true"/>
-                      <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.tpPercentageLevelModifierSlider.toolTipText"/>
+                      <toolTipText resource-bundle="com/dabomstew/pkrandom/newgui/Bundle" key="GUI.pbsRandomBST%.toolTipText"/>
                       <value value="0"/>
                     </properties>
                   </component>

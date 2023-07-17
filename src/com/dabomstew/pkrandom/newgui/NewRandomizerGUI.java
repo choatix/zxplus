@@ -1478,7 +1478,19 @@ public class NewRandomizerGUI {
         pbsRandomBSTRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.RANDOMBST);
         pbsRandomBSTPercentRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.RANDOMBSTPERC);
         pbsEqualizeBSTRadioButton.setSelected(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.EQUALIZE);
-        tpForceFullyEvolvedAtSlider.setValue(settings.getBaseStatRange());
+
+        if(settings.getBaseStatisticsMod() == Settings.BaseStatisticsMod.RANDOMBSTPERC)
+        {
+            pbsRandomBSTPercentSlider.setValue(settings.getBaseStatRange());
+            pbsRandomBSTPercentSlider.setEnabled(true);
+        }
+        else
+        {
+            pbsRandomBSTPercentSlider.setValue(0);
+            pbsRandomBSTPercentSlider.setEnabled(false);
+        }
+
+
 
         pbsFollowEvolutionsCheckBox.setSelected(settings.isBaseStatsFollowEvolutions());
         pbsUpdateBaseStatsCheckBox.setSelected(settings.isUpdateBaseStats());
