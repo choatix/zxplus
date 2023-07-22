@@ -18,7 +18,7 @@ public class CliRandomizer {
 
     private static boolean performDirectRandomization(String settingsFilePath, String sourceRomFilePath,
                                                       String destinationRomFilePath, boolean saveAsDirectory,
-                                                      String updateFilePath, boolean saveLog) {
+                                                      String updateFilePath, boolean saveLog, boolean overrideSeed, long seed) {
         // borrowed directly from NewRandomizerGUI()
         RomHandler.Factory[] checkHandlers = new RomHandler.Factory[] {
                 new Gen1RomHandler.Factory(),
@@ -93,7 +93,11 @@ public class CliRandomizer {
                     String filename = fh.getAbsolutePath();
 
                     Randomizer randomizer = new Randomizer(settings, romHandler, bundle, saveAsDirectory);
-                    randomizer.randomize(filename, verboseLog);
+                    if (overrideSeed) {
+                        randomizer.randomize(filename, verboseLog, seed);
+                    } else {
+                        randomizer.randomize(filename, verboseLog);
+                    }
                     verboseLog.close();
                     byte[] out = baos.toByteArray();
                     if (saveLog) {
@@ -138,8 +142,10 @@ public class CliRandomizer {
         boolean saveAsDirectory = false;
         String updateFilePath = null;
         boolean saveLog = false;
+        boolean overrideSeed = false;
+        long seed = 0;
 
-        List<String> allowedFlags = Arrays.asList("-i", "-o", "-s", "-d", "-u", "-l", "--help");
+        List<String> allowedFlags = Arrays.asList("-i", "-o", "-s", "-d", "-u", "-l", "--help", "-S");
         for (int i = 0; i < args.length; i++) {
             if (allowedFlags.contains(args[i])) {
                 switch(args[i]) {
@@ -160,6 +166,16 @@ public class CliRandomizer {
                         break;
                     case "-l":
                         saveLog = true;
+                        break;
+                    case "-S":
+                        try {
+                            seed = Long.parseLong(args[i + 1]);
+                            overrideSeed = true;
+                        } catch (Exception e) {
+                            printError("Invalid integer value for -S");
+                            CliRandomizer.printUsage();
+                            return 1;
+                        }
                         break;
                     case "--help":
                         printUsage();
@@ -204,7 +220,9 @@ public class CliRandomizer {
                 outputRomFilePath,
                 saveAsDirectory,
                 updateFilePath,
-                saveLog
+                saveLog,
+                overrideSeed,
+                seed
         );
         if (!processResult) {
             printError("Randomization failed");
@@ -224,7 +242,7 @@ public class CliRandomizer {
 
     private static void printUsage() {
         System.err.println("Usage: java [-Xmx4096M] -jar PokeRandoZX.jar cli -s <path to settings file> " +
-                "-i <path to source ROM> -o <path for new ROM> [-d][-u <path to 3DS game update>][-l]");
+                "-i <path to source ROM> -o <path for new ROM> [-d][-u <path to 3DS game update>][-l][-S <integer seed>]");
         System.err.println("-d: Save 3DS game as directory (LayeredFS)");
     }
 }
