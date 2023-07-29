@@ -822,14 +822,14 @@ public class Settings {
 
         settings.setCurrentMiscTweaks(codeTweaks);
 
-        settings.setTrainersLevelModified(restoreState(data[35], 7));
-        settings.setTrainersLevelModifier((data[35] & 0x7F) - 50);
+        //settings.setTrainersLevelModified(restoreState(data[35], 7));
+        //settings.setTrainersLevelModifier((data[35] & 0x7F) - 50);
 
         //settings.setBaseStatRange(data[36] & 0xFF);
         //settings.setBaseStatRange(data[36] & 0xFF);
         settings.setTrainersLevelModified(restoreState(data[36], 7));
         settings.setTrainersLevelModifier((data[36] & 0x7F) - 50);
-        settings.setTrainersLevelModifier((data[36] & 0x7F));
+        //settings.setTrainersLevelModifier((data[36] & 0x7F));
 
         settings.setShopItemsMod(restoreEnum(ShopItemsMod.class,data[37],
                 2,
