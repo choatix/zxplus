@@ -976,7 +976,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             EncounterSet es = new EncounterSet();
             es.displayName = "Fishing Group " + (k + 1);
             for (int i = 0; i < Gen2Constants.pokesPerFishingGroup; i++) {
-                offset++;
+                int percent = rom[offset++] & 0xFF;
                 int pokeNum = rom[offset++] & 0xFF;
                 int level = rom[offset++] & 0xFF;
                 if (pokeNum == 0) {
@@ -987,6 +987,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                         Encounter enc = new Encounter();
                         enc.pokemon = pokes[rom[specialOffset] & 0xFF];
                         enc.level = rom[specialOffset + 1] & 0xFF;
+                        enc.percent = rom[specialOffset + 1] & 0xFF;
                         es.encounters.add(enc);
                     }
                     // else will be handled by code below
@@ -994,6 +995,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                     Encounter enc = new Encounter();
                     enc.pokemon = pokes[pokeNum];
                     enc.level = level;
+                    enc.percent = percent;
                     es.encounters.add(enc);
                 }
             }
@@ -1022,12 +1024,13 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             EncounterSet es = new EncounterSet();
             es.displayName = "Headbutt Trees Set " + (i + 1);
             while ((rom[offset] & 0xFF) != 0xFF) {
-                offset++;
+                int percent = rom[offset++] & 0xFF;
                 int pokeNum = rom[offset++] & 0xFF;
                 int level = rom[offset++] & 0xFF;
                 Encounter enc = new Encounter();
                 enc.pokemon = pokes[pokeNum];
                 enc.level = level;
+                enc.percent = percent;
                 es.encounters.add(enc);
             }
             offset++;
@@ -1039,8 +1042,8 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         EncounterSet bccES = new EncounterSet();
         bccES.displayName = "Bug Catching Contest";
         while ((rom[offset] & 0xFF) != 0xFF) {
-            offset++;
             Encounter enc = new Encounter();
+            enc.percent = rom[offset++] & 0xFF;
             enc.pokemon = pokes[rom[offset++] & 0xFF];
             enc.level = rom[offset++] & 0xFF;
             enc.maxLevel = rom[offset++] & 0xFF;
@@ -1134,11 +1137,18 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             EncounterSet es = areas.next();
             Iterator<Encounter> encs = es.encounters.iterator();
             for (int i = 0; i < Gen2Constants.pokesPerFishingGroup; i++) {
-                offset++;
                 if (rom[offset] == 0) {
                     if (!settings.isUseTimeBasedEncounters()) {
                         // overwrite with a static encounter
                         Encounter enc = encs.next();
+                        if(settings.isNormaliseEncounterRates() && enc.percent > 0)
+                        {
+                            rom[offset++] = (byte) enc.percent;
+                        }
+                        else
+                        {
+                            offset++;
+                        }
                         rom[offset++] = (byte) enc.pokemon.number;
                         rom[offset++] = (byte) enc.level;
                     } else {
@@ -1147,6 +1157,14 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                     }
                 } else {
                     Encounter enc = encs.next();
+                    if(settings.isNormaliseEncounterRates() && enc.percent > 0)
+                    {
+                        rom[offset++] = (byte) enc.percent;
+                    }
+                    else
+                    {
+                        offset++;
+                    }
                     rom[offset++] = (byte) enc.pokemon.number;
                     rom[offset++] = (byte) enc.level;
                 }
@@ -1172,7 +1190,14 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             Iterator<Encounter> encs = es.encounters.iterator();
             while ((rom[offset] & 0xFF) != 0xFF) {
                 Encounter enc = encs.next();
-                offset++;
+                if(settings.isNormaliseEncounterRates() && enc.percent > 0)
+                {
+                    rom[offset++] = (byte) enc.percent;
+                }
+                else
+                {
+                    offset++;
+                }
                 rom[offset++] = (byte) enc.pokemon.number;
                 rom[offset++] = (byte) enc.level;
             }
@@ -1184,8 +1209,15 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         EncounterSet bccES = areas.next();
         Iterator<Encounter> bccEncs = bccES.encounters.iterator();
         while ((rom[offset] & 0xFF) != 0xFF) {
-            offset++;
             Encounter enc = bccEncs.next();
+            if(settings.isNormaliseEncounterRates() && enc.percent > 0)
+            {
+                rom[offset++] = (byte) enc.percent;
+            }
+            else
+            {
+                offset++;
+            }
             rom[offset++] = (byte) enc.pokemon.number;
             rom[offset++] = (byte) enc.level;
             rom[offset++] = (byte) enc.maxLevel;

@@ -1030,6 +1030,27 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
         }
 
+        // For now, this only affects the rates of standard encounters
+        if( settings.isNormaliseEncounterRates())
+        {
+            for( EncounterSet area : currentEncounters)
+            {
+                var encounters = area.encounters.stream().filter(x -> x.percent > 0);
+                var encounterSize = encounters.count();
+                if(encounterSize == 0)
+                {
+                    continue;
+                }
+
+                int percent = (int)(100 / encounterSize);
+                for(var encounter : area.encounters)
+                {
+                    encounter.percent = percent;
+                }
+            }
+
+        }
+
         setEncounters(settings, currentEncounters);
     }
 

@@ -320,6 +320,8 @@ public class Settings {
     private boolean guaranteeEvolutionItems;
     private boolean guaranteeXItems;
 
+    private boolean normaliseEncounterRates = true;
+
     public enum PickupItemsMod {
         UNCHANGED, RANDOM
     }
@@ -604,6 +606,9 @@ public class Settings {
 
         // 53: Base Stat Range
         out.write(baseStatRange);
+
+        // 54: New flags
+        out.write(makeByteSelected(normaliseEncounterRates));
 
         try {
             byte[] romName = this.romName.getBytes("US-ASCII");
@@ -909,6 +914,8 @@ public class Settings {
         settings.setTrainerLevelChangeForImportantFights(restoreState(data[52], 2));
 
         settings.setBaseStatRange(data[53] & 0xFF);
+
+        settings.setNormaliseEncounterRates(restoreState(data[54],0));
 
         int romNameLength = data[LENGTH_OF_SETTINGS_DATA] & 0xFF;
         String romName = new String(data, LENGTH_OF_SETTINGS_DATA + 1, romNameLength, "US-ASCII");
@@ -2514,6 +2521,16 @@ public class Settings {
         if ((int) checksum.getValue() != crc) {
             throw new IllegalArgumentException("Malformed input string");
         }
+    }
+
+    public boolean isNormaliseEncounterRates()
+    {
+        return this.normaliseEncounterRates;
+    }
+
+    public void setNormaliseEncounterRates(boolean normalise)
+    {
+        this.normaliseEncounterRates = normalise;
     }
 
 }

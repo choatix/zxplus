@@ -30,6 +30,7 @@ public class Encounter {
     public int maxLevel;
     public Pokemon pokemon;
     public int formeNumber;
+    public int percent;
 
     // Used only for Gen 7's SOS mechanic
     public boolean isSOS;

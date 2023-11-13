@@ -272,7 +272,7 @@ public class Randomizer {
 
         // Starter Pokemon
         // Applied after type to update the strings correctly based on new types
-        switch(settings.getStartersMod()) {
+        switch (settings.getStartersMod()) {
             case CUSTOM:
                 romHandler.customStarters(settings);
                 startersChanged = true;
@@ -463,7 +463,7 @@ public class Randomizer {
             trainersChanged = true;
         }
 
-        switch(settings.getTrainersMod()) {
+        switch (settings.getTrainersMod()) {
             case RANDOM:
             case DISTRIBUTED:
             case MAINPLAYTHROUGH:
@@ -496,9 +496,7 @@ public class Randomizer {
             romHandler.pickTrainerMovesets(settings);
             trainersChanged = true;
             trainerMovesetsChanged = true;
-        }
-        else
-        {
+        } else {
             var trainers = romHandler.getTrainers();
             for (Trainer t : trainers) {
                 for (TrainerPokemon tpk : t.pokemon) {
@@ -638,7 +636,7 @@ public class Randomizer {
         // In-game trades
 
         List<IngameTrade> oldTrades = romHandler.getIngameTrades();
-        switch(settings.getInGameTradesMod()) {
+        switch (settings.getInGameTradesMod()) {
             case RANDOMIZE_GIVEN:
             case RANDOMIZE_GIVEN_AND_REQUESTED:
                 romHandler.randomizeIngameTrades(settings);
@@ -653,17 +651,30 @@ public class Randomizer {
         }
 
         // Field Items
-        switch(settings.getFieldItemsMod()) {
+        // Get old field items
+
+        var originalFieldItems = romHandler.getRegularFieldItems();
+        var originalTMs = romHandler.getCurrentFieldTMs();
+        boolean itemsChanged = false;
+        switch (settings.getFieldItemsMod()) {
             case SHUFFLE:
                 romHandler.shuffleFieldItems();
+                itemsChanged = true;
                 break;
             case RANDOM:
             case RANDOM_EVEN:
                 romHandler.randomizeFieldItems(settings);
+                itemsChanged = true;
                 break;
             default:
                 break;
         }
+
+        if (itemsChanged)
+        {
+            logFieldItems(log, originalFieldItems, originalTMs);
+        }
+
 
         // Shops
 
@@ -1301,6 +1312,41 @@ public class Randomizer {
                 log.println();
             }
         }
+        log.println();
+    }
+
+    private void logFieldItems(PrintStream log, List<ItemLocation> originalItems, List<FieldTM> originalTMs) {
+        var newTMs = romHandler.getCurrentFieldTMs();
+        var newFieldItems = romHandler.getRegularFieldItems();
+
+        log.println("--Field Items--");
+        var size = newFieldItems.size();
+
+        String[] itemNames = romHandler.getItemNames();
+
+        for (int i = 0; i < size; i++)
+        {
+            var oldItem = originalItems.get(i);
+            var newItem = newFieldItems.get(i);
+
+
+
+            log.printf("%s: %s -> %s\n", newItem.description, itemNames[oldItem.item], itemNames[newItem.item]);
+
+        }
+
+        log.println("--Field TMs--");
+        size = newTMs.size();
+        for (int i = 0; i < size; i++)
+        {
+            var oldTm = originalTMs.get(i);
+            var newTM = newTMs.get(i);
+
+
+            log.printf("%s : TM%d -> TM%d\n", oldTm.description, oldTm.tm, newTM.tm);
+
+        }
+
         log.println();
     }
 

@@ -307,6 +307,7 @@ public class NewRandomizerGUI {
     private JRadioButton pbsEqualizeBSTRadioButton;
     private JRadioButton pbsRandomBSTPercentRadioButton;
     private JSlider pbsRandomBSTPercentSlider;
+    private JCheckBox normaliseEncounterRatesCheckBox;
 
     private static JFrame frame;
 
@@ -1718,6 +1719,8 @@ public class NewRandomizerGUI {
         puRandomRadioButton.setSelected(settings.getPickupItemsMod() == Settings.PickupItemsMod.RANDOM);
         puBanBadItemsCheckBox.setSelected(settings.isBanBadRandomPickupItems());
 
+        normaliseEncounterRatesCheckBox.setSelected(settings.isNormaliseEncounterRates());
+
         int mtsSelected = settings.getCurrentMiscTweaks();
         int mtCount = MiscTweak.allTweaks.size();
 
@@ -1940,6 +1943,7 @@ public class NewRandomizerGUI {
 
         settings.setPickupItemsMod(puUnchangedRadioButton.isSelected(), puRandomRadioButton.isSelected());
         settings.setBanBadRandomPickupItems(puBanBadItemsCheckBox.isSelected());
+        settings.setNormaliseEncounterRates(normaliseEncounterRatesCheckBox.isSelected());
 
         int currentMiscTweaks = 0;
         int mtCount = MiscTweak.allTweaks.size();
@@ -2680,6 +2684,9 @@ public class NewRandomizerGUI {
         puRandomRadioButton.setVisible(true);
         puRandomRadioButton.setEnabled(false);
         puRandomRadioButton.setSelected(false);
+        normaliseEncounterRatesCheckBox.setEnabled(false);
+        normaliseEncounterRatesCheckBox.setVisible(true);
+        normaliseEncounterRatesCheckBox.setSelected(false);
         puBanBadItemsCheckBox.setVisible(true);
         puBanBadItemsCheckBox.setEnabled(false);
         puBanBadItemsCheckBox.setSelected(false);
@@ -2961,6 +2968,10 @@ public class NewRandomizerGUI {
             tpBetterMovesetsCheckBox.setEnabled(pokemonGeneration >= 2);
             tpUseTemplatesCheckbox.setVisible(pokemonGeneration == 2);
             tpUseTemplatesCheckbox.setEnabled(pokemonGeneration == 2);
+
+            normaliseEncounterRatesCheckBox.setEnabled(pokemonGeneration == 2);
+            normaliseEncounterRatesCheckBox.setVisible(pokemonGeneration == 2);
+            normaliseEncounterRatesCheckBox.setSelected(false);
 
             totpPanel.setVisible(pokemonGeneration == 7);
             if (totpPanel.isVisible()) {
