@@ -972,9 +972,15 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         // Fishing Data
         offset = romEntry.getValue("FishingWildsOffset");
         int rootOffset = offset;
+
+        String rodName = null;
+
         for (int k = 0; k < Gen2Constants.fishingGroupCount; k++) {
             EncounterSet es = new EncounterSet();
-            es.displayName = "Fishing Group " + (k + 1);
+            rodName = "Old";
+            es.isAccumulator = true;
+            es.isPercent = true;
+            es.displayName = "Fishing Group " + rodName + " " + (k + 1);
             for (int i = 0; i < Gen2Constants.pokesPerFishingGroup; i++) {
                 int percent = rom[offset++] & 0xFF;
                 int pokeNum = rom[offset++] & 0xFF;
@@ -987,7 +993,15 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                         Encounter enc = new Encounter();
                         enc.pokemon = pokes[rom[specialOffset] & 0xFF];
                         enc.level = rom[specialOffset + 1] & 0xFF;
-                        enc.percent = rom[specialOffset + 1] & 0xFF;
+                        enc.percent = percent;
+                        es.encounters.add(enc);
+                    }
+                    else
+                    {
+                        Encounter enc = new Encounter();
+                        enc.percent = percent;
+                        enc.pokemon = null;
+                        enc.level = 0;
                         es.encounters.add(enc);
                     }
                     // else will be handled by code below
@@ -998,8 +1012,38 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                     enc.percent = percent;
                     es.encounters.add(enc);
                 }
+
+                if((percent & 0xFF) == 255)
+                {
+                    // Hit the maximum threshold, some make a new encounter set
+                    areas.add(es);
+                    es = new EncounterSet();
+
+
+                    if(rodName.equals("Old"))
+                    {
+                        rodName = "Good";
+                    }
+                    else if(rodName.equals("Good")) {
+                        rodName = "Super";
+                    }
+                    else {
+                        es = null;
+                    }
+
+                    if(es != null)
+                    {
+                        es.isAccumulator = true;
+                        es.isPercent = true;
+                        es.displayName = "Fishing Group " + rodName + " " + (k + 1);
+                    }
+                }
+
             }
-            areas.add(es);
+            if(es != null)
+            {
+                areas.add(es);
+            }
         }
         if (useTimeOfDay) {
             for (int k = 0; k < Gen2Constants.timeSpecificFishingGroupCount; k++) {
@@ -1067,6 +1111,8 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                     EncounterSet encset = new EncounterSet();
                     encset.rate = rom[offset + 2 + i] & 0xFF;
                     encset.displayName = mapName + " Grass/Cave (" + todNames[i] + ")";
+                    encset.encounterType = EncounterSetType.Grass;
+                    encset.isAccumulator = true;
                     for (int j = 0; j < Gen2Constants.landEncounterSlots; j++) {
                         Encounter enc = new Encounter();
                         enc.level = rom[offset + 5 + (i * Gen2Constants.landEncounterSlots * 2) + (j * 2)] & 0xFF;
@@ -1082,6 +1128,8 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                 EncounterSet encset = new EncounterSet();
                 encset.rate = rom[offset + 3] & 0xFF;
                 encset.displayName = mapName + " Grass/Cave";
+                encset.encounterType = EncounterSetType.Grass;
+                encset.isAccumulator = true;
                 for (int j = 0; j < Gen2Constants.landEncounterSlots; j++) {
                     Encounter enc = new Encounter();
                     enc.level = rom[offset + 5 + Gen2Constants.landEncounterSlots * 2 + (j * 2)] & 0xFF;
@@ -1104,6 +1152,8 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             EncounterSet encset = new EncounterSet();
             encset.rate = rom[offset + 2] & 0xFF;
             encset.displayName = mapName + " Surfing";
+            encset.encounterType = EncounterSetType.Sea;
+            encset.isAccumulator = true;
             for (int j = 0; j < Gen2Constants.seaEncounterSlots; j++) {
                 Encounter enc = new Encounter();
                 enc.level = rom[offset + 3 + (j * 2)] & 0xFF;
@@ -1133,14 +1183,17 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
 
         // Fishing Data
         offset = romEntry.getValue("FishingWildsOffset");
-        for (int k = 0; k < Gen2Constants.fishingGroupCount; k++) {
+        for (int k = 0; k < Gen2Constants.fishingGroupCount * 3; k++) {
             EncounterSet es = areas.next();
             Iterator<Encounter> encs = es.encounters.iterator();
-            for (int i = 0; i < Gen2Constants.pokesPerFishingGroup; i++) {
+
+            var lastPercent = 0;
+            while(lastPercent != 255) {
                 if (rom[offset] == 0) {
                     if (!settings.isUseTimeBasedEncounters()) {
                         // overwrite with a static encounter
                         Encounter enc = encs.next();
+                        lastPercent = enc.percent;
                         if(settings.isNormaliseEncounterRates() && enc.percent > 0)
                         {
                             rom[offset++] = (byte) enc.percent;
@@ -1149,14 +1202,20 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
                         {
                             offset++;
                         }
+
                         rom[offset++] = (byte) enc.pokemon.number;
                         rom[offset++] = (byte) enc.level;
-                    } else {
-                        // else handle below
-                        offset += 2;
+                    } else
+                    {
+                        Encounter enc = encs.next();
+                        lastPercent = enc.percent;
+                        offset += 3;
                     }
-                } else {
+                }
+                else
+                {
                     Encounter enc = encs.next();
+                    lastPercent = enc.percent;
                     if(settings.isNormaliseEncounterRates() && enc.percent > 0)
                     {
                         rom[offset++] = (byte) enc.percent;
@@ -1171,6 +1230,7 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
             }
         }
         if (settings.isUseTimeBasedEncounters()) {
+            System.out.println("Set Fish Percent Time");
             for (int k = 0; k < Gen2Constants.timeSpecificFishingGroupCount; k++) {
                 EncounterSet es = areas.next();
                 Iterator<Encounter> encs = es.encounters.iterator();
@@ -3243,6 +3303,154 @@ public class Gen2RomHandler extends AbstractGBCRomHandler {
         }
         return items;
     }
+
+    private ArrayList<Integer> HandleRates(Settings settings, long encounterSize,
+                                           boolean isAccumulator, boolean usesPercent)
+    {
+        ArrayList<Integer> results = new ArrayList<Integer>();
+
+        var ratioData = settings.GetRatioData();
+        var useRatio = ratioData.get((int)encounterSize);
+
+        var totalParts = 0;
+        for(var ratio : useRatio)
+        {
+            totalParts += ratio;
+        }
+
+        int percentElement = 0;
+        int remainder = 0;
+        if(usesPercent)
+        {
+            double percentValue = (255.0 / totalParts);
+            percentElement = (int)Math.floor(percentValue);
+            remainder = 255 % percentElement;
+        }
+        else {
+            double percentValue = (100.0 / totalParts);
+            percentElement = (int)Math.floor(percentValue);
+            remainder = 100 % percentElement;
+        }
+
+        var accumulator = 0;
+        for(int i =0; i<encounterSize; i++)
+        {
+            var parts = useRatio.get(i);
+            if(isAccumulator)
+            {
+                accumulator += percentElement * parts;
+            }
+            else {
+                accumulator = percentElement * parts;
+            }
+
+            if(encounterSize -1  == i)
+            {
+                if(remainder != 0)
+                {
+                    if(usesPercent)
+                    {
+                        accumulator += remainder;
+                    }
+                    else {
+                        accumulator += remainder;
+                    }
+                }
+            }
+
+            results.add(accumulator);
+        }
+
+        return results;
+    }
+
+    public ArrayList<Integer> getGrassEncounterRates()
+    {
+        var grassEncounterRates = new ArrayList<Integer>();
+        var wildOffset = romEntry.getValue("WildProbabilities");
+        for(int i=0; i< Gen2Constants.landEncounterSlots; i++)
+        {
+            var probability = rom[wildOffset];
+            grassEncounterRates.add(probability & 0xFF);
+            wildOffset+=2;
+        }
+
+        return grassEncounterRates;
+    }
+
+    public ArrayList<Integer> getSeaEncounterRates()
+    {
+        var grassEncounterRates = new ArrayList<Integer>();
+        var wildOffset = romEntry.getValue("WaterProbabilities");
+        for(int i=0; i< Gen2Constants.seaEncounterSlots; i++)
+        {
+            var probability = rom[wildOffset++];
+            grassEncounterRates.add(probability & 0xFF);
+            wildOffset++;
+        }
+
+        return grassEncounterRates;
+    }
+
+    @Override
+    public void normaliseEncounterRates(Settings settings, List<EncounterSet> currentEncounters)
+    {
+        for( EncounterSet area : currentEncounters)
+        {
+            var encounters = area.encounters.stream().filter(x -> x.percent > 0);
+            var encounterSize = encounters.count();
+            if(encounterSize == 0)
+            {
+                continue;
+            }
+
+            // Fishing uses accumulator and when true is always percent as well
+            var probabilities = HandleRates(settings, encounterSize, area.isAccumulator, area.isPercent);
+            for(int i=0; i<encounterSize; i++)
+            {
+                var probability = probabilities.get(i);
+                var encounter = area.encounters.get(i);
+
+                encounter.percent = probability;
+            }
+        }
+
+        // Standard wild encounter rates are not defined with the encounter
+        var wildOffset = romEntry.getValue("WildProbabilities");
+        var probabilities = HandleRates(settings, Gen2Constants.landEncounterSlots, true, false);
+        for(int i=0; i< Gen2Constants.landEncounterSlots; i++)
+        {
+            var probability = probabilities.get(i);
+            rom[wildOffset++] = (byte) (int)probability;
+            wildOffset++;
+        }
+
+        try {
+            wildOffset = romEntry.getValue("BetterWildProbabilities");
+            probabilities = HandleRates(settings, Gen2Constants.landEncounterSlots, true, false);
+            for(int i=0; i< Gen2Constants.landEncounterSlots; i++)
+            {
+                var probability = probabilities.get(i);
+                rom[wildOffset++] = (byte) (int)probability;
+                wildOffset++;
+            }
+        }
+        catch(Exception e)
+        {
+
+        }
+
+        wildOffset = romEntry.getValue("WaterProbabilities");
+        probabilities = HandleRates(settings, Gen2Constants.seaEncounterSlots, true, false);
+        for(int i=0; i< Gen2Constants.seaEncounterSlots; i++)
+        {
+            var probability = probabilities.get(i);
+            rom[wildOffset++] = (byte) (int)probability;
+            wildOffset++;
+        }
+    }
+
+
 
 
 }

@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 public class EncounterSet {
 
     public int rate;
@@ -37,6 +38,9 @@ public class EncounterSet {
     public String displayName;
     public int offset;
     public boolean reasonable = true;
+    public boolean isAccumulator = false;
+    public boolean isPercent = false;
+    public EncounterSetType encounterType;
 
     public String toString() {
         return "Encounter [Rate = " + rate + ", Encounters = " + encounters + "]";

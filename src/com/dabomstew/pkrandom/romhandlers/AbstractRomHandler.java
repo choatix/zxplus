@@ -28,6 +28,7 @@ package com.dabomstew.pkrandom.romhandlers;
 /*--  along with this program. If not, see <http://www.gnu.org/licenses/>.  --*/
 /*----------------------------------------------------------------------------*/
 
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ public abstract class AbstractRomHandler implements RomHandler {
     boolean isORAS = false;
     boolean isSM = false;
     int perfectAccuracy = 100;
+    HashMap<Integer,ArrayList<Integer>> ratioData = null;
 
     /* Constructor */
 
@@ -1030,28 +1032,36 @@ public abstract class AbstractRomHandler implements RomHandler {
             }
         }
 
-        // For now, this only affects the rates of standard encounters
-        if( settings.isNormaliseEncounterRates())
+        if(settings.isNormaliseEncounterRates())
         {
-            for( EncounterSet area : currentEncounters)
-            {
-                var encounters = area.encounters.stream().filter(x -> x.percent > 0);
-                var encounterSize = encounters.count();
-                if(encounterSize == 0)
-                {
-                    continue;
-                }
-
-                int percent = (int)(100 / encounterSize);
-                for(var encounter : area.encounters)
-                {
-                    encounter.percent = percent;
-                }
+            try {
+                ratioData =  this.ReadRatiosFile();
+                settings.SetRatioData(ratioData);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
             }
 
+            this.normaliseEncounterRates(settings,currentEncounters);
         }
 
         setEncounters(settings, currentEncounters);
+    }
+
+    public void normaliseEncounterRates(Settings settings, List<EncounterSet> currentEncounters)
+    {
+        return;
+    }
+
+    @Override
+    public ArrayList<Integer> getGrassEncounterRates()
+    {
+        return null;
+    }
+
+    @Override
+    public ArrayList<Integer> getSeaEncounterRates()
+    {
+        return null;
     }
 
     @Override
@@ -8100,6 +8110,48 @@ public abstract class AbstractRomHandler implements RomHandler {
     public boolean canCondenseEncounterSlots() {
         // default: no
         return false;
+    }
+
+    public HashMap<Integer, ArrayList<Integer>> ReadRatiosFile() throws FileNotFoundException {
+        Scanner sc = new Scanner(FileFunctions.openConfig(SysConstants.ratiosFile), "UTF-8");
+        var map = new HashMap<Integer, ArrayList<Integer>>();
+        while (sc.hasNextLine()) {
+            String keyValue = sc.nextLine().trim();
+            if (keyValue.isEmpty()) {
+                continue;
+            }
+            if (keyValue.startsWith("\uFEFF")) {
+                keyValue = keyValue.substring(1);
+            }
+
+            var keyAndValue = keyValue.split("=");
+            if(keyAndValue.length !=2)
+            {
+                continue;
+            }
+
+            var arraySize = Integer.parseInt(keyAndValue[0]);
+            var ratio = keyAndValue[1];
+
+
+            var ratioSet = ratio.split(":");
+            if(ratioSet.length != arraySize)
+            {
+                continue;
+            }
+
+            var ratioList = new ArrayList<Integer>();
+            for(var ratioValueStr : ratioSet)
+            {
+                int ratioValue = Integer.parseInt(ratioValueStr);
+                ratioList.add(ratioValue);
+            }
+
+            map.put(arraySize, ratioList);
+
+        }
+        sc.close();
+        return map;
     }
 
         private boolean isGoodCatchable(Pokemon pk) {

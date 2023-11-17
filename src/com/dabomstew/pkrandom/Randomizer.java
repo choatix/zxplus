@@ -1131,6 +1131,23 @@ public class Randomizer {
         log.println();
     }
 
+    private int[] GetPercentageToDisplay(int value, boolean isAccumulator, boolean isPercent, int previousAccumulator)
+    {
+        if(isAccumulator)
+        {
+            value = value - previousAccumulator;
+        }
+
+        var displayValue = value;
+
+        if(isPercent)
+        {
+            displayValue = value *100/255;
+        }
+
+        return new int[] {value, displayValue};
+    }
+
     private void logWildPokemonChanges(final PrintStream log) {
 
         log.println("--Wild Pokemon--");
@@ -1138,8 +1155,13 @@ public class Randomizer {
                 (settings.getWildPokemonMod() == Settings.WildPokemonMod.UNCHANGED && settings.isWildLevelsModified());
         boolean condenseSlots = settings.isCondenseEncounterSlots();
         List<EncounterSet> encounters = romHandler.getEncounters(useTimeBasedEncounters, condenseSlots);
+
+        var grassEncounterRates = romHandler.getGrassEncounterRates();
+        var seaEncounterRates = romHandler.getSeaEncounterRates();
+
         int idx = 0;
         for (EncounterSet es : encounters) {
+            int previousAccumulator = 0;
             idx++;
             log.print("Set #" + idx + " ");
             if (es.displayName != null) {
@@ -1147,6 +1169,7 @@ public class Randomizer {
             }
             log.print("(rate=" + es.rate + ")");
             log.println();
+            int index = 0;
             for (Encounter e : es.encounters) {
                 StringBuilder sb = new StringBuilder();
                 if (e.isSOS) {
@@ -1173,6 +1196,38 @@ public class Randomizer {
                 } else {
                     sb.append(e.level);
                 }
+
+                if(settings.isNormaliseEncounterRates())
+                {
+                    var displayPercentage = new int[] {0,0};
+                    if(e.percent > 0)
+                    {
+                        displayPercentage = GetPercentageToDisplay
+                                (e.percent,es.isAccumulator,es.isPercent,previousAccumulator);
+                    }
+                    else {
+                        if (es.encounterType == EncounterSetType.Grass && grassEncounterRates != null)
+                        {
+                            displayPercentage = GetPercentageToDisplay
+                                    (grassEncounterRates.get(index),es.isAccumulator,es.isPercent,previousAccumulator);
+                        }
+                        else if(es.encounterType == EncounterSetType.Sea && seaEncounterRates != null)
+                        {
+                            displayPercentage = GetPercentageToDisplay
+                                    (seaEncounterRates.get(index),es.isAccumulator,es.isPercent,previousAccumulator);
+                        }
+                    }
+
+                    if(displayPercentage[1] > 0)
+                    {
+                        sb.append(" (" + displayPercentage[1] + "%)" );
+                    }
+
+                    previousAccumulator += displayPercentage[0];
+
+                }
+
+
                 String whitespaceFormat = romHandler.generationOfPokemon() == 7 ? "%-31s" : "%-25s";
                 log.print(String.format(whitespaceFormat, sb));
                 StringBuilder sb2 = new StringBuilder();
@@ -1183,6 +1238,7 @@ public class Randomizer {
                 }
                 log.print(sb2);
                 log.println();
+                index++;
             }
             log.println();
         }

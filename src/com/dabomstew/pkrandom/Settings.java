@@ -32,7 +32,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.zip.CRC32;
 
@@ -320,7 +322,7 @@ public class Settings {
     private boolean guaranteeEvolutionItems;
     private boolean guaranteeXItems;
 
-    private boolean normaliseEncounterRates = true;
+    private boolean normaliseEncounterRates;
 
     public enum PickupItemsMod {
         UNCHANGED, RANDOM
@@ -328,6 +330,8 @@ public class Settings {
 
     private PickupItemsMod pickupItemsMod = PickupItemsMod.UNCHANGED;
     private boolean banBadRandomPickupItems;
+
+    private HashMap<Integer, ArrayList<Integer>> ratioData;
 
     // to and from strings etc
     public void write(FileOutputStream out) throws IOException {
@@ -2523,6 +2527,14 @@ public class Settings {
         }
     }
 
+    public void SetRatioData(HashMap<Integer, ArrayList<Integer>> ratioData)
+    {
+        this.ratioData = ratioData;
+    }
+    public HashMap<Integer, ArrayList<Integer>> GetRatioData()
+    {
+        return this.ratioData;
+    }
     public boolean isNormaliseEncounterRates()
     {
         return this.normaliseEncounterRates;

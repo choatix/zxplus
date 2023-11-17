@@ -44,6 +44,7 @@ public class SysConstants {
     public static final String tnamesFile = "trainernames.txt";
     public static final String tclassesFile = "trainerclasses.txt";
     public static final String nnamesFile = "nicknames.txt";
+    public static final String ratiosFile = "ratios.conf";
 
     private static String getRootPath() {
         try {

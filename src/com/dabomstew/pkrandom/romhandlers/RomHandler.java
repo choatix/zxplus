@@ -27,10 +27,7 @@ package com.dabomstew.pkrandom.romhandlers;
 
 import java.awt.image.BufferedImage;
 import java.io.PrintStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import com.dabomstew.pkrandom.MiscTweak;
 import com.dabomstew.pkrandom.Settings;
@@ -685,4 +682,8 @@ public interface RomHandler {
     List<Pokemon> getBannedFormesForPlayerPokemon();
 
     List<Pokemon> getBannedFormesForTrainerPokemon();
+
+    void normaliseEncounterRates(Settings settings, List<EncounterSet> currentEncounters);
+    ArrayList<Integer> getGrassEncounterRates();
+    ArrayList<Integer> getSeaEncounterRates();
 }
